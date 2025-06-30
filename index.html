@@ -187,8 +187,8 @@ button:hover {
 <script>
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=0&single=true&output=csv";
 
-let data = [];
-let filteredData = [];
+let rawData = [];
+let groupedData = [];
 let currentIndex = 0;
 
 function loadFilteredData() {
@@ -197,21 +197,45 @@ function loadFilteredData() {
   const enterprise = document.getElementById('enterpriseFilter').value.trim().toLowerCase();
   const qcUser = document.getElementById('qcUserFilter').value.trim().toLowerCase();
 
-  filteredData = data.filter(row => {
+  const filteredRaw = rawData.filter(row => {
     const rowDate = (row["date"] || '').trim();
     const rowEnterprise = (row["enterprise"] || '').trim().toLowerCase();
     const rowUser = (row["user"] || '').trim().toLowerCase();
     const status = (row["status"] || '').trim().toLowerCase();
 
     return (
-      status === '' && // ✅ Only include rows where status is blank
+      status === '' &&
       (!date || rowDate === date) &&
       (!enterprise || rowEnterprise === enterprise) &&
       (!qcUser || rowUser === qcUser)
     );
   });
 
-  if (filteredData.length > 0) {
+  const map = new Map();
+  for (const row of filteredRaw) {
+    const imageId = row["t1.image_id"];
+    if (!imageId) continue;
+
+    if (!map.has(imageId)) {
+      map.set(imageId, {
+        ...row,
+        users: new Set([row["user"]]),
+        issues: new Set([row["issue"]])
+      });
+    } else {
+      const existing = map.get(imageId);
+      existing.users.add(row["user"]);
+      existing.issues.add(row["issue"]);
+    }
+  }
+
+  groupedData = Array.from(map.values()).map(item => ({
+    ...item,
+    user: Array.from(item.users).filter(Boolean).join(", "),
+    issue: Array.from(item.issues).filter(Boolean).join(", ")
+  }));
+
+  if (groupedData.length > 0) {
     currentIndex = 0;
     showReview();
     document.getElementById("login-section").style.display = "none";
@@ -222,7 +246,7 @@ function loadFilteredData() {
 }
 
 function showReview() {
-  const row = filteredData[currentIndex];
+  const row = groupedData[currentIndex];
   document.getElementById('userName').textContent = row["user"];
   document.getElementById('issue').textContent = row["issue"];
   document.getElementById('enterprise').textContent = row["enterprise"];
@@ -236,7 +260,7 @@ function showReview() {
 }
 
 function submitAndNext() {
-  const row = filteredData[currentIndex];
+  const row = groupedData[currentIndex];
   const loginUser = document.getElementById('loginID').value || "";
   let comment = document.getElementById('qcComment').value.trim();
   if (!comment) comment = "Done";
@@ -257,7 +281,7 @@ function submitAndNext() {
 
   fetch(`${url}?${params.toString()}`, { method: 'POST', mode: 'no-cors' });
 
-  if (currentIndex < filteredData.length - 1) {
+  if (currentIndex < groupedData.length - 1) {
     currentIndex++;
     showReview();
   } else {
@@ -277,7 +301,6 @@ function exitToLogin() {
   document.getElementById("login-section").style.display = "block";
 }
 
-// Keyboard Shortcuts
 document.addEventListener('keydown', function(event) {
   if (document.getElementById("review-section").style.display !== "none") {
     if (event.key === "Enter") {
@@ -322,14 +345,14 @@ window.onload = () => {
     skipEmptyLines: true,
     complete: function(results) {
       const raw = results.data;
-      data = raw.map(row => {
+      rawData = raw.map(row => {
         const normalized = {};
         for (let key in row) {
           normalized[key.trim().toLowerCase()] = row[key];
         }
         return normalized;
       });
-      populateDropdowns(data);
+      populateDropdowns(rawData);
     }
   });
 };
