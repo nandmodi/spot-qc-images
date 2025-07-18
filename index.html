@@ -29,6 +29,7 @@ body {
   background: var(--bg);
   color: var(--text);
   line-height: 1.5;
+  position: relative; /* Added for button positioning */
 }
 .container {
   width: 100%; /* Make container take full width */
@@ -39,6 +40,7 @@ body {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
   box-sizing: border-box;
+  position: relative; /* Added for button positioning */
 }
 h2 {
   color: var(--text);
@@ -252,6 +254,29 @@ button:disabled {
   display: none;
   width: 100%; /* Allow the section to take full width */
 }
+
+/* ADDED MEET REVIEW BUTTON STYLES */
+.meet-review-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  box-shadow: var(--shadow);
+  z-index: 10;
+}
+.meet-review-btn:hover {
+  background-color: #218838;
+  transform: translateY(-1px);
+}
+
 @media screen and (max-width: 768px) {
   .top-bar div {
     flex: 1 1 100%;
@@ -266,11 +291,26 @@ button:disabled {
     flex-direction: column;
     gap: 10px;
   }
+  
+  /* Mobile adjustment for Meet Review button */
+  .meet-review-btn {
+    position: relative;
+    top: auto;
+    right: auto;
+    margin: 10px auto;
+    width: 90%;
+    display: block;
+  }
 }
   </style>
 </head>
 <body>
   <div class="container" id="login-section">
+    <!-- ADDED MEET REVIEW BUTTON -->
+    <button class="meet-review-btn" onclick="window.location.href='https://nandmodi.github.io/spot-qc-images/meet-review'">
+      Meet Review
+    </button>
+    
     <h2>QC Review Login</h2>
     
     <div class="source-toggle">
