@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QC Review Dashboard</title>
+    <link rel="icon" href="https://spyne-prod-ai.s3.us-east-1.amazonaws.com/ai-dataset/2025/logo/unnamed.png" type="image/x-icon"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f4f7fa;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        .header {
+            background-color: #ffffff;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h2 {
+            margin: 0;
+            font-size: 1.8em;
+            color: #333;
+            font-weight: 600;
+            cursor: pointer; /* Makes the title look clickable */
+        }
+
+        .filters {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .filters label {
+            font-size: 1.1em;
+            color: #555;
+        }
+
+        .filters select, .filters input {
+            padding: 8px;
+            font-size: 1em;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .filter-btn {
+            background-color: #f44336;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        .section {
+            margin: 20px 0;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .details {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* Four columns */
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .details .box {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .details .box:hover {
+            background-color: #e3f2fd;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .image-section div {
+            text-align: center;
+            width: 32%; /* Adjust to fit 3 images in the row */
+            margin: 0 10px;
+        }
+
+        .image-section img {
+            width: 100%; /* Full width */
+            height: auto; /* Maintain aspect ratio */
+            border: 2px solid #ddd; /* 2px border */
+            margin-bottom: 10px;
+            border-radius: 6px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px; /* Space between buttons */
+            margin-top: 30px;
+        }
+
+        .button {
+            background-color: #007BFF;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 1.1em;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+        .button:focus {
+            outline: none;
+        }
+
+        /* Responsive Design */
+        @media screen and (max-width: 768px) {
+            .details {
+                grid-template-columns: repeat(2, 1fr); /* 2 columns on smaller screens */
+            }
+
+            .image-section {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .image-section div {
+                width: 90%;
+                margin: 10px 0;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <a href="https://nandmodi.github.io/spot-qc-images/" target="_self">
+        <h2>QC Review Dashboard</h2>
+    </a>
+    <div class="filters">
+        <label for="dateFilter">Date:</label>
+        <input type="date" id="dateFilter">
+
+        <label for="enterpriseFilter">Enterprise:</label>
+        <select id="enterpriseFilter">
+            <option value="">All</option>
+            <!-- Options will be populated dynamically -->
+        </select>
+
+        <label for="qcUserFilter">QC User:</label>
+        <select id="qcUserFilter">
+            <option value="">All</option>
+            <!-- Options will be populated dynamically -->
+        </select>
+
+        <label for="editingUserFilter">Editing User:</label>
+        <select id="editingUserFilter">
+            <option value="">All</option>
+            <!-- Options will be populated dynamically -->
+        </select>
+
+        <button class="filter-btn" id="resetButton">Reset</button>
+    </div>
+</div>
+
+<div id="contentSection"></div>
+<div class="button-container">
+    <button class="button" id="previousButton" style="display:none;">Previous</button>
+    <button class="button" id="nextButton">Next</button>
+</div>
+
+<script>
+    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=1880564018&single=true&output=csv';
+    
+    let data;
+    let currentIndex = 0;
+    let filteredData = [];
+
+    // Fetch and process CSV data
+    fetch(csvUrl)
+        .then(response => response.text())
+        .then(csv => {
+            data = Papa.parse(csv, { header: true, skipEmptyLines: true }).data;
+            filteredData = data.filter(row => row['Comment'] !== 'Done');
+            populateFilters(filteredData);
+            displaySection(filteredData, currentIndex);
+        });
+
+    function displaySection(filteredData, index) {
+        const contentSection = document.getElementById('contentSection');
+        contentSection.innerHTML = ''; // Clear previous content
+
+        if (filteredData.length === 0) {
+            contentSection.innerHTML = "<p>No records found matching the filters.</p>";
+            return;
+        }
+
+        const row = filteredData[index];
+        const sectionDiv = document.createElement('div');
+        sectionDiv.classList.add('section');
+
+        // Details Section - Presented in 2 rows, 4 columns
+        sectionDiv.innerHTML = `
+            <div class="details">
+                <!-- Row 1 -->
+                <div class="box"><strong>Date:</strong> ${row['Timestamp'].split(' ')[0]}</div>
+                <div class="box"><strong>Enterprise:</strong> ${row['Enterprise']}</div>
+                <div class="box"><strong>QC User:</strong> ${row['qc-user']}</div>
+                <div class="box"><strong>Editing User:</strong> ${row['editing user']}</div>
+
+                <!-- Row 2 -->
+                <div class="box"><strong>Sku ID:</strong> ${row['sku_id']}</div>
+                <div class="box"><strong>Image ID:</strong> ${row['image_id']}</div>
+                <div class="box"><strong>Issue:</strong> ${row['Issue']}</div>
+                <div class="box"><strong>Comment:</strong> ${row['Comment']}</div>
+            </div>
+
+            <div class="image-section">
+                <div><img src="${row['input image']}" alt="Input Image"><p>Input Image</p></div>
+                <div><img src="${row['Ai image']}" alt="AI Image"><p>AI Image</p></div>
+                <div><img src="${row['Final Image']}" alt="Final Image"><p>Final Image</p></div>
+            </div>
+        `;
+
+        contentSection.appendChild(sectionDiv);
+
+        // Handle Next and Previous button visibility
+        document.getElementById('previousButton').style.display = index > 0 ? 'block' : 'none';
+        document.getElementById('nextButton').style.display = index < filteredData.length - 1 ? 'block' : 'none';
+    }
+
+    function populateFilters(data) {
+        const uniqueValues = {
+            enterprise: [...new Set(data.map(row => row['Enterprise']))],
+            qcUser: [...new Set(data.flatMap(row => row['qc-user'].split(',')))],
+            editingUser: [...new Set(data.map(row => row['editing user']))],
+        };
+
+        const enterpriseSelect = document.getElementById('enterpriseFilter');
+        uniqueValues.enterprise.forEach(value => {
+            const option = document.createElement('option');
+            option.value = value;
+            option.text = value;
+            enterpriseSelect.appendChild(option);
+        });
+
+        const qcUserSelect = document.getElementById('qcUserFilter');
+        uniqueValues.qcUser.forEach(value => {
+            const option = document.createElement('option');
+            option.value = value.trim();
+            option.text = value.trim();
+            qcUserSelect.appendChild(option);
+        });
+
+        const editingUserSelect = document.getElementById('editingUserFilter');
+        uniqueValues.editingUser.forEach(value => {
+            const option = document.createElement('option');
+            option.value = value;
+            option.text = value;
+            editingUserSelect.appendChild(option);
+        });
+
+        enterpriseSelect.addEventListener('change', filterData);
+        qcUserSelect.addEventListener('change', filterData);
+        editingUserSelect.addEventListener('change', filterData);
+    }
+
+    function filterData() {
+        const dateFilter = document.getElementById('dateFilter').value;
+        const enterpriseFilter = document.getElementById('enterpriseFilter').value;
+        const qcUserFilter = document.getElementById('qcUserFilter').value;
+        const editingUserFilter = document.getElementById('editingUserFilter').value;
+
+        filteredData = data.filter(row => row['Comment'] !== 'Done');
+
+        // Format the Timestamp to YYYY-MM-DD format for comparison
+        if (dateFilter) {
+            filteredData = filteredData.filter(row => {
+                const timestampDate = row['Timestamp'].split(' ')[0]; // Extract only the date part (YYYY-MM-DD)
+                return timestampDate === dateFilter;
+            });
+        }
+
+        if (enterpriseFilter) {
+            filteredData = filteredData.filter(row => row['Enterprise'] === enterpriseFilter);
+        }
+        if (qcUserFilter) {
+            filteredData = filteredData.filter(row => row['qc-user'].includes(qcUserFilter));
+        }
+        if (editingUserFilter) {
+            filteredData = filteredData.filter(row => row['editing user'] === editingUserFilter);
+        }
+
+        displaySection(filteredData, currentIndex);
+    }
+
+    // Reset filters
+    document.getElementById('resetButton').addEventListener('click', () => {
+        document.getElementById('dateFilter').value = '';
+        document.getElementById('enterpriseFilter').value = '';
+        document.getElementById('qcUserFilter').value = '';
+        document.getElementById('editingUserFilter').value = '';
+        filteredData = data.filter(row => row['Comment'] !== 'Done');
+        displaySection(filteredData, currentIndex);
+    });
+
+    document.getElementById('nextButton').addEventListener('click', () => {
+        if (currentIndex < filteredData.length - 1) {
+            currentIndex++;
+            displaySection(filteredData, currentIndex);
+        }
+    });
+
+    document.getElementById('previousButton').addEventListener('click', () => {
+        if (currentIndex > 0) {
+            currentIndex--;
+            displaySection(filteredData, currentIndex);
+        }
+    });
+
+    // Keyboard Shortcuts for Next and Previous
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') { // Right Arrow for Next
+            document.getElementById('nextButton').click();
+        } else if (e.key === 'ArrowLeft') { // Left Arrow for Previous
+            document.getElementById('previousButton').click();
+        }
+    });
+</script>
+
+</body>
+</html>
