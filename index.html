@@ -6,309 +6,181 @@
   <link rel="icon" href="https://spyne-prod-ai.s3.us-east-1.amazonaws.com/ai-dataset/2025/logo/unnamed.png" type="image/x-icon"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
   <style>
-:root {
-  --primary: #007BFF;
-  --primary-dark: #0056b3;
-  --primary-light: #e6f2ff;
-  --bg: #f9fafb;
-  --text: #333;
-  --text-light: #666;
-  --card-bg: #ffffff;
-  --border: #e1e4e8;
-  --border-dark: #d1d5da;
-  --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  --shadow: 0 1px 3px rgba(0,0,0,0.1);
-  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-  --radius: 8px;
-  --radius-lg: 12px;
-}
-body {
-  font-family: var(--font);
-  margin: 0;
-  padding: 0;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.5;
-  position: relative;
-}
-.container {
-  width: 100%;
-  max-width: none;
-  margin: 2px auto;
-  background: var(--card-bg);
-  padding: 2px;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-  box-sizing: border-box;
-  position: relative;
-}
-h2 {
-  color: var(--text);
-  margin-bottom: 1px;
-  font-size: 1.75rem;
-  font-weight: 600;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 1px;
-}
-label {
-  font-weight: 600;
-  display: block;
-  margin-top: 15px;
-  margin-bottom: 8px;
-  font-size: 0.95rem;
-  color: var(--text);
-}
-select, input, textarea {
-  padding: 10px 12px;
-  width: 100%;
-  max-width: 300px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  font-size: 14px;
-  box-sizing: border-box;
-  font-family: var(--font);
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-select:focus, input:focus, textarea:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--primary-light);
-}
-textarea {
-  width: 100%;
-  height: 120px;
-  resize: vertical;
-  line-height: 1.5;
-  max-width: 100%;
-}
-button {
-  background-color: var(--primary);
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  font-size: 14px;
-  font-weight: 500;
-  border-radius: var(--radius);
-  cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
-  box-shadow: var(--shadow);
-}
-button:hover {
-  background-color: var(--primary-dark);
-  transform: translateY(-1px);
-}
-button:active {
-  transform: translateY(0);
-}
-button:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-  transform: none;
-}
-.filters, .form-section {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  align-items: flex-start;
-}
-.top-bar {
-  background: var(--primary-light);
-  padding: 1px 1px;
-  border-radius: var(--radius);
-  margin-bottom: 2px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  width: 100%;
-}
-.top-bar div {
-  min-width: 150px;
-  flex: 1 1 200px;
-  word-wrap: break-word;
-  font-size: 0.95rem;
-}
-.top-bar strong {
-  color: var(--primary-dark);
-  font-weight: 600;
-  display: block;
-  margin-bottom: 3px;
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-.top-bar span {
-  color: var(--text);
-  font-weight: 500;
-}
-.images {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2px;
-  margin: 2px 0;
-  width: 100%;
-}
-.images img {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: contain;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  background: #f8f9fa;
-  box-shadow: var(--shadow);
-  transition: transform 0.2s;
-}
-.images img:hover {
-  transform: scale(1.02);
-}
-.image-label {
-  display: block;
-  text-align: center;
-  margin-top: 8px;
-  font-size: 0.9rem;
-  color: var(--text-light);
-  font-weight: 500;
-}
-.form-section {
-  flex-direction: column;
-  gap: 1px;
-  margin-top: 1px;
-  width: 100%;
-}
-.nav-buttons {
-  display: flex;
-  gap: 15px;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  margin-top: 2px;
-  width: 100%;
-}
-.nav-buttons button {
-  min-width: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-.source-toggle {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 25px;
-  background: var(--primary-light);
-  padding: 15px;
-  border-radius: var(--radius);
-}
-.source-toggle label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  font-weight: 500;
-  margin-top: 0;
-  color: var(--text);
-}
-.source-toggle input {
-  width: auto;
-  max-width: none;
-  margin: 0;
-}
-.loading {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 3px solid rgba(0,0,0,.1);
-  border-radius: 50%;
-  border-top-color: var(--primary);
-  animation: spin 1s ease-in-out infinite;
-  margin-left: 10px;
-}
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-.status-message {
-  margin-top: 15px;
-  padding: 12px 15px;
-  border-radius: var(--radius);
-  font-size: 0.95rem;
-}
-.error {
-  background-color: #ffebee;
-  color: #c62828;
-  border-left: 4px solid #c62828;
-}
-.success {
-  background-color: #e8f5e9;
-  color: #2e7d32;
-  border-left: 4px solid #2e7d32;
-}
-.image-container {
-  display: flex;
-  flex-direction: column;
-}
-.progress-indicator {
-  margin: 15px 0;
-  font-size: 0.9rem;
-  color: var(--text-light);
-  font-weight: 500;
-}
-#review-section {
-  display: none;
-  width: 100%;
-}
+    :root {
+      --primary: #007BFF;
+      --primary-dark: #0056b3;
+      --primary-light: #e6f2ff;
+      --bg: #f9fafb;
+      --text: #333;
+      --text-light: #666;
+      --card-bg: #ffffff;
+      --border: #e1e4e8;
+      --border-dark: #d1d5da;
+      --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      --shadow: 0 1px 3px rgba(0,0,0,0.1);
+      --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+      --radius: 8px;
+      --radius-lg: 12px;
+    }
+    body {
+      font-family: var(--font);
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .container {
+      width: 100%;
+      max-width: none;
+      margin: 2px auto;
+      background: var(--card-bg);
+      padding: 15px;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      box-sizing: border-box;
+      position: relative;
+    }
+    h2 {
+      color: var(--text);
+      margin-bottom: 15px;
+      font-size: 1.5rem;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+    label {
+      font-weight: 600;
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+    select, input, textarea {
+      padding: 10px 12px;
+      width: 100%;
+      max-width: 300px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 14px;
+      box-sizing: border-box;
+      font-family: var(--font);
+      transition: border-color 0.2s;
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      resize: vertical;
+      max-width: 100%;
+    }
+    button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover { background-color: var(--primary-dark); }
+    button:disabled { background-color: #ccc; cursor: not-allowed; }
 
-/* ADDED MEET REVIEW BUTTON STYLES */
-.meet-review-btn {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background-color: #28a745;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  font-size: 14px;
-  font-weight: 500;
-  border-radius: var(--radius);
-  cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
-  box-shadow: var(--shadow);
-  z-index: 10;
-}
-.meet-review-btn:hover {
-  background-color: #218838;
-  transform: translateY(-1px);
-}
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+      align-items: end;
+    }
+    .filters div { width: 100%; }
+    .filters select { max-width: 100%; }
 
-@media screen and (max-width: 768px) {
-  .top-bar div {
-    flex: 1 1 100%;
-  }
-  .nav-buttons button {
-    flex: 1 1 100%;
-  }
-  .images {
-    grid-template-columns: 1fr;
-  }
-  .source-toggle {
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .meet-review-btn {
-    position: relative;
-    top: auto;
-    right: auto;
-    margin: 10px auto;
-    width: 90%;
-    display: block;
-  }
-}
+    .top-bar {
+      background: var(--primary-light);
+      padding: 15px;
+      border-radius: var(--radius);
+      margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    .top-bar div { flex: 1 1 150px; }
+    .top-bar strong {
+      display: block;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--primary-dark);
+      margin-bottom: 4px;
+    }
 
-/* Added for QC-Pass image visibility */
-.qc-pass .image-container:nth-child(3) {
-  display: none;
-}
+    .images {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .images img {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: contain;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: #fdfdfd;
+    }
+    .image-label {
+      display: block;
+      text-align: center;
+      margin-top: 8px;
+      font-weight: 600;
+      color: var(--text-light);
+    }
+
+    .source-toggle {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+      background: #f0f4f8;
+      padding: 12px;
+      border-radius: var(--radius);
+    }
+    .source-toggle label { margin: 0; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .source-toggle input { width: auto; }
+
+    .loading {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #ccc;
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .status-message {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: var(--radius);
+    }
+    .error { background: #fee2e2; color: #991b1b; }
+    .success { background: #dcfce7; color: #166534; }
+
+    .meet-review-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background-color: #10b981;
+    }
+
+    /* Hide 3rd image for QC-Pass */
+    .qc-pass .image-container:nth-child(3) { display: none; }
   </style>
 </head>
 <body>
+
   <div class="container" id="login-section">
     <button class="meet-review-btn" onclick="window.location.href='https://nandmodi.github.io/spot-qc-images/meet-review'">
       Meet Review
@@ -317,28 +189,25 @@ button:disabled {
     <h2>QC Review Login</h2>
     
     <div class="source-toggle">
-      <label>
-        <input type="radio" name="dataSource" value="qc" checked> QC-Pass
-      </label>
-      <label>
-        <input type="radio" name="dataSource" value="edited"> Re-Edit
-      </label>
-      <label>
-        <input type="radio" name="dataSource" value="qc_tool"> QC-Tool
-      </label>
+      <label><input type="radio" name="dataSource" value="qc" checked> QC-Pass</label>
+      <label><input type="radio" name="dataSource" value="edited"> Re-Edit</label>
+      <label><input type="radio" name="dataSource" value="qc_tool"> QC-Tool</label>
     </div>
     
-    <label for="loginID">Login ID</label>
-    <select id="loginID">
-      <option value="">Select Login ID</option>
-      <option>Nand Kishor</option>
-      <option>Ranbir Manoranjan</option>
-      <option>Nitin kumar</option>
-      <option>Praveen Agarwal</option>
-      <option>Raj Tripatrhi</option>
-      <option>Rohit Chahuhan</option>
-      <option>Ajay Devrani</option>
-    </select>
+    <div style="max-width: 400px; margin-bottom: 20px;">
+        <label for="loginID">Login User (Reviewer)</label>
+        <select id="loginID">
+          <option value="">Select Your Name</option>
+          <option>Nand Kishor</option>
+          <option>Ranbir Manoranjan</option>
+          <option>Nitin kumar</option>
+          <option>Praveen Agarwal</option>
+          <option>Raj Tripatrhi</option>
+          <option>Rohit Chahuhan</option>
+          <option>Ajay Devrani</option>
+        </select>
+    </div>
+
     <div class="filters">
       <div>
         <label>Date</label>
@@ -349,8 +218,12 @@ button:disabled {
         <select id="enterpriseFilter"><option value="">ALL</option></select>
       </div>
       <div>
-        <label>QC User</label>
-        <select id="qcUserFilter"><option value="">ALL</option></select>
+        <label>First QC</label>
+        <select id="firstQCFilter"><option value="">ALL</option></select>
+      </div>
+      <div>
+        <label>Last QC</label>
+        <select id="lastQCFilter"><option value="">ALL</option></select>
       </div>
       <div id="editingUserFilterContainer" style="display: none;">
         <label>Editing User</label>
@@ -361,53 +234,51 @@ button:disabled {
         <select id="issueFilter"><option value="">ALL</option></select>
       </div>
     </div>
-    <button id="startButton">Start QC</button>
-    <div id="loadingIndicator" style="display: none;"><span class="loading"></span> Loading data...</div>
+
+    <button id="startButton">Start QC Review</button>
+    <div id="loadingIndicator" style="display: none; margin-top: 15px;"><span class="loading"></span> Fetching records...</div>
     <div id="statusMessage" class="status-message" style="display: none;"></div>
   </div>
 
   <div class="container" id="review-section" style="display:none">
-    <h2>Review Details</h2>
+    <h2>Reviewing Image</h2>
     
     <div class="top-bar">
-      <div><strong>Enterprise</strong> <span id="enterprise"></span></div>
-      <div id="qcUsersContainer"><strong>QC Users</strong> <span id="qcUsers"></span></div>
-      <div id="userContainer"><strong>User</strong> <span id="user"></span></div>
-      <div id="editingUserContainer"><strong>Editing User</strong> <span id="editingUser"></span></div>
-      <div id="issueContainer"><strong>Issue</strong> <span id="issue"></span></div>
-      <div><strong>SKU ID</strong> <span id="sku"></span></div>
-      <div><strong>Image ID</strong> <span id="imageID"></span></div>
+      <div><strong>Enterprise</strong> <span id="disp_enterprise"></span></div>
+      <div><strong>SKU ID</strong> <span id="disp_sku"></span></div>
+      <div><strong>Image ID</strong> <span id="disp_imageID"></span></div>
+      <div id="disp_qcBox"><strong>QC Users</strong> <span id="disp_qcUsers"></span></div>
+      <div id="disp_editBox"><strong>Editor</strong> <span id="disp_editingUser"></span></div>
+      <div id="disp_issueBox"><strong>Existing Issues</strong> <span id="disp_issue"></span></div>
     </div>
     
-    <div class="progress-indicator">
-      Reviewing <span id="currentIndexDisplay">1</span> of <span id="totalCountDisplay">0</span>
+    <div style="font-weight: 600; margin-bottom: 10px; color: var(--text-light);">
+      Record <span id="currentIndexDisplay">1</span> of <span id="totalCountDisplay">0</span>
     </div>
     
     <div class="images" id="imagesContainer">
       <div class="image-container">
-        <img id="left" src="" alt="Input Image">
+        <img id="img_left" src="" alt="Input">
         <span class="image-label">Input Image</span>
       </div>
       <div class="image-container">
-        <img id="middle" src="" alt="AI Image">
-        <span class="image-label">AI Image</span>
+        <img id="img_middle" src="" alt="AI">
+        <span class="image-label">AI Output</span>
       </div>
       <div class="image-container">
-        <img id="right" src="" alt="Final Image">
-        <span class="image-label">Final Image</span>
+        <img id="img_right" src="" alt="Manual">
+        <span class="image-label">Manual Final</span>
       </div>
     </div>
     
-    <div class="form-section">
-      <div>
-        <label for="qcComment">QC Comment</label>
-        <textarea id="qcComment" placeholder="Enter your detailed comments here..."></textarea>
-      </div>
+    <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px;">
+      <label for="qcComment">Review Comment</label>
+      <textarea id="qcComment" placeholder="Enter feedback here..."></textarea>
       
-      <div class="nav-buttons">
-        <button id="prevButton">← Previous</button>
-        <button id="nextButton">Next →</button>
-        <button id="exitButton">Exit</button>
+      <div style="display: flex; gap: 10px; margin-top: 15px;">
+        <button id="prevButton" style="background: #6c757d;">Previous</button>
+        <button id="nextButton">Submit & Next</button>
+        <button id="exitButton" style="background: #dc3545; margin-left: auto;">Exit</button>
       </div>
     </div>
   </div>
@@ -416,17 +287,16 @@ button:disabled {
 const QC_PASS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=1717039169&single=true&output=csv";
 const RE_EDIT_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=320301246&single=true&output=csv";
 
-// Field mapping configuration
 const FIELD_MAPPING = {
   qc: {
     'enterprise': 'enterprise_name',
-    't1.image_id': 'ai.image_id',
-    't1.sku_id': 'sku_id',
+    'image_id': 'ai.image_id',
+    'sku_id': 'sku_id',
     'left_path': 'input_image_hres_url',
     'middle_path': 'output_image_hres_url',
     'right_path': 'manual_image_hres_url',
     'user': 'qc_user_name',
-    'first_qc_user': '',
+    'first_qc_user': '', 
     'last_qc_user': '',
     'last_editor_user': '',
     'issue': '',
@@ -435,8 +305,8 @@ const FIELD_MAPPING = {
   },
   edited: {
     'enterprise': 'enterprise_name',
-    't1.image_id': 'ai.image_id',
-    't1.sku_id': 'sku_id',
+    'image_id': 'ai.image_id',
+    'sku_id': 'sku_id',
     'left_path': 'input_image_hres_url',
     'middle_path': 'ai_output',
     'right_path': 'final_output',
@@ -451,8 +321,8 @@ const FIELD_MAPPING = {
   },
   qc_tool: {
     'enterprise': 'enterprise_name',
-    't1.image_id': 'ai.image_id',
-    't1.sku_id': 'sku_id',
+    'image_id': 'ai.image_id',
+    'sku_id': 'sku_id',
     'left_path': 'input_image_hres_url',
     'middle_path': 'ai_output',
     'right_path': 'final_output',
@@ -471,23 +341,9 @@ let rawData = [];
 let groupedData = [];
 let currentIndex = 0;
 
-// DOM elements
-const startButton = document.getElementById('startButton');
-const prevButton = document.getElementById('prevButton');
-const nextButton = document.getElementById('nextButton');
-const exitButton = document.getElementById('exitButton');
-const imagesContainer = document.getElementById('imagesContainer');
-
 function showLoading(show) {
-  const button = document.getElementById('startButton');
-  const loading = document.getElementById('loadingIndicator');
-  if (show) {
-    button.disabled = true;
-    loading.style.display = 'block';
-  } else {
-    button.disabled = false;
-    loading.style.display = 'none';
-  }
+  document.getElementById('startButton').disabled = show;
+  document.getElementById('loadingIndicator').style.display = show ? 'block' : 'none';
 }
 
 function showStatus(message, isError = false) {
@@ -495,194 +351,111 @@ function showStatus(message, isError = false) {
   statusElement.textContent = message;
   statusElement.className = isError ? 'status-message error' : 'status-message success';
   statusElement.style.display = 'block';
-  
-  if (!isError) {
-    setTimeout(() => {
-      statusElement.style.display = 'none';
-    }, 3000);
-  }
 }
 
 function getDataSource() {
-  const selected = document.querySelector('input[name="dataSource"]:checked');
-  return selected ? selected.value : 'qc';
+  return document.querySelector('input[name="dataSource"]:checked').value;
 }
 
-function getDataSourceUrl() {
-  return getDataSource() === 'qc' ? QC_PASS_URL : RE_EDIT_URL;
-}
-
-function toggleAdditionalFilters() {
-  const sourceType = getDataSource();
-  const editingUserContainer = document.getElementById('editingUserFilterContainer');
-  const issueContainer = document.getElementById('issueFilterContainer');
-  
-  if (sourceType === 'edited' || sourceType === 'qc_tool') {
-    editingUserContainer.style.display = 'block';
-    issueContainer.style.display = 'block';
-  } else {
-    editingUserContainer.style.display = 'none';
-    issueContainer.style.display = 'none';
-  }
-}
-
-function normalizeData(rawData, sourceType) {
+function normalizeData(data, sourceType) {
   const mapping = FIELD_MAPPING[sourceType];
-  return rawData.map(row => {
-    const normalized = {};
-    
-    // Map all fields according to the configuration
-    for (const [targetField, sourceField] of Object.entries(mapping)) {
-      if (sourceField) {
-        normalized[targetField] = row[sourceField] || '';
-      } else {
-        // For fields without sourceField (like issue in QC-Pass), set to empty string
-        normalized[targetField] = '';
-      }
+  return data.map(row => {
+    const norm = {};
+    for (const [target, source] of Object.entries(mapping)) {
+      norm[target] = source ? (row[source] || '') : '';
     }
-    
-    // Ensure required fields exist
-    normalized['status'] = normalized['status'] || '';
-    
-    return normalized;
+    norm['latest_image_action'] = row['latest_image_action'] || '';
+    return norm;
   });
-}
-
-function populateDropdowns(data) {
-  const dates = new Set(), enterprises = new Set(), users = new Set();
-  const editingUsers = new Set(), issues = new Set();
-  
-  data.forEach(row => {
-    if (row["date"]) dates.add(row["date"]);
-    if (row["enterprise"]) enterprises.add(row["enterprise"]);
-    if (row["user"]) users.add(row["user"]);
-    if (row["last_editor_user"]) editingUsers.add(row["last_editor_user"]);
-    
-    // Enhanced issue processing - split comma-separated values
-    // SAFE ACCESS: Check if issue exists before splitting
-    if (row["issue"] && row["issue"].trim() !== '') {
-      const issueList = row["issue"].split(',')
-        .map(issue => issue.trim())
-        .filter(issue => issue.length > 0);
-      issueList.forEach(issue => issues.add(issue));
-    }
-  });
-  
-  fillSelect("dateFilter", [...dates]);
-  fillSelect("enterpriseFilter", [...enterprises]);
-  fillSelect("qcUserFilter", [...users]);
-  fillSelect("editingUserFilter", [...editingUsers]);
-  fillSelect("issueFilter", [...issues]);
 }
 
 function fillSelect(id, options) {
   const select = document.getElementById(id);
-  // Clear existing options except the first one
-  while (select.options.length > 1) {
-    select.remove(1);
-  }
-  options.sort().forEach(opt => {
-    const option = document.createElement("option");
-    option.value = opt;
-    option.text = opt;
-    select.appendChild(option);
+  while (select.options.length > 1) select.remove(1);
+  [...options].sort().forEach(opt => {
+    if(!opt) return;
+    const o = document.createElement("option");
+    o.value = opt; o.text = opt;
+    select.appendChild(o);
   });
 }
 
+function populateDropdowns(data) {
+  const dates = new Set(), ents = new Set(), firsts = new Set(), lasts = new Set(), edits = new Set(), issues = new Set();
+  
+  data.forEach(row => {
+    if (row.date) dates.add(row.date);
+    if (row.enterprise) ents.add(row.enterprise);
+    if (row.first_qc_user) firsts.add(row.first_qc_user);
+    if (row.last_qc_user) lasts.add(row.last_qc_user);
+    if (row.last_editor_user) edits.add(row.last_editor_user);
+    if (row.issue) {
+      row.issue.split(',').forEach(i => issues.add(i.trim()));
+    }
+  });
+  
+  fillSelect("dateFilter", dates);
+  fillSelect("enterpriseFilter", ents);
+  fillSelect("firstQCFilter", firsts);
+  fillSelect("lastQCFilter", lasts);
+  fillSelect("editingUserFilter", edits);
+  fillSelect("issueFilter", issues);
+}
+
+function toggleAdditionalFilters() {
+  const type = getDataSource();
+  const show = (type === 'edited' || type === 'qc_tool');
+  document.getElementById('editingUserFilterContainer').style.display = show ? 'block' : 'none';
+  document.getElementById('issueFilterContainer').style.display = show ? 'block' : 'none';
+}
+
 function loadFilteredData() {
-  const loginID = document.getElementById('loginID').value.trim().toLowerCase();
-  if (!loginID) {
-    showStatus('Please select a Login ID', true);
-    return;
-  }
+  const loginID = document.getElementById('loginID').value;
+  if (!loginID) { showStatus('Select a Login User first.', true); return; }
 
   showLoading(true);
   
-  const date = document.getElementById('dateFilter').value.trim();
-  const enterprise = document.getElementById('enterpriseFilter').value.trim().toLowerCase();
-  const qcUser = document.getElementById('qcUserFilter').value.trim().toLowerCase();
-  const editingUser = document.getElementById('editingUserFilter').value.trim().toLowerCase();
-  const issue = document.getElementById('issueFilter').value.trim().toLowerCase();
-  const sourceType = getDataSource();
+  const filters = {
+    date: document.getElementById('dateFilter').value,
+    ent: document.getElementById('enterpriseFilter').value.toLowerCase(),
+    first: document.getElementById('firstQCFilter').value.toLowerCase(),
+    last: document.getElementById('lastQCFilter').value.toLowerCase(),
+    edit: document.getElementById('editingUserFilter').value.toLowerCase(),
+    issue: document.getElementById('issueFilter').value.toLowerCase(),
+    source: getDataSource()
+  };
 
-  const filteredRaw = rawData.filter(row => {
-    const rowDate = (row["date"] || '').trim();
-    const rowEnterprise = (row["enterprise"] || '').trim().toLowerCase();
-    const rowUser = (row["user"] || '').trim().toLowerCase();
-    const rowEditingUser = (row["last_editor_user"] || '').trim().toLowerCase();
+  const filtered = rawData.filter(row => {
+    const status = (row.status || '').trim().toLowerCase();
+    const action = (row.latest_image_action || '').trim().toLowerCase();
     
-    // SAFE ACCESS: Handle undefined issue field
-    const issueValue = row["issue"] || '';
-    const rowIssues = issueValue.split(',').map(i => i.trim().toLowerCase());
-    
-    const status = (row["status"] || '').trim().toLowerCase();
-    const latestImageAction = (row["latest_image_action"] || '').trim().toLowerCase();
+    let ok = (status === '' || status === 'null');
+    if (filters.date) ok = ok && row.date === filters.date;
+    if (filters.ent) ok = ok && row.enterprise.toLowerCase() === filters.ent;
+    if (filters.first) ok = ok && row.first_qc_user.toLowerCase() === filters.first;
+    if (filters.last) ok = ok && row.last_qc_user.toLowerCase() === filters.last;
 
-    // Common filters for all data sources
-    let shouldInclude = (
-      (status === '' || status === 'null' || status === null) && // Only include blank/null status
-      (!date || rowDate === date) &&
-      (!enterprise || rowEnterprise === enterprise) &&
-      (!qcUser || rowUser === qcUser)
-    );
-
-    // Additional filters for Re-Edit and QC-Tool
-    if (sourceType === 'edited' || sourceType === 'qc_tool') {
-      shouldInclude = shouldInclude && 
-        (!editingUser || rowEditingUser === editingUser) &&
-        (!issue || rowIssues.includes(issue)); // Changed to check if any issue matches
+    if (filters.source === 'edited' || filters.source === 'qc_tool') {
+        if (filters.edit) ok = ok && row.last_editor_user.toLowerCase() === filters.edit;
+        if (filters.issue) ok = ok && (row.issue || '').toLowerCase().includes(filters.issue);
     }
 
-    // Additional filters based on data source
-    if (sourceType === 'qc_tool') {
-      shouldInclude = shouldInclude && (latestImageAction === 'qc_editingtool');
-    } else if (sourceType === 'edited') {
-      shouldInclude = shouldInclude && (latestImageAction !== 'qc_editingtool');
-    }
+    if (filters.source === 'qc_tool') ok = ok && action === 'qc_editingtool';
+    else if (filters.source === 'edited') ok = ok && action !== 'qc_editingtool';
 
-    return shouldInclude;
+    return ok;
   });
 
+  // Grouping logic (unique by image_id)
   const map = new Map();
-  for (const row of filteredRaw) {
-    const imageId = row["t1.image_id"];
-    if (!imageId) continue;
-
-    if (!map.has(imageId)) {
-      // SAFE ACCESS: Handle undefined issue field
-      const issueValue = row["issue"] || '';
-      const issueArray = issueValue.split(',').map(i => i.trim()).filter(i => i);
-      
-      map.set(imageId, {
-        ...row,
-        users: new Set([row["user"]]),
-        first_qc_users: new Set([row["first_qc_user"]]),
-        last_qc_users: new Set([row["last_qc_user"]]),
-        issues: new Set(issueArray)
-      });
-    } else {
-      const existing = map.get(imageId);
-      existing.users.add(row["user"]);
-      existing.first_qc_users.add(row["first_qc_user"]);
-      existing.last_qc_users.add(row["last_qc_user"]);
-      
-      // SAFE ACCESS: Handle undefined issue field
-      const issueValue = row["issue"] || '';
-      const issueArray = issueValue.split(',').map(i => i.trim()).filter(i => i);
-      issueArray.forEach(i => existing.issues.add(i));
-    }
-  }
-
-  groupedData = Array.from(map.values()).map(item => ({
-    ...item,
-    user: Array.from(item.users).filter(Boolean).join(", "),
-    first_qc_user: Array.from(item.first_qc_users).filter(Boolean).join(", "),
-    last_qc_user: Array.from(item.last_qc_users).filter(Boolean).join(", "),
-    // SAFE ACCESS: Handle undefined issue field
-    issue: item.issues ? Array.from(item.issues).filter(Boolean).join(", ") : ""
-  }));
-
-  // Shuffle the groupedData array for random display
+  filtered.forEach(row => {
+    if (!row.image_id) return;
+    if (!map.has(row.image_id)) map.set(row.image_id, row);
+  });
+  
+  groupedData = Array.from(map.values());
+  
+  // Shuffle
   for (let i = groupedData.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [groupedData[i], groupedData[j]] = [groupedData[j], groupedData[i]];
@@ -692,237 +465,120 @@ function loadFilteredData() {
 
   if (groupedData.length > 0) {
     currentIndex = 0;
-    showReview();
     document.getElementById("login-section").style.display = "none";
     document.getElementById("review-section").style.display = "block";
-    showStatus(`Loaded ${groupedData.length} records to review`);
+    showReview();
   } else {
-    showStatus('No matching records found.', true);
+    showStatus('No records found with these filters.', true);
   }
-}
-
-function formatQCUsers(firstQC, lastQC) {
-  if (!firstQC && !lastQC) return "";
-
-  // Clean up the values
-  firstQC = (firstQC || "").trim();
-  lastQC = (lastQC || "").trim();
-
-  // If firstQC is N/A or empty, use lastQC
-  if (!firstQC || firstQC.toLowerCase() === "n/a") {
-    return lastQC || "";
-  }
-
-  // If lastQC is N/A or empty, use firstQC
-  if (!lastQC || lastQC.toLowerCase() === "n/a") {
-    return firstQC || "";
-  }
-
-  // If both are the same, return just one
-  if (firstQC === lastQC) {
-    return firstQC;
-  }
-
-  // Otherwise return both, ensuring no duplicates
-  const users = [firstQC, lastQC];
-  const uniqueUsers = Array.from(new Set(users)).join(", ");
-  return uniqueUsers;
 }
 
 function showReview() {
   const row = groupedData[currentIndex];
-  const sourceType = getDataSource();
-  
-  // Update progress indicator
+  const type = getDataSource();
+
   document.getElementById('currentIndexDisplay').textContent = currentIndex + 1;
   document.getElementById('totalCountDisplay').textContent = groupedData.length;
 
-  // Show/hide fields based on data source
-  document.getElementById('qcUsersContainer').style.display = (sourceType === 'edited' || sourceType === 'qc_tool') ? 'block' : 'none';
-  document.getElementById('userContainer').style.display = (sourceType === 'qc') ? 'block' : 'none';
-  document.getElementById('editingUserContainer').style.display = (sourceType === 'edited' || sourceType === 'qc_tool') ? 'block' : 'none';
-  document.getElementById('issueContainer').style.display = (sourceType === 'edited' || sourceType === 'qc_tool') ? 'block' : 'none';
+  // Header data
+  const setText = (id, val) => document.getElementById(id).textContent = val || '-';
+  setText('disp_enterprise', row.enterprise);
+  setText('disp_sku', row.sku_id);
+  setText('disp_imageID', row.image_id);
+  setText('disp_editingUser', row.last_editor_user);
+  setText('disp_issue', row.issue);
 
-  // Set values only if they're not "N/A"
-  const setValue = (elementId, value) => {
-    const element = document.getElementById(elementId);
-    element.textContent = value && value.trim() && value.trim().toLowerCase() !== "n/a" ? value.trim() : "";
-    element.parentElement.style.display = element.textContent ? "block" : "none";
+  // QC Users Logic
+  const users = [row.first_qc_user, row.last_qc_user, row.user].filter(u => u && u.toLowerCase() !== 'n/a');
+  setText('disp_qcUsers', [...new Set(users)].join(', '));
+
+  // Visibility logic
+  const isQCPass = type === 'qc';
+  document.getElementById('disp_editBox').style.display = isQCPass ? 'none' : 'block';
+  document.getElementById('disp_issueBox').style.display = isQCPass ? 'none' : 'block';
+  document.getElementById('imagesContainer').className = isQCPass ? 'images qc-pass' : 'images';
+
+  // Images
+  const setImg = (id, src) => {
+    const el = document.getElementById(id);
+    el.src = src || 'https://via.placeholder.com/400x300?text=No+Image';
+    el.onerror = () => el.src = 'https://via.placeholder.com/400x300?text=Error+Loading';
   };
-  
-  setValue('enterprise', row["enterprise"]);
-  setValue('sku', row["t1.sku_id"]);
-  setValue('imageID', row["t1.image_id"]);
-  setValue('issue', row["issue"]);
-  setValue('editingUser', row["last_editor_user"]);
+  setImg('img_left', row.left_path);
+  setImg('img_middle', row.middle_path);
+  setImg('img_right', row.right_path);
 
-  // Format QC users specially for Re-Edit and QC-Tool
-  const firstQC = row["first_qc_user"] || "";
-  const lastQC = row["last_qc_user"] || "";
-  const qcUsersDisplay = formatQCUsers(firstQC, lastQC);
-  setValue('qcUsers', qcUsersDisplay);
-
-  // For QC-Pass, show the single user
-  setValue('user', row["user"]);
-
-  // Set image sources with error handling
-  const setImage = (elementId, path) => {
-    const img = document.getElementById(elementId);
-    img.src = path || '';
-    img.onerror = () => {
-      img.src = 'https://via.placeholder.com/400x300?text=Image+Not+Available';
-    };
-  };
-  
-  setImage('left', row["left_path"]);
-  setImage('middle', row["middle_path"]);
-  setImage('right', row["right_path"]);
-  
   document.getElementById('qcComment').value = "";
-  
-  // Apply QC-Pass specific styling to hide the final image
-  if (sourceType === 'qc') {
-    imagesContainer.classList.add('qc-pass');
-  } else {
-    imagesContainer.classList.remove('qc-pass');
-  }
 }
 
-function submitAndNext() {
+function submitReview() {
   const row = groupedData[currentIndex];
-  const loginUser = document.getElementById('loginID').value || "";
-  let comment = document.getElementById('qcComment').value.trim();
-  if (!comment) comment = "Done";
-
-  const sourceType = getDataSource();
+  const loginUser = document.getElementById('loginID').value;
+  const comment = document.getElementById('qcComment').value.trim() || "Done";
   
-  // Prepare form data based on source type
-  let qcUserField = "";
-  let editingUserField = "";
-  
-  if (sourceType === 'qc') {
-    // For QC-Pass, use the single user field
-    qcUserField = row["user"] || "";
-    editingUserField = ""; // No editing user for QC-Pass
-  } else {
-    // For Re-Edit and QC-Tool, combine first and last QC users
-    const firstQC = row["first_qc_user"] || "";
-    const lastQC = row["last_qc_user"] || "";
-    qcUserField = formatQCUsers(firstQC, lastQC);
-    editingUserField = row["last_editor_user"] || "";
-  }
-
-  const url = new URL("https://docs.google.com/forms/d/e/1FAIpQLSdrjhynjWITfOqHpkgKX8enCmDKg1b3s0Ij05Cux36kPmZEUA/formResponse");
+  const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSdrjhynjWITfOqHpkgKX8enCmDKg1b3s0Ij05Cux36kPmZEUA/formResponse";
   const params = new URLSearchParams({
-    "entry.890284089": row["enterprise"] || "", // Enterprise
-    "entry.5932044": qcUserField, // QC User (varies by source)
-    "entry.1880389842": editingUserField, // Editing User (for Re-Edit/QC-Tool)
-    "entry.1139236247": row["t1.sku_id"] || "", // SKU ID
-    "entry.661750446": row["t1.image_id"] || "", // Image ID
-    "entry.1317530325": row["issue"] || "", // Issue
-    "entry.1455673211": row["left_path"] || "", // Input Image
-    "entry.772576827": row["middle_path"] || "", // AI Image
-    "entry.780536997": row["right_path"] || "", // Final Image
-    "entry.865196657": loginUser, // Login User
-    "entry.778698303": comment // Comment
+    "entry.890284089": row.enterprise,
+    "entry.5932044": [row.first_qc_user, row.last_qc_user, row.user].filter(u=>u).join(', '),
+    "entry.1880389842": row.last_editor_user,
+    "entry.1139236247": row.sku_id,
+    "entry.661750446": row.image_id,
+    "entry.1317530325": row.issue,
+    "entry.1455673211": row.left_path,
+    "entry.772576827": row.middle_path,
+    "entry.780536997": row.right_path,
+    "entry.865196657": loginUser,
+    "entry.778698303": comment
   });
 
-  fetch(`${url}?${params.toString()}`, { method: 'POST', mode: 'no-cors' })
+  fetch(`${formUrl}?${params.toString()}`, { method: 'POST', mode: 'no-cors' })
     .then(() => {
       if (currentIndex < groupedData.length - 1) {
         currentIndex++;
         showReview();
       } else {
-        showStatus('All entries reviewed. Returning to login screen.');
-        setTimeout(exitToLogin, 2000);
+        alert("Finished all records!");
+        exitToLogin();
       }
-    })
-    .catch(error => {
-      console.error('Submission error:', error);
-      showStatus('Error submitting data', true);
     });
-}
-
-function prevEntry() {
-  if (currentIndex > 0) {
-    currentIndex--;
-    showReview();
-  }
 }
 
 function exitToLogin() {
   document.getElementById("review-section").style.display = "none";
   document.getElementById("login-section").style.display = "block";
-  imagesContainer.classList.remove('qc-pass');
+  document.getElementById("statusMessage").style.display = "none";
 }
 
-function loadData() {
+function loadInitialData() {
   showLoading(true);
-  const url = getDataSourceUrl();
-  const sourceType = getDataSource();
+  const type = getDataSource();
+  const url = type === 'qc' ? QC_PASS_URL : RE_EDIT_URL;
   
   Papa.parse(url, {
     download: true,
     header: true,
-    skipEmptyLines: true,
-    complete: function(results) {
-      showLoading(false);
-      if (results.data && results.data.length > 0) {
-        rawData = normalizeData(results.data, sourceType);
-        populateDropdowns(rawData);
-        toggleAdditionalFilters();
-        showStatus(`Successfully loaded ${rawData.length} records from ${sourceType === 'qc' ? 'QC-Pass' : sourceType === 'edited' ? 'Re-Edit' : 'QC-Tool'}`);
-      } else {
-        showStatus('No data found in the selected source', true);
-      }
-    },
-    error: function(error) {
-      showLoading(false);
-      console.error("Error loading data:", error);
-      showStatus('Error loading data. Please try again.', true);
-    }
-  });
-}
-
-// Event listeners setup
-function setupEventListeners() {
-  // Start QC button
-  startButton.addEventListener('click', loadFilteredData);
-  
-  // Navigation buttons
-  prevButton.addEventListener('click', prevEntry);
-  nextButton.addEventListener('click', submitAndNext);
-  exitButton.addEventListener('click', exitToLogin);
-  
-  // Keyboard shortcuts
-  document.addEventListener('keydown', function(event) {
-    if (document.getElementById("review-section").style.display !== "none") {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        submitAndNext();
-      } else if (event.key === "p" || event.key === "P") {
-        event.preventDefault();
-        prevEntry();
-      } else if (event.key === "Escape") {
-        event.preventDefault();
-        exitToLogin();
-      }
-    }
-  });
-
-  // Listen for data source changes
-  document.querySelectorAll('input[name="dataSource"]').forEach(radio => {
-    radio.addEventListener('change', function() {
-      loadData();
+    complete: (res) => {
+      rawData = normalizeData(res.data, type);
+      populateDropdowns(rawData);
       toggleAdditionalFilters();
-    });
+      showLoading(false);
+      showStatus(`Loaded ${rawData.length} records. Ready to start.`);
+    }
   });
 }
 
-// Initialize on load
+// Global Events
 window.onload = () => {
-  setupEventListeners();
-  loadData();
+  document.getElementById('startButton').onclick = loadFilteredData;
+  document.getElementById('prevButton').onclick = () => { if(currentIndex > 0) { currentIndex--; showReview(); } };
+  document.getElementById('nextButton').onclick = submitReview;
+  document.getElementById('exitButton').onclick = exitToLogin;
+
+  document.querySelectorAll('input[name="dataSource"]').forEach(r => {
+    r.onchange = loadInitialData;
+  });
+
+  loadInitialData();
 };
 </script>
 </body>
