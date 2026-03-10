@@ -287,6 +287,9 @@
 const QC_PASS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=1717039169&single=true&output=csv";
 const RE_EDIT_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=320301246&single=true&output=csv";
 
+// Optimization Prefix
+const IMAGE_PROXY_PREFIX = "https://media.spyneai.com/unsafe/0x0/filters:format(webp)/";
+
 const FIELD_MAPPING = {
   qc: {
     'enterprise': 'enterprise_name',
@@ -498,11 +501,22 @@ function showReview() {
   document.getElementById('disp_issueBox').style.display = isQCPass ? 'none' : 'block';
   document.getElementById('imagesContainer').className = isQCPass ? 'images qc-pass' : 'images';
 
-  // Images
+  // Images with optimization prefix
   const setImg = (id, src) => {
     const el = document.getElementById(id);
-    el.src = src || 'https://via.placeholder.com/400x300?text=No+Image';
-    el.onerror = () => el.src = 'https://via.placeholder.com/400x300?text=Error+Loading';
+    if (src && src.startsWith('http')) {
+        el.src = IMAGE_PROXY_PREFIX + src;
+    } else {
+        el.src = src || 'https://via.placeholder.com/400x300?text=No+Image';
+    }
+    el.onerror = () => {
+        // Fallback to original URL if proxy fails, then to placeholder
+        if (el.src !== src) {
+            el.src = src;
+        } else {
+            el.src = 'https://via.placeholder.com/400x300?text=Error+Loading';
+        }
+    };
   };
   setImg('img_left', row.left_path);
   setImg('img_middle', row.middle_path);
