@@ -272,7 +272,7 @@
     </div>
     
     <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px;">
-      <label for="qcComment">Review Comment</label>
+      <label for="qcComment">Review Comment (Press Enter to Submit)</label>
       <textarea id="qcComment" placeholder="Enter feedback here..."></textarea>
       
       <div style="display: flex; gap: 10px; margin-top: 15px;">
@@ -523,6 +523,7 @@ function showReview() {
   setImg('img_right', row.right_path);
 
   document.getElementById('qcComment').value = "";
+  document.getElementById('qcComment').focus();
 }
 
 function submitReview() {
@@ -590,6 +591,18 @@ window.onload = () => {
 
   document.querySelectorAll('input[name="dataSource"]').forEach(r => {
     r.onchange = loadInitialData;
+  });
+
+  // Hotkey support for Enter
+  document.addEventListener('keydown', (e) => {
+    const isReviewVisible = document.getElementById("review-section").style.display === "block";
+    if (isReviewVisible && e.key === "Enter") {
+        // Check if button is not disabled (prevent double submits)
+        const nextBtn = document.getElementById('nextButton');
+        if (!nextBtn.disabled) {
+            submitReview();
+        }
+    }
   });
 
   loadInitialData();
