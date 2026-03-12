@@ -217,11 +217,17 @@
         <label>Enterprise</label>
         <select id="enterpriseFilter"><option value="">ALL</option></select>
       </div>
-      <div>
+      <!-- Single Filter for QC-Pass -->
+      <div id="qcUserFilterContainer">
+        <label>QC User</label>
+        <select id="qcUserFilter"><option value="">ALL</option></select>
+      </div>
+      <!-- Dual Filters for Edited/QC-Tool -->
+      <div id="firstQCFilterContainer" style="display: none;">
         <label>First QC</label>
         <select id="firstQCFilter"><option value="">ALL</option></select>
       </div>
-      <div>
+      <div id="lastQCFilterContainer" style="display: none;">
         <label>Last QC</label>
         <select id="lastQCFilter"><option value="">ALL</option></select>
       </div>
@@ -287,7 +293,6 @@
 const QC_PASS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=1717039169&single=true&output=csv";
 const RE_EDIT_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=320301246&single=true&output=csv";
 
-// Optimization Prefix
 const IMAGE_PROXY_PREFIX = "https://media.spyneai.com/unsafe/0x0/filters:format(webp)/";
 
 const FIELD_MAPPING = {
@@ -384,11 +389,12 @@ function fillSelect(id, options) {
 }
 
 function populateDropdowns(data) {
-  const dates = new Set(), ents = new Set(), firsts = new Set(), lasts = new Set(), edits = new Set(), issues = new Set();
+  const dates = new Set(), ents = new Set(), qcUsers = new Set(), firsts = new Set(), lasts = new Set(), edits = new Set(), issues = new Set();
   
   data.forEach(row => {
     if (row.date) dates.add(row.date);
     if (row.enterprise) ents.add(row.enterprise);
+    if (row.user) qcUsers.add(row.user);
     if (row.first_qc_user) firsts.add(row.first_qc_user);
     if (row.last_qc_user) lasts.add(row.last_qc_user);
     if (row.last_editor_user) edits.add(row.last_editor_user);
@@ -399,6 +405,7 @@ function populateDropdowns(data) {
   
   fillSelect("dateFilter", dates);
   fillSelect("enterpriseFilter", ents);
+  fillSelect("qcUserFilter", qcUsers);
   fillSelect("firstQCFilter", firsts);
   fillSelect("lastQCFilter", lasts);
   fillSelect("editingUserFilter", edits);
@@ -407,9 +414,14 @@ function populateDropdowns(data) {
 
 function toggleAdditionalFilters() {
   const type = getDataSource();
-  const show = (type === 'edited' || type === 'qc_tool');
-  document.getElementById('editingUserFilterContainer').style.display = show ? 'block' : 'none';
-  document.getElementById('issueFilterContainer').style.display = show ? 'block' : 'none';
+  const isQC = type === 'qc';
+  const isEditedOrTool = (type === 'edited' || type === 'qc_tool');
+
+  document.getElementById('qcUserFilterContainer').style.display = isQC ? 'block' : 'none';
+  document.getElementById('firstQCFilterContainer').style.display = isEditedOrTool ? 'block' : 'none';
+  document.getElementById('lastQCFilterContainer').style.display = isEditedOrTool ? 'block' : 'none';
+  document.getElementById('editingUserFilterContainer').style.display = isEditedOrTool ? 'block' : 'none';
+  document.getElementById('issueFilterContainer').style.display = isEditedOrTool ? 'block' : 'none';
 }
 
 function loadFilteredData() {
@@ -421,6 +433,7 @@ function loadFilteredData() {
   const filters = {
     date: document.getElementById('dateFilter').value,
     ent: document.getElementById('enterpriseFilter').value.toLowerCase(),
+    qc: document.getElementById('qcUserFilter').value.toLowerCase(),
     first: document.getElementById('firstQCFilter').value.toLowerCase(),
     last: document.getElementById('lastQCFilter').value.toLowerCase(),
     edit: document.getElementById('editingUserFilter').value.toLowerCase(),
@@ -435,10 +448,12 @@ function loadFilteredData() {
     let ok = (status === '' || status === 'null');
     if (filters.date) ok = ok && row.date === filters.date;
     if (filters.ent) ok = ok && row.enterprise.toLowerCase() === filters.ent;
-    if (filters.first) ok = ok && row.first_qc_user.toLowerCase() === filters.first;
-    if (filters.last) ok = ok && row.last_qc_user.toLowerCase() === filters.last;
-
-    if (filters.source === 'edited' || filters.source === 'qc_tool') {
+    
+    if (filters.source === 'qc') {
+        if (filters.qc) ok = ok && (row.user || '').toLowerCase() === filters.qc;
+    } else {
+        if (filters.first) ok = ok && row.first_qc_user.toLowerCase() === filters.first;
+        if (filters.last) ok = ok && row.last_qc_user.toLowerCase() === filters.last;
         if (filters.edit) ok = ok && row.last_editor_user.toLowerCase() === filters.edit;
         if (filters.issue) ok = ok && (row.issue || '').toLowerCase().includes(filters.issue);
     }
@@ -449,7 +464,6 @@ function loadFilteredData() {
     return ok;
   });
 
-  // Grouping logic (unique by image_id)
   const map = new Map();
   filtered.forEach(row => {
     if (!row.image_id) return;
@@ -458,7 +472,6 @@ function loadFilteredData() {
   
   groupedData = Array.from(map.values());
   
-  // Shuffle
   for (let i = groupedData.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [groupedData[i], groupedData[j]] = [groupedData[j], groupedData[i]];
@@ -483,7 +496,6 @@ function showReview() {
   document.getElementById('currentIndexDisplay').textContent = currentIndex + 1;
   document.getElementById('totalCountDisplay').textContent = groupedData.length;
 
-  // Header data
   const setText = (id, val) => document.getElementById(id).textContent = val || '-';
   setText('disp_enterprise', row.enterprise);
   setText('disp_sku', row.sku_id);
@@ -491,17 +503,14 @@ function showReview() {
   setText('disp_editingUser', row.last_editor_user);
   setText('disp_issue', row.issue);
 
-  // QC Users Logic
   const users = [row.first_qc_user, row.last_qc_user, row.user].filter(u => u && u.toLowerCase() !== 'n/a');
   setText('disp_qcUsers', [...new Set(users)].join(', '));
 
-  // Visibility logic
   const isQCPass = type === 'qc';
   document.getElementById('disp_editBox').style.display = isQCPass ? 'none' : 'block';
   document.getElementById('disp_issueBox').style.display = isQCPass ? 'none' : 'block';
   document.getElementById('imagesContainer').className = isQCPass ? 'images qc-pass' : 'images';
 
-  // Images with optimization prefix
   const setImg = (id, src) => {
     const el = document.getElementById(id);
     if (src && src.startsWith('http')) {
@@ -510,7 +519,6 @@ function showReview() {
         el.src = src || 'https://via.placeholder.com/400x300?text=No+Image';
     }
     el.onerror = () => {
-        // Fallback to original URL if proxy fails, then to placeholder
         if (el.src !== src) {
             el.src = src;
         } else {
@@ -582,7 +590,6 @@ function loadInitialData() {
   });
 }
 
-// Global Events
 window.onload = () => {
   document.getElementById('startButton').onclick = loadFilteredData;
   document.getElementById('prevButton').onclick = () => { if(currentIndex > 0) { currentIndex--; showReview(); } };
@@ -593,11 +600,9 @@ window.onload = () => {
     r.onchange = loadInitialData;
   });
 
-  // Hotkey support for Enter
   document.addEventListener('keydown', (e) => {
     const isReviewVisible = document.getElementById("review-section").style.display === "block";
     if (isReviewVisible && e.key === "Enter") {
-        // Check if button is not disabled (prevent double submits)
         const nextBtn = document.getElementById('nextButton');
         if (!nextBtn.disabled) {
             submitReview();
