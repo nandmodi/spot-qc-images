@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg0:#D6EAF8;
+  --bg0:#D6E8FA;
   --bg1:#FFFFFF;
   --bg2:#F7F8FA;
   --bg3:#EEF0F4;
@@ -54,10 +54,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 /* ── LOGIN ── */
 #loginPage{
   height:100%;display:flex;align-items:center;justify-content:center;
-  background:
-    radial-gradient(ellipse 70% 50% at 20% 100%,rgba(37,99,235,.06) 0%,transparent 60%),
-    radial-gradient(ellipse 60% 40% at 80% 0%,rgba(37,99,235,.04) 0%,transparent 55%),
-    var(--bg0);
+  background:var(--bg0);
 }
 .login-card{
   width:390px;background:var(--bg1);
@@ -481,17 +478,31 @@ let lastSubmitTime = 0;
 let paceTimer = null;
 let todayCount = 0;
 
-/* ── TODAY'S PROGRESS ── */
-function getTodayKey(){ return 'spyne_qc_' + new Date().toISOString().slice(0,10); }
-function loadTodayCount(){ todayCount = parseInt(localStorage.getItem(getTodayKey())||'0',10)||0; }
-function saveTodayCount(){ localStorage.setItem(getTodayKey(), todayCount); }
+/* ── TODAY'S PROGRESS (7AM–next 6:59AM IST window, per-user localStorage) ── */
+function getShiftWindow(){
+  const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+  const nowIST = new Date(Date.now() + IST_OFFSET_MS);
+  const dayStart = new Date(Date.UTC(nowIST.getUTCFullYear(), nowIST.getUTCMonth(), nowIST.getUTCDate()));
+  const windowStart = new Date(dayStart.getTime() + 7 * 3600000);
+  if(nowIST.getUTCHours() < 7) windowStart.setUTCDate(windowStart.getUTCDate() - 1);
+  return windowStart.toISOString().slice(0, 13); // "2025-04-10T07" — unique per shift
+}
+
+function getLocalKey(){ return 'spyne_qc_' + (user||'') + '_' + getShiftWindow(); }
+
+function loadTodayCount(){
+  todayCount = parseInt(localStorage.getItem(getLocalKey())||'0', 10) || 0;
+  updateTodayUI();
+}
+
+function saveTodayCount(){
+  localStorage.setItem(getLocalKey(), todayCount);
+}
+
 function updateTodayUI(){
   const prog = _id('todayProg');
   if(!prog) return;
-  const total = group.length || 1;
-  const pct = Math.min(100, Math.round((todayCount/Math.max(total,todayCount))*100));
-  _id('todayLabel').textContent = 'Today';
-  _id('todayFill').style.width = pct+'%';
+  _id('todayFill').style.width = Math.min(100, todayCount * 2) + '%';
   _id('todayNum').textContent = todayCount + ' done';
   prog.classList.remove('hidden');
 }
