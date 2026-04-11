@@ -478,25 +478,64 @@ let lastSubmitTime = 0;
 let paceTimer = null;
 let todayCount = 0;
 
-/* ── TODAY'S PROGRESS (7AM–next 6:59AM IST window, per-user localStorage) ── */
-function getShiftWindow(){
+/* ── TODAY'S PROGRESS — 7AM→6:59AM IST, cross-device via form responses sheet ── */
+
+// Returns the UTC timestamp of shift start (7AM IST = 1:30 AM UTC)
+function getShiftStart(){
   const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
-  const nowIST = new Date(Date.now() + IST_OFFSET_MS);
-  const dayStart = new Date(Date.UTC(nowIST.getUTCFullYear(), nowIST.getUTCMonth(), nowIST.getUTCDate()));
-  const windowStart = new Date(dayStart.getTime() + 7 * 3600000);
-  if(nowIST.getUTCHours() < 7) windowStart.setUTCDate(windowStart.getUTCDate() - 1);
-  return windowStart.toISOString().slice(0, 13); // "2025-04-10T07" — unique per shift
+  const nowUTC = Date.now();
+  const nowIST = new Date(nowUTC + IST_OFFSET_MS);
+  // Midnight IST in UTC
+  const midnightIST = Date.UTC(nowIST.getUTCFullYear(), nowIST.getUTCMonth(), nowIST.getUTCDate());
+  let shiftStart = midnightIST + 7 * 3600000; // 7AM IST = midnight + 7h
+  // If current IST time is before 7AM, the shift started yesterday at 7AM
+  if(nowIST.getUTCHours() < 7) shiftStart -= 24 * 3600000;
+  return shiftStart; // ms UTC
+}
+
+function getShiftWindow(){
+  return new Date(getShiftStart()).toISOString().slice(0, 13); // e.g. "2025-04-10T01"
 }
 
 function getLocalKey(){ return 'spyne_qc_' + (user||'') + '_' + getShiftWindow(); }
 
 function loadTodayCount(){
+  // Show localStorage value instantly
   todayCount = parseInt(localStorage.getItem(getLocalKey())||'0', 10) || 0;
   updateTodayUI();
+  // Then fetch accurate count from form responses (non-blocking, after a short delay
+  // so it doesn't compete with the main loadData fetch)
+  setTimeout(syncTodayFromSheet, 2000);
 }
 
 function saveTodayCount(){
   localStorage.setItem(getLocalKey(), todayCount);
+}
+
+// Fetch form responses sheet and count submissions by this user in today's shift
+// Sheet: "Form Responses 1", gid=1880564018, reviewer col = "qc-user"
+const RESPONSES_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=1880564018&single=true&output=csv";
+
+function syncTodayFromSheet(){
+  if(!user) return;
+  const shiftStart = getShiftStart();
+  const shiftEnd   = shiftStart + 24 * 3600000;
+  Papa.parse(RESPONSES_URL, {
+    download: true, header: true,
+    complete: res => {
+      let count = 0;
+      (res.data||[]).forEach(row => {
+        // Timestamp col, reviewer = "qc-user" col
+        const ts  = new Date(row['Timestamp']);
+        const rev = (row['qc-user']||'').trim();
+        if(!isNaN(ts) && ts.getTime() >= shiftStart && ts.getTime() < shiftEnd && rev === user) count++;
+      });
+      todayCount = count;
+      saveTodayCount();
+      updateTodayUI();
+    },
+    error: () => {} // silently fall back to localStorage count
+  });
 }
 
 function updateTodayUI(){
@@ -741,10 +780,11 @@ function doSubmit(){
   lastSubmitTime=Date.now();
   const r=group[idx], comment=getCheckedIssues();
   _id('nextBtn').disabled=true;
-  // Update today's progress
+  // Update today's progress (local immediately, re-sync from sheet after delay)
   todayCount++;
   saveTodayCount();
   updateTodayUI();
+  setTimeout(syncTodayFromSheet, 4000);
   const params=new URLSearchParams({
     "entry.890284089":r.enterprise,
     "entry.5932044":[r.fqc,r.lqc,r.user].filter(u=>u).join(', '),
