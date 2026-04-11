@@ -527,7 +527,7 @@ function syncTodayFromSheet(){
       (res.data||[]).forEach(row => {
         // Timestamp col, reviewer = "qc-user" col
         const ts  = new Date(row['Timestamp']);
-        const rev = (row['qc-user']||'').trim();
+        const rev = (row['login user']||'').trim();
         if(!isNaN(ts) && ts.getTime() >= shiftStart && ts.getTime() < shiftEnd && rev === user) count++;
       });
       todayCount = count;
