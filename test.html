@@ -64,6 +64,11 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 .fi-sel{font-family:'Inter',sans-serif;font-size:12.5px;color:var(--t1);background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:5px 10px;outline:none;cursor:pointer}
 .btn-start{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;background:var(--accent);color:#fff;border:none;border-radius:var(--r);padding:0 18px;height:34px;cursor:pointer;transition:background .14s}
 
+/* ── DATA LOADER ── */
+.load-strip{display:none;align-items:center;gap:10px;padding:9px 18px;background:var(--accentlt);border-bottom:1px solid var(--line);font-size:12.5px;font-weight:500;color:var(--accent);flex-shrink:0}
+.spin{width:14px;height:14px;border:2px solid var(--line2);border-top-color:var(--accent);border-radius:50%;animation:rot .7s linear infinite;flex-shrink:0}
+@keyframes rot{to{transform:rotate(360deg)}}
+
 /* ── REVIEW PAGE ── */
 #reviewPage{display:none;flex-direction:column;flex:1;overflow:hidden;min-height:0}
 .rev-top{background:var(--bg1);border-bottom:1px solid var(--line);padding:0 18px;display:flex;align-items:stretch;overflow-x:auto;flex-shrink:0}
@@ -152,6 +157,11 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
       <span id="fcount" class="t-chip"></span>
       <button class="btn-start" id="startBtn">▶ Start Review</button>
     </div>
+    
+    <div class="load-strip" id="loadStrip">
+      <div class="spin"></div><span id="loadTxt">Fetching data…</span>
+    </div>
+
     <div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--t4)">
       Select filters and click Start Review.
     </div>
@@ -223,6 +233,16 @@ const PWDS = {"Nand Kishor":"spyne@123","Ranbir Manoranjan":"spyne@123","Nitin K
 
 function _id(id){ return document.getElementById(id); }
 
+/* --- UTILS --- */
+function setLoading(show, txt = 'Fetching data…') {
+  const strip = _id('loadStrip');
+  if (strip) {
+    strip.style.display = show ? 'flex' : 'none';
+    _id('loadTxt').textContent = txt;
+  }
+  _id('startBtn').disabled = show;
+}
+
 function toast(msg, type='ok') {
   const shelf = _id('toastShelf');
   const t = document.createElement('div');
@@ -257,6 +277,7 @@ function setMode(m){
 }
 
 function loadData(){
+  setLoading(true);
   Papa.parse(mode==='qc' ? QC_URL : EDIT_URL, {
     download: true, header: true,
     complete: res => {
@@ -269,6 +290,12 @@ function loadData(){
       }));
       fillFilters();
       _id('fcount').textContent = raw.length.toLocaleString() + ' records';
+      setLoading(false);
+    },
+    error: err => {
+      console.error(err);
+      toast('Failed to load data', 'err');
+      setLoading(false);
     }
   });
 }
@@ -337,7 +364,6 @@ function showRecord(){
 
 function doSubmit(){
   const r = group[idx];
-  // COLLECT MULTIPLE OPTIONS
   const selectedOptions = Array.from(document.querySelectorAll('.issue-cb:checked'))
                                .map(cb => cb.value);
   
@@ -355,8 +381,6 @@ function doSubmit(){
   body.append("entry.780536997", r.right || r.mid);  // Final Image
   body.append("entry.865196657", user);              // login user
 
-  // Handle Checkboxes correctly for Google Forms: 
-  // Append each selected value individually with the same key
   if (selectedOptions.length > 0) {
     selectedOptions.forEach(val => {
       body.append("entry.778698303", val);           // RBG issue
