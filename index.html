@@ -36,7 +36,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 @keyframes rot{to{transform:rotate(360deg)}}
 
 /* ── LOGIN ── */
-#loginPage{height:100%;display:flex;align-items:center;justify-content:center;background:var(--bg0)}
+#loginPage{height:100%;display:flex;align-items:center;justify-content:center;background:var(--bg0);padding-bottom:24px}
 .login-card{width:390px;background:var(--bg1);border:1px solid var(--line);border-radius:var(--rlg);padding:44px 40px 38px;box-shadow:var(--shadow-lg);animation:slideUp .35s cubic-bezier(.22,.68,0,1.2) both}
 .login-h{font-size:20px;font-weight:800;letter-spacing:-.03em;margin-bottom:4px;color:#000}
 .login-sub{font-size:13px;color:var(--t3);margin-bottom:28px}
@@ -49,7 +49,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 .btn-login:hover{background:var(--accent2);box-shadow:0 4px 16px rgba(37,99,235,.35)}
 
 /* ── APP SHELL ── */
-#app{display:none;flex-direction:column;height:100vh}
+#app{display:none;flex-direction:column;height:100vh;padding-bottom:24px}
 .topbar{height:52px;background:var(--bg1);border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 18px;gap:8px;flex-shrink:0;z-index:30;box-shadow:var(--shadow)}
 .t-logo-img{height:28px; width:auto; display:block; margin-right:8px;}
 .mode-group{display:flex;background:var(--bg0);border:1px solid var(--line);border-radius:var(--r);padding:3px;gap:2px}
@@ -101,7 +101,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 .issue-cb-row.done-row:has(.issue-cb:checked) .issue-cb-num{background:var(--ok);color:#fff}
 
 .btn-sub{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;background:var(--ok);color:#fff;border:none;border-radius:var(--r);padding:0 20px;height:38px;cursor:pointer}
-.btn-sub:disabled{background:var(--line2);cursor:not-allowed;color:var(--t3)}
+.btn-sub:disabled{background:var(--line2);cursor:not-allowed;color:var(--t3);opacity:0.8}
 .btn-prev{font-family:'Inter',sans-serif;font-size:13px;font-weight:500;background:var(--bg1);border:1px solid var(--line2);padding:0 16px;height:38px;border-radius:var(--r);cursor:pointer}
 
 .toast-shelf{position:fixed;bottom:18px;left:18px;z-index:999;display:flex;flex-direction:column;gap:7px}
@@ -111,6 +111,35 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 .toast.warn{border-left:3px solid var(--warn)}
 
 #paceFlash{display:none;position:fixed;inset:0;z-index:500;background:rgba(220,38,38,0.08);pointer-events:none}
+
+/* ── RIBBON STRIPE ── */
+.bottom-ribbon {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 24px;
+  background: var(--bg1);
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--t3);
+  z-index: 1000;
+  pointer-events: auto;
+}
+.bottom-ribbon a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  margin-left: 4px;
+  transition: color 0.15s;
+}
+.bottom-ribbon a:hover {
+  color: var(--accent2);
+  text-decoration: underline;
+}
 </style>
 </head>
 <body>
@@ -149,7 +178,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
       <button class="mode-pill" id="tabTool" onclick="setMode('qc_tool')">QC Tool</button>
     </div>
     <div class="t-space"></div>
-    <!-- NEW: Production Count Chip -->
     <div class="t-chip done-count" id="doneCounter">Done: 0</div>
     <div class="t-avatar" id="tAvatar">–</div>
     <div class="t-uname" id="tUser">–</div>
@@ -159,30 +187,21 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
   <div id="setupPage">
     <div class="filter-bar">
       <select id="entFilter" class="fi-sel"><option value="">All Enterprises</option></select>
-      
       <div id="contQcOnly" style="display:contents">
         <select id="qcUFilter" class="fi-sel"><option value="">All QC Users</option></select>
       </div>
-      
       <div id="contEditOnly" class="hidden" style="display:contents">
         <select id="fqcFilter" class="fi-sel"><option value="">All First QC</option></select>
         <select id="lqcFilter" class="fi-sel"><option value="">All Last QC</option></select>
         <select id="editorFilter" class="fi-sel"><option value="">All Editors</option></select>
         <select id="issueFilter" class="fi-sel"><option value="">All Issues</option></select>
       </div>
-
       <div class="t-space"></div>
       <span id="fcount" class="t-chip"></span>
       <button class="btn-start" id="startBtn">▶ Start Review</button>
     </div>
-    
-    <div class="load-strip" id="loadStrip">
-      <div class="spin"></div><span id="loadTxt">Fetching data…</span>
-    </div>
-
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--t4)">
-      Select filters and click Start Review.
-    </div>
+    <div class="load-strip" id="loadStrip"><div class="spin"></div><span id="loadTxt">Fetching data…</span></div>
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--t4)">Select filters and click Start Review.</div>
   </div>
 
   <div id="reviewPage">
@@ -235,12 +254,15 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
   </div>
 </div>
 
+<div class="bottom-ribbon">
+  Managed by <a href="mailto:kishor@spyne.ai">kishor@spyne.ai</a>
+</div>
+
 <div class="toast-shelf" id="toastShelf"></div>
 
 <script>
 const QC_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=1717039169&single=true&output=csv";
 const EDIT_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=320301246&single=true&output=csv";
-// NEW: Data source for counting done items
 const DONE_COUNT_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=2128295653&single=true&output=csv";
 const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdrjhynjWITfOqHpkgKX8enCmDKg1b3s0Ij05Cux36kPmZEUA/formResponse";
 
@@ -253,13 +275,13 @@ const FMAP = {
 
 let raw=[], group=[], idx=0, mode='qc', user='';
 let imagesLoaded = false, loadedCount = 0, imgsToLoadTotal = 0;
+let safetyTimer = null; 
 const preloadedIndices = new Set();
 
 const PWDS = {"Nand Kishor":"spyne@123","Ranbir Manoranjan":"spyne@123","Nitin Kumar":"spyne@123","Praveen Agarwal":"spyne@123","Raj Tripathi":"spyne@123","Rohit Chauhan":"spyne@123","Ajay Devrani":"spyne@123"};
 
 function _id(id){ return document.getElementById(id); }
 
-/* --- UTILS --- */
 function setLoading(show, txt = 'Fetching data…') {
   const strip = _id('loadStrip');
   if (strip) {
@@ -280,31 +302,21 @@ function toast(msg, type='ok') {
   setTimeout(() => {
     t.style.animation = 'tOut .2s ease both';
     setTimeout(() => t.remove(), 200);
-  }, 2500);
+  }, type === 'err' ? 4000 : 2500);
 }
 
-// NEW: Shift Boundary Calculation Logic (7 AM - 6:59 AM)
 function getShiftBoundaries() {
   const now = new Date();
   const start = new Date(now);
   start.setMinutes(0, 0, 0);
   start.setSeconds(0, 0);
-  
-  if (now.getHours() < 7) {
-    // Before 7 AM: Shift started yesterday at 7 AM
-    start.setDate(now.getDate() - 1);
-    start.setHours(7);
-  } else {
-    // After 7 AM: Shift started today at 7 AM
-    start.setHours(7);
-  }
-  
+  if (now.getHours() < 7) { start.setDate(now.getDate() - 1); start.setHours(7); } 
+  else { start.setHours(7); }
   const end = new Date(start);
   end.setDate(start.getDate() + 1);
   return { start, end };
 }
 
-// NEW: Fetch Production Count from Google Sheet
 async function fetchProductionCount() {
   if (!user) return;
   try {
@@ -312,42 +324,32 @@ async function fetchProductionCount() {
     if (!response.ok) return;
     const csvData = await response.text();
     const boundaries = getShiftBoundaries();
-    
     Papa.parse(csvData, {
       header: true,
       complete: res => {
         const userProduction = res.data.filter(row => {
-          // Check user name from column 'login user'
           if (row['login user'] !== user) return false;
-          
-          // Check timestamp column (usually first column or named 'Timestamp')
           const timestampStr = row['Timestamp']; 
           if (!timestampStr) return false;
-          
           const entryDate = new Date(timestampStr);
           return entryDate >= boundaries.start && entryDate < boundaries.end;
         });
-        
         _id('doneCounter').textContent = `Done: ${userProduction.length}`;
       }
     });
-  } catch (err) {
-    console.error("Count fetch failed:", err);
-  }
+  } catch (err) { console.error("Count fetch failed:", err); }
 }
 
 function doLogin(){
   const name = _id('loginName').value, pw = _id('loginPw').value;
   if(PWDS[name] === pw){
     user = name;
-    const avatar = _id('tAvatar');
-    if (avatar) avatar.textContent = name.split(' ').map(n => n[0]).join('').toUpperCase();
-    const tUser = _id('tUser');
-    if (tUser) tUser.textContent = name;
+    _id('tAvatar').textContent = name.split(' ').map(n => n[0]).join('').toUpperCase();
+    _id('tUser').textContent = name;
     _id('loginPage').style.display = 'none';
     _id('app').style.display = 'flex';
     setMode('qc');
-    fetchProductionCount(); // Fetch count on login
+    fetchProductionCount();
   } else { _id('loginErr').style.display = 'block'; }
 }
 
@@ -377,8 +379,7 @@ async function loadData() {
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     const csvData = await response.text();
     Papa.parse(csvData, {
-      header: true,
-      skipEmptyLines: true,
+      header: true, skipEmptyLines: true,
       complete: res => {
         const m = mode === 'qc' ? FMAP.qc : FMAP.edited;
         raw = res.data.map(r => ({
@@ -400,27 +401,12 @@ async function loadData() {
         updateCount();
         setLoading(false);
       },
-      error: err => {
-        console.error("PapaParse error:", err);
-        toast('Error parsing data', 'err');
-        setLoading(false);
-      }
+      error: err => { toast('Error parsing data', 'err'); setLoading(false); }
     });
-  } catch (err) {
-    console.error("Fetch error:", err);
-    toast('Network error - Check Sheet permissions', 'err');
-    setLoading(false);
-  }
+  } catch (err) { toast('Network error - Check Sheet permissions', 'err'); setLoading(false); }
 }
 
 function fillFilters(){
-  const ents = [...new Set(raw.map(r=>r.enterprise))].sort();
-  const qcus = [...new Set(raw.map(r=>r.user))].sort();
-  const fqcs = [...new Set(raw.map(r=>r.fqc))].sort();
-  const lqcs = [...new Set(raw.map(r=>r.lqc))].sort();
-  const editors = [...new Set(raw.map(r=>r.editor))].sort();
-  const issues = [...new Set(raw.flatMap(r=>r.issue ? r.issue.split(',') : []))].map(i=>i.trim()).filter(Boolean).sort();
-
   const populate = (id, list) => {
     const sel = _id(id);
     if (!sel) return;
@@ -428,35 +414,22 @@ function fillFilters(){
     sel.innerHTML = `<option value="">${first}</option>`;
     list.forEach(v => { if(v && v!=='N/A') sel.innerHTML += `<option value="${v}">${v}</option>`; });
   };
-
-  populate('entFilter', ents);
-  populate('qcUFilter', qcus);
-  populate('fqcFilter', fqcs);
-  populate('lqcFilter', lqcs);
-  populate('editorFilter', editors);
-  populate('issueFilter', issues);
+  populate('entFilter', [...new Set(raw.map(r=>r.enterprise))].sort());
+  populate('qcUFilter', [...new Set(raw.map(r=>r.user))].sort());
+  populate('fqcFilter', [...new Set(raw.map(r=>r.fqc))].sort());
+  populate('lqcFilter', [...new Set(raw.map(r=>r.lqc))].sort());
+  populate('editorFilter', [...new Set(raw.map(r=>r.editor))].sort());
+  populate('issueFilter', [...new Set(raw.flatMap(r=>r.issue?r.issue.split(','):[]))].map(i=>i.trim()).filter(Boolean).sort());
 }
 
 function getFiltered(){
-  const ent = _id('entFilter').value;
-  const qcu = _id('qcUFilter').value;
-  const fqc = _id('fqcFilter').value;
-  const lqc = _id('lqcFilter').value;
-  const ed = _id('editorFilter').value;
-  const is = _id('issueFilter').value;
-
+  const ent = _id('entFilter').value, qcu = _id('qcUFilter').value, fqc = _id('fqcFilter').value, lqc = _id('lqcFilter').value, ed = _id('editorFilter').value, is = _id('issueFilter').value;
   return raw.filter(r => {
     const statusVal = (r.status || '').toString().trim().toLowerCase();
     let ok = statusVal === '' || statusVal === 'null';
     if(ent) ok = ok && r.enterprise === ent;
-    if(mode === 'qc'){
-      if(qcu) ok = ok && r.user === qcu;
-    } else {
-      if(fqc) ok = ok && r.fqc === fqc;
-      if(lqc) ok = ok && r.lqc === lqc;
-      if(ed) ok = ok && r.editor === ed;
-      if(is) ok = ok && r.issue.includes(is);
-    }
+    if(mode === 'qc'){ if(qcu) ok = ok && r.user === qcu; } 
+    else { if(fqc) ok = ok && r.fqc === fqc; if(lqc) ok = ok && r.lqc === lqc; if(ed) ok = ok && r.editor === ed; if(is) ok = ok && r.issue.includes(is); }
     if(mode === 'qc_tool') ok = ok && r.action === 'qc_editingtool';
     else if(mode === 'edited') ok = ok && r.action !== 'qc_editingtool';
     return ok;
@@ -476,21 +449,22 @@ function startReview(){
   _id('setupPage').style.display = 'none';
   _id('reviewPage').style.display = 'flex';
   showRecord();
-  preloadFuture(15);
 }
 
 function resetImage(imgId) {
     const img = _id(imgId);
-    if (img) {
-      img.classList.remove('loaded');
-      img.src = "";
-    }
+    if (img) { img.classList.remove('loaded'); img.src = ""; }
 }
 
 function checkAllLoaded() {
-  if(loadedCount >= imgsToLoadTotal) {
-    imagesLoaded = true;
-    preloadFuture(10);
+  if(loadedCount >= imgsToLoadTotal && !imagesLoaded) {
+    if (safetyTimer) clearTimeout(safetyTimer);
+    safetyTimer = setTimeout(() => {
+        imagesLoaded = true;
+        _id('nextBtn').disabled = false;
+        _id('nextBtn').textContent = "Submit & Next →";
+        setTimeout(() => preloadFuture(15), 500);
+    }, 1000); 
   }
 }
 
@@ -511,18 +485,23 @@ function showRecord(){
   const r = group[idx];
   imagesLoaded = false;
   loadedCount = 0;
+  if (safetyTimer) clearTimeout(safetyTimer);
   imgsToLoadTotal = mode === 'qc' ? 2 : 3;
+  _id('nextBtn').disabled = true;
+  _id('nextBtn').textContent = "⌛ Loading Images...";
 
   const handleFinish = (e) => {
-    e.target.classList.add('loaded');
-    loadedCount++;
-    checkAllLoaded();
+    if (e.target.src && !e.target.src.endsWith('blob:') && e.target.src !== window.location.href) {
+        e.target.classList.add('loaded');
+        loadedCount++;
+        checkAllLoaded();
+    }
   };
 
   _id('mEnt').textContent = r.enterprise;
   _id('mSku').textContent = r.sku_id;
   _id('mImg').textContent = r.image_id;
-  _id('mQcUsers').textContent = r.fqc !== 'N/A' ? `${r.fqc}, ${r.lqc}` : r.user;
+  _id('mQcUsers').textContent = [r.fqc, r.lqc, r.user].filter(u => u && u!=='N/A').join(', ');
   _id('mEditor').textContent = r.editor;
   _id('mEditorWrap').classList.toggle('hidden', mode === 'qc');
   _id('mIssue').textContent = r.issue;
@@ -535,7 +514,7 @@ function showRecord(){
   ['imgL','imgM','imgR'].forEach(id => {
     const el = _id(id);
     el.onload = handleFinish;
-    el.onerror = handleFinish;
+    el.onerror = handleFinish; 
   });
 
   _id('imgL').src = PROXY + r.left;
@@ -559,21 +538,14 @@ function doSubmit(){
     toast('Wait to load images then enter', 'warn');
     return;
   }
-
   const r = group[idx];
-  const selectedOptions = Array.from(document.querySelectorAll('.issue-cb:checked'))
-                               .map(cb => cb.value);
-  
-  if (selectedOptions.length === 0) {
-      toast('Please select an issue or Done', 'warn');
-      return;
-  }
+  const checkedBoxes = Array.from(document.querySelectorAll('.issue-cb:checked'));
+  if (checkedBoxes.length === 0) { toast('Please select an issue or Done', 'warn'); return; }
 
   _id('nextBtn').disabled = true;
-
   const body = new URLSearchParams();
   body.append("entry.890284089", r.enterprise);
-  body.append("entry.5932044", [r.fqc, r.lqc, r.user].filter(u => u && u.toLowerCase() !== 'n/a').join(', '));
+  body.append("entry.5932044", [r.fqc, r.lqc, r.user].filter(u => u && u!=='N/A').join(', '));
   body.append("entry.1880389842", r.editor);
   body.append("entry.1139236247", r.sku_id);
   body.append("entry.661750446", r.image_id);
@@ -582,49 +554,32 @@ function doSubmit(){
   body.append("entry.772576827", r.mid);
   body.append("entry.780536997", r.right || r.mid);
   body.append("entry.865196657", user);
-  body.append("entry.778698303", selectedOptions.join(", "));
+  checkedBoxes.forEach(cb => { body.append("entry.778698303", cb.value); });
 
   fetch(FORM_URL, { 
-    method: 'POST', 
-    mode: 'no-cors', 
+    method: 'POST', mode: 'no-cors', 
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: body.toString() 
-  })
-    .then(() => {
-      _id('nextBtn').disabled = false;
-      toast('Submitted successfully');
-      fetchProductionCount(); // Update done count after submission
-      if(idx < group.length - 1){ idx++; showRecord(); }
-      else { alert('Review Finished.'); exitToSetup(); }
-    })
-    .catch(err => {
-      _id('nextBtn').disabled = false;
-      toast('Error submitting', 'err');
-    });
+  }).then(() => {
+    _id('nextBtn').disabled = false;
+    toast('Submitted successfully');
+    fetchProductionCount();
+    if(idx < group.length - 1){ idx++; showRecord(); }
+    else { alert('Review Finished.'); exitToSetup(); }
+  }).catch(() => { _id('nextBtn').disabled = false; toast('Error submitting', 'err'); });
 }
 
-function exitToSetup(){
-  _id('reviewPage').style.display = 'none';
-  _id('setupPage').style.display = 'flex';
-}
+function exitToSetup(){ _id('reviewPage').style.display = 'none'; _id('setupPage').style.display = 'flex'; }
 
-function handleLoginEnter(e) {
-  if (e.key === 'Enter') { e.preventDefault(); doLogin(); }
-}
+function handleLoginEnter(e) { if (e.key === 'Enter') { e.preventDefault(); doLogin(); } }
 
 document.querySelectorAll('.issue-cb').forEach(cb => {
   cb.addEventListener('change', (e) => {
     if (e.target.id === 'cbDone') {
-      if (e.target.checked) {
-        document.querySelectorAll('.issue-cb:not(#cbDone)').forEach(other => other.checked = false);
-      }
+      if (e.target.checked) document.querySelectorAll('.issue-cb:not(#cbDone)').forEach(o => o.checked = false);
     } else {
-      if (e.target.checked) {
-        _id('cbDone').checked = false;
-      } else {
-        const anyOthers = Array.from(document.querySelectorAll('.issue-cb:not(#cbDone)')).some(c => c.checked);
-        if (!anyOthers) _id('cbDone').checked = true;
-      }
+      if (e.target.checked) _id('cbDone').checked = false;
+      else if (!Array.from(document.querySelectorAll('.issue-cb:not(#cbDone)')).some(c => c.checked)) _id('cbDone').checked = true;
     }
   });
 });
@@ -635,12 +590,7 @@ document.addEventListener('keydown', e => {
       const cb = _id('cb' + e.key);
       if (cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); e.preventDefault(); }
     }
-    if (e.key === '9') {
-       const cb = _id('cbDone');
-       cb.checked = !cb.checked;
-       cb.dispatchEvent(new Event('change'));
-       e.preventDefault();
-    }
+    if (e.key === '9') { const cb = _id('cbDone'); cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); e.preventDefault(); }
     if (e.key === 'Enter') { doSubmit(); e.preventDefault(); }
   }
 });
@@ -650,10 +600,8 @@ _id('loginName').addEventListener('keydown', handleLoginEnter);
 _id('loginPw').addEventListener('keydown', handleLoginEnter);
 _id('startBtn').onclick = startReview;
 _id('prevBtn').onclick = () => { if(idx > 0) { idx--; showRecord(); } };
-
 ['entFilter','qcUFilter','fqcFilter','lqcFilter','editorFilter','issueFilter'].forEach(id => {
-  const el = _id(id);
-  if (el) el.addEventListener('change', updateCount);
+  const el = _id(id); if (el) el.addEventListener('change', updateCount);
 });
 </script>
 </body>
