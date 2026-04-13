@@ -242,7 +242,10 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
           <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb6" value="Number Plate"><span class="issue-cb-num">6</span>Number Plate</label>
           <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb7" value="Shadow"><span class="issue-cb-num">7</span>Shadow</label>
           <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb8" value="Open-door RBG"><span class="issue-cb-num">8</span>Open-door RBG</label>
-          <label class="issue-cb-row done-row"><input type="checkbox" class="issue-cb" id="cbDone" value="Done"><span class="issue-cb-num">9</span>Done</label>
+          <!-- New Wrong Marking Issue with key 9 -->
+          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb9" value="Wrong Marking"><span class="issue-cb-num">9</span>Wrong Marking</label>
+          <!-- Done with no shortcut key -->
+          <label class="issue-cb-row done-row"><input type="checkbox" class="issue-cb" id="cbDone" value="Done">Done</label>
         </div>
       </div>
       <div style="display:flex;gap:8px">
@@ -276,7 +279,7 @@ const FMAP = {
 let raw=[], group=[], idx=0, mode='qc', user='';
 let imagesLoaded = false, loadedCount = 0, imgsToLoadTotal = 0;
 let safetyTimer = null; 
-let currentDoneCount = 0; // Local counter for instant UI updates
+let currentDoneCount = 0; 
 const preloadedIndices = new Set();
 
 const PWDS = {"Nand Kishor":"spyne@123","Ranbir Manoranjan":"spyne@123","Nitin Kumar":"spyne@123","Praveen Agarwal":"spyne@123","Raj Tripathi":"spyne@123","Rohit Chauhan":"spyne@123","Ajay Devrani":"spyne@123"};
@@ -345,7 +348,6 @@ async function fetchProductionCount() {
           return entryDate >= boundaries.start && entryDate < boundaries.end;
         });
         
-        // Sync local counter with actual sheet data
         currentDoneCount = userProduction.length;
         _id('doneCounter').textContent = `Done: ${currentDoneCount}`;
       }
@@ -576,14 +578,9 @@ function doSubmit(){
   }).then(() => {
     _id('nextBtn').disabled = false;
     toast('Submitted successfully');
-    
-    // FEATURE: Instant local count update
     currentDoneCount++;
     _id('doneCounter').textContent = `Done: ${currentDoneCount}`;
-    
-    // Refresh background sync after a short delay
     setTimeout(fetchProductionCount, 5000);
-    
     if(idx < group.length - 1){ idx++; showRecord(); }
     else { alert('Review Finished.'); exitToSetup(); }
   }).catch(() => { _id('nextBtn').disabled = false; toast('Error submitting', 'err'); });
@@ -606,11 +603,12 @@ document.querySelectorAll('.issue-cb').forEach(cb => {
 
 document.addEventListener('keydown', e => {
   if (_id('reviewPage').style.display === 'flex') {
-    if (e.key >= '1' && e.key <= '8') {
+    // Keys 1 through 9 now toggle cb1 through cb9 (RBG issue to Wrong Marking)
+    if (e.key >= '1' && e.key <= '9') {
       const cb = _id('cb' + e.key);
       if (cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); e.preventDefault(); }
     }
-    if (e.key === '9') { const cb = _id('cbDone'); cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); e.preventDefault(); }
+    // Enter key submits
     if (e.key === 'Enter') { doSubmit(); e.preventDefault(); }
   }
 });
