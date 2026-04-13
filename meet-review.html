@@ -100,7 +100,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 
 /* empty state */
 .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;text-align:center;color:var(--t3)}
-.empty svg{margin-bottom:16px;opacity:.4}
 .empty-t{font-size:15px;font-weight:600;color:var(--t2);margin-bottom:6px}
 .empty-b{font-size:13px;color:var(--t3)}
 
@@ -148,7 +147,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   height:100%;min-height:420px;gap:8px;color:#555;
 }
-.img-err svg{opacity:.25;stroke:currentColor;fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
 .img-err span{font-size:12px;opacity:.4;color:#aaa}
 
 /* progress + nav */
@@ -186,8 +184,8 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 
 <!-- TOPBAR -->
 <div class="topbar">
-  <a class="t-logo" href="https://nandmodi.github.io/spot-qc-images/" target="_self">
-    <img src="data:image/jpeg;base64,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" style="height:28px;width:auto;display:block;" alt="Spyne"/>
+  <a class="t-logo" href="#">
+    <img src="https://spyne-prod-ai.s3.us-east-1.amazonaws.com/ai-dataset/2025/logo/unnamed.png" style="height:28px;width:auto;display:block;" alt="Spyne"/>
   </a>
   <div class="t-sep"></div>
   <span class="t-title">Meet Review</span>
@@ -218,7 +216,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 <!-- CONTENT -->
 <div class="content" id="content">
   <div class="empty">
-    <svg width="48" height="48" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M9 9h6M9 13h4"/></svg>
     <div class="empty-t">Loading records…</div>
     <div class="empty-b">Fetching review data from sheet.</div>
   </div>
@@ -237,7 +234,8 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 </div>
 
 <script>
-const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=1880564018&single=true&output=csv';
+// Updated CSV source and Comment mapping logic
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=2128295653&single=true&output=csv';
 const PROXY = 'https://media.spyneai.com/unsafe/0x0/filters:format(webp)/';
 
 let allData = [], filtered = [], idx = 0;
@@ -248,7 +246,8 @@ fetch(CSV_URL)
   .then(r => r.text())
   .then(csv => {
     allData = Papa.parse(csv, {header:true, skipEmptyLines:true}).data
-                  .filter(r => r['Comment'] !== 'Done');
+                  .filter(r => r['Submit Issue'] !== 'Done'); // Using 'Submit Issue' as the filter field
+    
     document.getElementById('loadStrip').style.display = 'none';
     const chip = document.getElementById('tCount');
     chip.textContent = allData.length.toLocaleString() + ' records';
@@ -259,7 +258,6 @@ fetch(CSV_URL)
   .catch(() => {
     document.getElementById('loadStrip').style.display = 'none';
     document.getElementById('content').innerHTML = `<div class="empty">
-      <svg width="40" height="40" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
       <div class="empty-t">Failed to load</div>
       <div class="empty-b">Check your connection and reload.</div>
     </div>`;
@@ -296,7 +294,7 @@ function applyFilters() {
   const ed   = document.getElementById('editingUserFilter').value;
 
   filtered = allData.filter(r => {
-    if(date && r['Timestamp'].split(' ')[0] !== date) return false;
+    if(date && r['Timestamp'] && r['Timestamp'].split(' ')[0] !== date) return false;
     if(ent  && r['Enterprise'] !== ent) return false;
     if(qcu  && !(r['qc-user']||'').includes(qcu)) return false;
     if(ed   && r['editing user'] !== ed) return false;
@@ -315,7 +313,6 @@ function render() {
 
   if(filtered.length === 0) {
     content.innerHTML = `<div class="empty">
-      <svg width="48" height="48" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M9 9h6M9 13h4"/></svg>
       <div class="empty-t">No records found</div>
       <div class="empty-b">Try adjusting the filters above.</div>
     </div>`;
@@ -341,8 +338,8 @@ function render() {
       <div class="img-pane-label">${label}</div>
       ${hasImg
         ? `<img src="${imgUrl(src)}" alt="${label}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
-           <div class="img-err" style="display:none"><svg width="28" height="28" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9l4-4 4 4 4-6 4 6"/></svg><span>No image</span></div>`
-        : `<div class="img-err"><svg width="28" height="28" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9l4-4 4 4 4-6 4 6"/></svg><span>No image</span></div>`
+           <div class="img-err" style="display:none"><span>No image</span></div>`
+        : `<div class="img-err"><span>No image</span></div>`
       }
     </div>`;
   };
@@ -361,7 +358,7 @@ function render() {
       </div>
       <div class="meta-strip2" style="border-bottom:1px solid var(--line)">
         <div class="meta-cell2"><span style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#B45309">⚠ Issue</span><div class="issue-val" style="margin-top:2px">${r['Issue']||'–'}</div></div>
-        <div class="meta-cell2"><span style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#000">Comment</span><div class="comment-val" style="margin-top:2px">${r['Comment']||'–'}</div></div>
+        <div class="meta-cell2"><span style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#000">Comment (Submit Issue)</span><div class="comment-val" style="margin-top:2px">${r['Submit Issue']||'–'}</div></div>
       </div>
       <div class="images-row">
         ${imgEl(r['input image'], 'Input Image')}
