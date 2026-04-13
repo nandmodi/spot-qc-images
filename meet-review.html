@@ -111,41 +111,92 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 
 /* meta strip */
 .meta-strip{
-  display:grid;grid-template-columns:repeat(4,1fr);
+  display:grid;grid-template-columns:repeat(2,1fr);
   border-bottom:1px solid var(--line);
 }
-.meta-cell{padding:10px 16px;border-right:1px solid var(--line)}
+@media (min-width: 640px) {
+  .meta-strip { grid-template-columns: repeat(4,1fr); }
+}
+.meta-cell{padding:10px 16px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+@media (min-width: 640px) {
+  .meta-cell { border-bottom: none; }
+}
 .meta-cell:last-child{border-right:none}
 .meta-cell-l{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#000;margin-bottom:2px}
 .meta-cell-v{font-family:var(--mono);font-size:11.5px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* issue + comment row */
 .meta-strip2{
-  display:grid;grid-template-columns:1fr 1fr;
+  display:grid;grid-template-columns:1fr;
   border-bottom:1px solid var(--line);
 }
-.meta-cell2{padding:8px 16px;border-right:1px solid var(--line)}
-.meta-cell2:last-child{border-right:none}
+@media (min-width: 640px) {
+  .meta-strip2 { grid-template-columns: 1fr 1fr; }
+}
+.meta-cell2{padding:8px 16px;border-right:none;border-bottom:1px solid var(--line)}
+@media (min-width: 640px) {
+  .meta-cell2 { border-right: 1px solid var(--line); border-bottom: none; }
+}
+.meta-cell2:last-child{border-right:none;border-bottom:none}
 .issue-val{color:var(--warn);font-weight:600;font-size:12px}
 .comment-val{color:var(--t2);font-size:12px}
 
-/* images */
+/* images - FIT ON WIDTH IMPROVEMENTS */
 .images-row{
-  display:grid;grid-template-columns:repeat(3,1fr);
-  min-height:420px;
+  display:grid;
+  grid-template-columns: 1fr; /* Stacked by default for mobile */
 }
-.img-pane{position:relative;background:#1A1C23;overflow:hidden;border-right:1px solid #2A2D38}
-.img-pane:last-child{border-right:none}
+
+@media (min-width: 768px) {
+  .images-row {
+    grid-template-columns: repeat(3, 1fr); /* Side-by-side on desktop */
+  }
+}
+
+.img-pane{
+  position:relative;
+  background:#1A1C23;
+  overflow:hidden;
+  border-bottom:1px solid #2A2D38;
+}
+
+@media (min-width: 768px) {
+  .img-pane {
+    border-bottom: none;
+    border-right: 1px solid #2A2D38;
+    min-height: 420px;
+  }
+  .img-pane:last-child { border-right: none; }
+}
+
 .img-pane-label{
   position:absolute;top:10px;left:10px;z-index:5;
   font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
   background:rgba(255,255,255,.88);border:1px solid rgba(0,0,0,.08);color:#374151;
   padding:3px 9px;border-radius:5px;backdrop-filter:blur(6px);
 }
-.img-pane img{width:100%;height:100%;object-fit:contain;display:block}
+
+.img-pane img{
+  width:100%;
+  height:auto;
+  max-height: 80vh; /* Prevent huge vertical stretch on mobile */
+  object-fit:contain;
+  display:block;
+}
+
+@media (min-width: 768px) {
+  .img-pane img {
+    height: 100%;
+    max-height: none;
+  }
+}
+
 .img-err{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  height:100%;min-height:420px;gap:8px;color:#555;
+  height:200px; gap:8px;color:#555;
+}
+@media (min-width: 768px) {
+  .img-err { height: 100%; min-height: 420px; }
 }
 .img-err span{font-size:12px;opacity:.4;color:#aaa}
 
@@ -154,9 +205,10 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
   background:var(--bg1);border-top:1px solid var(--line);
   padding:10px 18px;display:flex;align-items:center;gap:12px;
   position:sticky;bottom:0;box-shadow:0 -2px 8px rgba(0,0,0,.06);
+  flex-wrap: wrap;
 }
 .prog-lbl{font-family:var(--mono);font-size:11px;color:#000;font-weight:700;min-width:110px}
-.prog-track{flex:1;max-width:280px;height:4px;background:var(--line);border-radius:2px;overflow:hidden}
+.prog-track{flex:1;min-width: 150px;max-width:280px;height:4px;background:var(--line);border-radius:2px;overflow:hidden}
 .prog-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s ease}
 .prog-pct{font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:500;min-width:34px}
 .nav-space{flex:1}
@@ -174,6 +226,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 
 /* kbd hint */
 .kbd-hint{font-size:11px;color:var(--t4);display:flex;align-items:center;gap:5px}
+@media (max-width: 600px) { .kbd-hint { display: none; } }
 .kbd{font-family:var(--mono);font-size:9.5px;background:var(--bg3);border:1px solid var(--line2);border-radius:3px;padding:1px 5px;color:var(--t3)}
 
 /* loading overlay */
@@ -234,7 +287,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 </div>
 
 <script>
-// Updated CSV source and Comment mapping logic
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=2128295653&single=true&output=csv';
 const PROXY = 'https://media.spyneai.com/unsafe/0x0/filters:format(webp)/';
 
@@ -246,7 +298,7 @@ fetch(CSV_URL)
   .then(r => r.text())
   .then(csv => {
     allData = Papa.parse(csv, {header:true, skipEmptyLines:true}).data
-                  .filter(r => r['Submit Issue'] !== 'Done'); // Using 'Submit Issue' as the filter field
+                  .filter(r => r['Submit Issue'] !== 'Done');
     
     document.getElementById('loadStrip').style.display = 'none';
     const chip = document.getElementById('tCount');
