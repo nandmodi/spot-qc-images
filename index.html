@@ -378,7 +378,10 @@ function getFiltered(){
   const is = _id('issueFilter').value;
 
   return raw.filter(r => {
-    let ok = r.status === '' || r.status === 'null';
+    // MAINTAIN STATUS CONDITION: Only show records where status is empty or 'null'
+    const statusVal = (r.status || '').toString().trim().toLowerCase();
+    let ok = statusVal === '' || statusVal === 'null';
+
     if(ent) ok = ok && r.enterprise === ent;
     
     if(mode === 'qc'){
@@ -506,6 +509,14 @@ function exitToSetup(){
   _id('setupPage').style.display = 'flex';
 }
 
+// Global handleEnter to handle login from any input field
+function handleLoginEnter(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    doLogin();
+  }
+}
+
 document.addEventListener('keydown', e => {
   if (_id('reviewPage').style.display === 'flex') {
     if (e.key >= '1' && e.key <= '8') {
@@ -517,6 +528,10 @@ document.addEventListener('keydown', e => {
 });
 
 _id('loginBtn').onclick = doLogin;
+// Add Enter key support to login fields
+_id('loginName').addEventListener('keydown', handleLoginEnter);
+_id('loginPw').addEventListener('keydown', handleLoginEnter);
+
 _id('startBtn').onclick = startReview;
 _id('prevBtn').onclick = () => { if(idx > 0) { idx--; showRecord(); } };
 
