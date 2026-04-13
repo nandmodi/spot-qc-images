@@ -28,13 +28,16 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 ::-webkit-scrollbar-thumb{background:var(--line2);border-radius:2px}
 .hidden{display:none!important}
 
-/* ── SHIMMER SKELETON ── */
+/* ── ANIMATIONS ── */
 @keyframes shimmer{0%{background-position:-800px 0}100%{background-position:800px 0}}
+@keyframes tIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
+@keyframes tOut{to{opacity:0;transform:translateX(-12px)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes rot{to{transform:rotate(360deg)}}
 
 /* ── LOGIN ── */
 #loginPage{height:100%;display:flex;align-items:center;justify-content:center;background:var(--bg0)}
 .login-card{width:390px;background:var(--bg1);border:1px solid var(--line);border-radius:var(--rlg);padding:44px 40px 38px;box-shadow:var(--shadow-lg);animation:slideUp .35s cubic-bezier(.22,.68,0,1.2) both}
-@keyframes slideUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 .login-h{font-size:20px;font-weight:800;letter-spacing:-.03em;margin-bottom:4px;color:#000}
 .login-sub{font-size:13px;color:var(--t3);margin-bottom:28px}
 .field+.field{margin-top:15px}
@@ -54,6 +57,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 .mode-pill.on{background:var(--bg1);color:var(--accent);font-weight:600;box-shadow:var(--shadow)}
 .t-space{flex:1}
 .t-chip{font-family:var(--mono);font-size:11px;color:var(--t3);background:var(--bg2);border:1px solid var(--line);border-radius:5px;padding:3px 9px;white-space:nowrap}
+.t-chip.done-count{background:var(--oklt);color:var(--ok);border-color:var(--ok);font-weight:700}
 .t-avatar{width:28px;height:28px;background:var(--accentlt);border:1.5px solid var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--accent);flex-shrink:0}
 .t-uname{font-size:13px;font-weight:500;color:var(--t2)}
 .btn-sm{font-family:'Inter',sans-serif;font-size:12px;font-weight:500;background:transparent;border:1px solid var(--line2);border-radius:6px;color:var(--t3);padding:0 11px;height:28px;cursor:pointer;transition:all .14s}
@@ -67,7 +71,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 /* ── DATA LOADER ── */
 .load-strip{display:none;align-items:center;gap:10px;padding:9px 18px;background:var(--accentlt);border-bottom:1px solid var(--line);font-size:12.5px;font-weight:500;color:var(--accent);flex-shrink:0}
 .spin{width:14px;height:14px;border:2px solid var(--line2);border-top-color:var(--accent);border-radius:50%;animation:rot .7s linear infinite;flex-shrink:0}
-@keyframes rot{to{transform:rotate(360deg)}}
 
 /* ── REVIEW PAGE ── */
 #reviewPage{display:none;flex-direction:column;flex:1;overflow:hidden;min-height:0}
@@ -75,7 +78,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 .rmc{padding:9px 18px 9px 0;border-right:1px solid var(--line);margin-right:18px;flex-shrink:0;min-width:0;max-width:260px}
 .rmc-l{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#000;margin-bottom:2px}
 .rmc-v{font-family:var(--mono);font-size:11.5px;color:var(--t2);font-weight:400;overflow:hidden;text-overflow:ellipsis}
-.issue-cell .rmc-v{color:var(--warn);font-family:'Inter',sans-serif;font-size:12px;font-weight:500}
 
 .prog-row{background:var(--bg2);border-bottom:1px solid var(--line);padding:6px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0}
 .prog-track{flex:1;max-width:280px;height:4px;background:var(--line);border-radius:2px;overflow:hidden}
@@ -84,7 +86,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 .img-area{flex:1;display:grid;grid-template-columns:repeat(3,1fr);overflow:hidden;min-height:0}
 .img-area.two-col{grid-template-columns:1fr 1fr}
 .img-panel{position:relative;display:flex;flex-direction:column;background:#1A1C23;overflow:hidden;border-right:1px solid #2A2D38}
-.img-panel img{width:100%;height:100%;object-fit:contain;display:block;opacity:0;transition:opacity .22s ease;position:absolute;inset:0}
+.img-panel img{width:100%;height:100%;object-fit:contain;display:block;opacity:0;transition:opacity .2s ease;position:absolute;inset:0}
 .img-panel img.loaded{opacity:1}
 .img-label{position:absolute;top:10px;left:10px;z-index:5;font-size:10.5px;font-weight:600;text-transform:uppercase;background:rgba(255,255,255,0.88);padding:3px 9px;border-radius:5px}
 
@@ -92,7 +94,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 .issue-checkboxes{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}
 .issue-cb-row{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:500;color:var(--t2);cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid var(--line);background:var(--bg2);transition:background 0.2s}
 .issue-cb-row:has(.issue-cb:checked){background:var(--dangerlt);border-color:#FCA5A5;color:var(--danger);font-weight:600}
-/* Done style */
 .issue-cb-row.done-row:has(.issue-cb:checked){background:var(--oklt);border-color:var(--ok);color:var(--ok)}
 .issue-cb{display:none}
 .issue-cb-num{font-family:var(--mono);font-size:9.5px;font-weight:700;background:var(--bg4);border-radius:3px;padding:1px 4px;color:var(--t3);line-height:1}
@@ -108,11 +109,8 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 .toast.ok{border-left:3px solid var(--ok)}
 .toast.err{border-left:3px solid var(--danger)}
 .toast.warn{border-left:3px solid var(--warn)}
-@keyframes tIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
-@keyframes tOut{to{opacity:0;transform:translateX(-12px)}}
 
-#paceFlash{display:none;position:fixed;inset:0;z-index:500;background:rgba(220,38,38,0.08);pointer-events:none;animation:flashPulse .4s ease both}
-@keyframes flashPulse{0%{opacity:0}30%{opacity:1}100%{opacity:0}}
+#paceFlash{display:none;position:fixed;inset:0;z-index:500;background:rgba(220,38,38,0.08);pointer-events:none}
 </style>
 </head>
 <body>
@@ -151,6 +149,8 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
       <button class="mode-pill" id="tabTool" onclick="setMode('qc_tool')">QC Tool</button>
     </div>
     <div class="t-space"></div>
+    <!-- NEW: Production Count Chip -->
+    <div class="t-chip done-count" id="doneCounter">Done: 0</div>
     <div class="t-avatar" id="tAvatar">–</div>
     <div class="t-uname" id="tUser">–</div>
     <button class="btn-sm" onclick="doLogout()">Logout</button>
@@ -160,7 +160,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
     <div class="filter-bar">
       <select id="entFilter" class="fi-sel"><option value="">All Enterprises</option></select>
       
-      <!-- Tab-specific filter containers -->
       <div id="contQcOnly" style="display:contents">
         <select id="qcUFilter" class="fi-sel"><option value="">All QC Users</option></select>
       </div>
@@ -202,15 +201,15 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
     <div class="img-area" id="imgArea">
       <div class="img-panel">
         <div class="img-label">Input</div>
-        <img id="imgL" src="" alt="Input"/>
+        <img id="imgL" src="" alt="Input" loading="eager" decoding="async"/>
       </div>
       <div class="img-panel">
         <div class="img-label">AI Output</div>
-        <img id="imgM" src="" alt="Output"/>
+        <img id="imgM" src="" alt="Output" loading="eager" decoding="async"/>
       </div>
       <div class="img-panel" id="panelR">
         <div class="img-label">Final Output</div>
-        <img id="imgR" src="" alt="Final"/>
+        <img id="imgR" src="" alt="Final" loading="eager" decoding="async"/>
       </div>
     </div>
     <div class="rev-footer">
@@ -224,7 +223,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
           <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb6" value="Number Plate"><span class="issue-cb-num">6</span>Number Plate</label>
           <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb7" value="Shadow"><span class="issue-cb-num">7</span>Shadow</label>
           <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb8" value="Open-door RBG"><span class="issue-cb-num">8</span>Open-door RBG</label>
-          <!-- Done Checkbox -->
           <label class="issue-cb-row done-row"><input type="checkbox" class="issue-cb" id="cbDone" value="Done"><span class="issue-cb-num">9</span>Done</label>
         </div>
       </div>
@@ -238,11 +236,12 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 </div>
 
 <div class="toast-shelf" id="toastShelf"></div>
-<div id="paceFlash"></div>
 
 <script>
 const QC_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=1717039169&single=true&output=csv";
 const EDIT_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=320301246&single=true&output=csv";
+// NEW: Data source for counting done items
+const DONE_COUNT_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=2128295653&single=true&output=csv";
 const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdrjhynjWITfOqHpkgKX8enCmDKg1b3s0Ij05Cux36kPmZEUA/formResponse";
 
 const PROXY = "https://media.spyneai.com/unsafe/0x0/filters:format(webp)/";
@@ -253,9 +252,8 @@ const FMAP = {
 };
 
 let raw=[], group=[], idx=0, mode='qc', user='';
-let imagesLoaded = false;
-let loadedCount = 0;
-let imgsToLoadTotal = 0;
+let imagesLoaded = false, loadedCount = 0, imgsToLoadTotal = 0;
+const preloadedIndices = new Set();
 
 const PWDS = {"Nand Kishor":"spyne@123","Ranbir Manoranjan":"spyne@123","Nitin Kumar":"spyne@123","Praveen Agarwal":"spyne@123","Raj Tripathi":"spyne@123","Rohit Chauhan":"spyne@123","Ajay Devrani":"spyne@123"};
 
@@ -285,6 +283,59 @@ function toast(msg, type='ok') {
   }, 2500);
 }
 
+// NEW: Shift Boundary Calculation Logic (7 AM - 6:59 AM)
+function getShiftBoundaries() {
+  const now = new Date();
+  const start = new Date(now);
+  start.setMinutes(0, 0, 0);
+  start.setSeconds(0, 0);
+  
+  if (now.getHours() < 7) {
+    // Before 7 AM: Shift started yesterday at 7 AM
+    start.setDate(now.getDate() - 1);
+    start.setHours(7);
+  } else {
+    // After 7 AM: Shift started today at 7 AM
+    start.setHours(7);
+  }
+  
+  const end = new Date(start);
+  end.setDate(start.getDate() + 1);
+  return { start, end };
+}
+
+// NEW: Fetch Production Count from Google Sheet
+async function fetchProductionCount() {
+  if (!user) return;
+  try {
+    const response = await fetch(DONE_COUNT_URL);
+    if (!response.ok) return;
+    const csvData = await response.text();
+    const boundaries = getShiftBoundaries();
+    
+    Papa.parse(csvData, {
+      header: true,
+      complete: res => {
+        const userProduction = res.data.filter(row => {
+          // Check user name from column 'login user'
+          if (row['login user'] !== user) return false;
+          
+          // Check timestamp column (usually first column or named 'Timestamp')
+          const timestampStr = row['Timestamp']; 
+          if (!timestampStr) return false;
+          
+          const entryDate = new Date(timestampStr);
+          return entryDate >= boundaries.start && entryDate < boundaries.end;
+        });
+        
+        _id('doneCounter').textContent = `Done: ${userProduction.length}`;
+      }
+    });
+  } catch (err) {
+    console.error("Count fetch failed:", err);
+  }
+}
+
 function doLogin(){
   const name = _id('loginName').value, pw = _id('loginPw').value;
   if(PWDS[name] === pw){
@@ -296,6 +347,7 @@ function doLogin(){
     _id('loginPage').style.display = 'none';
     _id('app').style.display = 'flex';
     setMode('qc');
+    fetchProductionCount(); // Fetch count on login
   } else { _id('loginErr').style.display = 'block'; }
 }
 
@@ -312,6 +364,7 @@ function setMode(m){
   if (qcOnly) qcOnly.classList.toggle('hidden', !isQc);
   if (editOnly) editOnly.classList.toggle('hidden', isQc);
   raw = [];
+  preloadedIndices.clear();
   updateCount();
   loadData();
 }
@@ -423,6 +476,7 @@ function startReview(){
   _id('setupPage').style.display = 'none';
   _id('reviewPage').style.display = 'flex';
   showRecord();
+  preloadFuture(15);
 }
 
 function resetImage(imgId) {
@@ -436,6 +490,20 @@ function resetImage(imgId) {
 function checkAllLoaded() {
   if(loadedCount >= imgsToLoadTotal) {
     imagesLoaded = true;
+    preloadFuture(10);
+  }
+}
+
+function preloadFuture(count = 15) {
+  for (let i = 1; i <= count; i++) {
+    const targetIdx = idx + i;
+    if (targetIdx < group.length && !preloadedIndices.has(targetIdx)) {
+      const item = group[targetIdx];
+      const urls = [item.left, item.mid];
+      if (mode !== 'qc') urls.push(item.right || item.mid);
+      urls.forEach(url => { if (!url) return; const img = new Image(); img.src = PROXY + url; });
+      preloadedIndices.add(targetIdx);
+    }
   }
 }
 
@@ -462,9 +530,7 @@ function showRecord(){
   _id('progLbl').textContent = `Record ${idx+1} of ${group.length}`;
   _id('progFill').style.width = ((idx+1)/group.length*100) + '%';
   
-  resetImage('imgL');
-  resetImage('imgM');
-  resetImage('imgR');
+  resetImage('imgL'); resetImage('imgM'); resetImage('imgR');
 
   ['imgL','imgM','imgR'].forEach(id => {
     const el = _id(id);
@@ -484,7 +550,6 @@ function showRecord(){
   }
 
   _id('prevBtn').disabled = idx === 0;
-  
   document.querySelectorAll('.issue-cb').forEach(cb => cb.checked = false);
   _id('cbDone').checked = true;
 }
@@ -517,10 +582,7 @@ function doSubmit(){
   body.append("entry.772576827", r.mid);
   body.append("entry.780536997", r.right || r.mid);
   body.append("entry.865196657", user);
-
-  // LOGIC: Send multiple issues as ONE comma-separated string to the field
-  const finalValue = selectedOptions.join(", ");
-  body.append("entry.778698303", finalValue);
+  body.append("entry.778698303", selectedOptions.join(", "));
 
   fetch(FORM_URL, { 
     method: 'POST', 
@@ -531,6 +593,7 @@ function doSubmit(){
     .then(() => {
       _id('nextBtn').disabled = false;
       toast('Submitted successfully');
+      fetchProductionCount(); // Update done count after submission
       if(idx < group.length - 1){ idx++; showRecord(); }
       else { alert('Review Finished.'); exitToSetup(); }
     })
@@ -546,10 +609,7 @@ function exitToSetup(){
 }
 
 function handleLoginEnter(e) {
-  if (e.key === 'Enter') {
-    e.preventDefault();
-    doLogin();
-  }
+  if (e.key === 'Enter') { e.preventDefault(); doLogin(); }
 }
 
 document.querySelectorAll('.issue-cb').forEach(cb => {
@@ -573,11 +633,7 @@ document.addEventListener('keydown', e => {
   if (_id('reviewPage').style.display === 'flex') {
     if (e.key >= '1' && e.key <= '8') {
       const cb = _id('cb' + e.key);
-      if (cb) { 
-        cb.checked = !cb.checked; 
-        cb.dispatchEvent(new Event('change'));
-        e.preventDefault(); 
-      }
+      if (cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); e.preventDefault(); }
     }
     if (e.key === '9') {
        const cb = _id('cbDone');
@@ -585,10 +641,7 @@ document.addEventListener('keydown', e => {
        cb.dispatchEvent(new Event('change'));
        e.preventDefault();
     }
-    if (e.key === 'Enter') { 
-      doSubmit(); 
-      e.preventDefault(); 
-    }
+    if (e.key === 'Enter') { doSubmit(); e.preventDefault(); }
   }
 });
 
