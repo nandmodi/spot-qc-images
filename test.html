@@ -152,7 +152,19 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
   <div id="setupPage">
     <div class="filter-bar">
       <select id="entFilter" class="fi-sel"><option value="">All Enterprises</option></select>
-      <select id="qcUFilter" class="fi-sel"><option value="">All QC Users</option></select>
+      
+      <!-- Tab-specific filter containers -->
+      <div id="contQcOnly" style="display:contents">
+        <select id="qcUFilter" class="fi-sel"><option value="">All QC Users</option></select>
+      </div>
+      
+      <div id="contEditOnly" class="hidden" style="display:contents">
+        <select id="fqcFilter" class="fi-sel"><option value="">All First QC</option></select>
+        <select id="lqcFilter" class="fi-sel"><option value="">All Last QC</option></select>
+        <select id="editorFilter" class="fi-sel"><option value="">All Editors</option></select>
+        <select id="issueFilter" class="fi-sel"><option value="">All Issues</option></select>
+      </div>
+
       <div class="t-space"></div>
       <span id="fcount" class="t-chip"></span>
       <button class="btn-start" id="startBtn">▶ Start Review</button>
@@ -172,6 +184,8 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
       <div class="rmc"><div class="rmc-l">Enterprise</div><div class="rmc-v" id="mEnt">-</div></div>
       <div class="rmc"><div class="rmc-l">SKU</div><div class="rmc-v" id="mSku">-</div></div>
       <div class="rmc"><div class="rmc-l">Image ID</div><div class="rmc-v" id="mImg">-</div></div>
+      <div class="rmc"><div class="rmc-l">QC Users</div><div class="rmc-v" id="mQcUsers">-</div></div>
+      <div class="rmc hidden" id="mEditorWrap"><div class="rmc-l">Editor</div><div class="rmc-v" id="mEditor">-</div></div>
       <div class="rmc hidden" id="mIssueWrap" style="color:var(--warn)"><div class="rmc-l">Previous Issue</div><div class="rmc-v" id="mIssue">-</div></div>
     </div>
     <div class="prog-row">
@@ -224,8 +238,8 @@ const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdrjhynjWITfOqHpkgKX8
 const PROXY = "https://media.spyneai.com/unsafe/0x0/filters:format(webp)/";
 
 const FMAP = {
-  qc: { enterprise:'enterprise_name', image_id:'ai.image_id', sku_id:'sku_id', left:'input_image_hres_url', mid:'output_image_hres_url', right:'manual_image_hres_url', user:'qc_user_name', editor:'', issue:'', status:'status' },
-  edited: { enterprise:'enterprise_name', image_id:'ai.image_id', sku_id:'sku_id', left:'input_image_hres_url', mid:'ai_output', right:'final_output', user:'last_qc_user', editor:'last_editor_user', issue:'rejected_comments', status:'status' }
+  qc: { enterprise:'enterprise_name', image_id:'ai.image_id', sku_id:'sku_id', left:'input_image_hres_url', mid:'output_image_hres_url', right:'manual_image_hres_url', user:'qc_user_name', editor:'', fqc:'', lqc:'', issue:'', status:'status' },
+  edited: { enterprise:'enterprise_name', image_id:'ai.image_id', sku_id:'sku_id', left:'input_image_hres_url', mid:'ai_output', right:'final_output', user:'last_qc_user', editor:'last_editor_user', fqc:'first_qc_user', lqc:'last_qc_user', issue:'rejected_comments', status:'status', action:'latest_image_action' }
 };
 
 let raw=[], group=[], idx=0, mode='qc', user='';
@@ -240,7 +254,8 @@ function setLoading(show, txt = 'Fetching data…') {
     strip.style.display = show ? 'flex' : 'none';
     _id('loadTxt').textContent = txt;
   }
-  _id('startBtn').disabled = show;
+  const startBtn = _id('startBtn');
+  if (startBtn) startBtn.disabled = show;
 }
 
 function toast(msg, type='ok') {
@@ -259,8 +274,10 @@ function doLogin(){
   const name = _id('loginName').value, pw = _id('loginPw').value;
   if(PWDS[name] === pw){
     user = name;
-    _id('tAvatar').textContent = name.split(' ').map(n => n[0]).join('').toUpperCase();
-    _id('tUser').textContent = name;
+    const avatar = _id('tAvatar');
+    if (avatar) avatar.textContent = name.split(' ').map(n => n[0]).join('').toUpperCase();
+    const tUser = _id('tUser');
+    if (tUser) tUser.textContent = name;
     _id('loginPage').style.display = 'none';
     _id('app').style.display = 'flex';
     setMode('qc');
@@ -273,48 +290,121 @@ function setMode(m){
   mode = m;
   ['tabQC','tabEdit','tabTool'].forEach(id => _id(id).classList.remove('on'));
   _id(m === 'qc' ? 'tabQC' : m === 'edited' ? 'tabEdit' : 'tabTool').classList.add('on');
+  
+  // Toggle filter UI
+  const isQc = m === 'qc';
+  const qcOnly = _id('contQcOnly');
+  const editOnly = _id('contEditOnly');
+  if (qcOnly) qcOnly.classList.toggle('hidden', !isQc);
+  if (editOnly) editOnly.classList.toggle('hidden', isQc);
+  
   loadData();
 }
 
-function loadData(){
+async function loadData() {
   setLoading(true);
-  Papa.parse(mode==='qc' ? QC_URL : EDIT_URL, {
-    download: true, header: true,
-    complete: res => {
-      const m = mode === 'qc' ? FMAP.qc : FMAP.edited;
-      raw = res.data.map(r => ({
-        enterprise: r[m.enterprise] || '', image_id: r[m.image_id] || '', sku_id: r[m.sku_id] || '',
-        left: r[m.left] || '', mid: r[m.mid] || '', right: r[m.right] || '',
-        user: r[m.user] || 'N/A', editor: r[m.editor] || 'N/A', issue: r[m.issue] || '',
-        status: r[m.status] || '', action: r['latest_image_action'] || ''
-      }));
-      fillFilters();
-      _id('fcount').textContent = raw.length.toLocaleString() + ' records';
-      setLoading(false);
-    },
-    error: err => {
-      console.error(err);
-      toast('Failed to load data', 'err');
-      setLoading(false);
-    }
-  });
+  const url = mode === 'qc' ? QC_URL : EDIT_URL;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const csvData = await response.text();
+    Papa.parse(csvData, {
+      header: true,
+      skipEmptyLines: true,
+      complete: res => {
+        const m = mode === 'qc' ? FMAP.qc : FMAP.edited;
+        raw = res.data.map(r => ({
+          enterprise: r[m.enterprise] || '',
+          image_id: r[m.image_id] || '',
+          sku_id: r[m.sku_id] || '',
+          left: r[m.left] || '',
+          mid: r[m.mid] || '',
+          right: r[m.right] || '',
+          user: r[m.user] || 'N/A',
+          editor: r[m.editor] || 'N/A',
+          fqc: r[m.fqc] || 'N/A',
+          lqc: r[m.lqc] || 'N/A',
+          issue: r[m.issue] || '',
+          status: r[m.status] || '',
+          action: r['latest_image_action'] || ''
+        }));
+        fillFilters();
+        updateCount();
+        setLoading(false);
+      },
+      error: err => {
+        console.error("PapaParse error:", err);
+        toast('Error parsing data', 'err');
+        setLoading(false);
+      }
+    });
+  } catch (err) {
+    console.error("Fetch error:", err);
+    toast('Network error - Check Sheet permissions', 'err');
+    setLoading(false);
+  }
 }
 
 function fillFilters(){
   const ents = [...new Set(raw.map(r=>r.enterprise))].sort();
-  const sel = _id('entFilter');
-  sel.innerHTML = '<option value="">All Enterprises</option>';
-  ents.forEach(e => { if(e) sel.innerHTML += `<option value="${e}">${e}</option>`; });
+  const qcus = [...new Set(raw.map(r=>r.user))].sort();
+  const fqcs = [...new Set(raw.map(r=>r.fqc))].sort();
+  const lqcs = [...new Set(raw.map(r=>r.lqc))].sort();
+  const editors = [...new Set(raw.map(r=>r.editor))].sort();
+  const issues = [...new Set(raw.flatMap(r=>r.issue ? r.issue.split(',') : []))].map(i=>i.trim()).filter(Boolean).sort();
+
+  const populate = (id, list) => {
+    const sel = _id(id);
+    if (!sel) return;
+    const first = sel.options[0].text;
+    sel.innerHTML = `<option value="">${first}</option>`;
+    list.forEach(v => { if(v && v!=='N/A') sel.innerHTML += `<option value="${v}">${v}</option>`; });
+  };
+
+  populate('entFilter', ents);
+  populate('qcUFilter', qcus);
+  populate('fqcFilter', fqcs);
+  populate('lqcFilter', lqcs);
+  populate('editorFilter', editors);
+  populate('issueFilter', issues);
+}
+
+function getFiltered(){
+  const ent = _id('entFilter').value;
+  const qcu = _id('qcUFilter').value;
+  const fqc = _id('fqcFilter').value;
+  const lqc = _id('lqcFilter').value;
+  const ed = _id('editorFilter').value;
+  const is = _id('issueFilter').value;
+
+  return raw.filter(r => {
+    let ok = r.status === '' || r.status === 'null';
+    if(ent) ok = ok && r.enterprise === ent;
+    
+    if(mode === 'qc'){
+      if(qcu) ok = ok && r.user === qcu;
+    } else {
+      if(fqc) ok = ok && r.fqc === fqc;
+      if(lqc) ok = ok && r.lqc === lqc;
+      if(ed) ok = ok && r.editor === ed;
+      if(is) ok = ok && r.issue.includes(is);
+    }
+    
+    if(mode === 'qc_tool') ok = ok && r.action === 'qc_editingtool';
+    else if(mode === 'edited') ok = ok && r.action !== 'qc_editingtool';
+    
+    return ok;
+  });
+}
+
+function updateCount(){
+  const filtered = getFiltered();
+  const fcount = _id('fcount');
+  if (fcount) fcount.textContent = filtered.length.toLocaleString() + ' records';
 }
 
 function startReview(){
-  const ent = _id('entFilter').value;
-  group = raw.filter(r => {
-    let ok = r.status === '' || r.status === 'null';
-    if(ent) ok = ok && r.enterprise === ent;
-    if(mode === 'qc_tool') ok = ok && r.action === 'qc_editingtool';
-    return ok;
-  }).sort(() => Math.random() - 0.5);
+  group = getFiltered().sort(() => Math.random() - 0.5);
   if(!group.length) return alert('No records to review');
   idx = 0;
   _id('setupPage').style.display = 'none';
@@ -324,18 +414,25 @@ function startReview(){
 
 function resetImage(imgId) {
     const img = _id(imgId);
-    img.classList.remove('loaded');
-    img.src = "";
+    if (img) {
+      img.classList.remove('loaded');
+      img.src = "";
+    }
 }
 
 function showRecord(){
   const r = group[idx];
-  
   _id('mEnt').textContent = r.enterprise;
   _id('mSku').textContent = r.sku_id;
   _id('mImg').textContent = r.image_id;
+  _id('mQcUsers').textContent = r.fqc !== 'N/A' ? `${r.fqc}, ${r.lqc}` : r.user;
+  
+  _id('mEditor').textContent = r.editor;
+  _id('mEditorWrap').classList.toggle('hidden', mode === 'qc');
+  
   _id('mIssue').textContent = r.issue;
   _id('mIssueWrap').classList.toggle('hidden', !r.issue);
+  
   _id('progLbl').textContent = `Record ${idx+1} of ${group.length}`;
   _id('progFill').style.width = ((idx+1)/group.length*100) + '%';
   
@@ -347,10 +444,10 @@ function showRecord(){
   _id('imgM').src = PROXY + r.mid;
   if(mode === 'qc'){
     _id('panelR').style.display = 'none';
-    _id('imgArea').classList.add('two-col');
+    _id('imgArea').className = 'img-area two-col';
   } else {
     _id('panelR').style.display = 'flex';
-    _id('imgArea').classList.remove('two-col');
+    _id('imgArea').className = 'img-area';
     _id('imgR').src = PROXY + (r.right || r.mid);
   }
 
@@ -366,25 +463,22 @@ function doSubmit(){
   const r = group[idx];
   const selectedOptions = Array.from(document.querySelectorAll('.issue-cb:checked'))
                                .map(cb => cb.value);
-  
   _id('nextBtn').disabled = true;
 
   const body = new URLSearchParams();
-  body.append("entry.890284089", r.enterprise);      // Enterprise
-  body.append("entry.5932044", r.user);              // qc-user
-  body.append("entry.1880389842", r.editor);         // editing user
-  body.append("entry.1139236247", r.sku_id);         // sku_id
-  body.append("entry.661750446", r.image_id);        // image_id
-  body.append("entry.1317530325", r.issue);          // Issue (Historical)
-  body.append("entry.1455673211", r.left);           // input image
-  body.append("entry.772576827", r.mid);             // Ai image
-  body.append("entry.780536997", r.right || r.mid);  // Final Image
-  body.append("entry.865196657", user);              // login user
+  body.append("entry.890284089", r.enterprise);
+  body.append("entry.5932044", r.fqc !== 'N/A' ? `${r.fqc}, ${r.lqc}` : r.user);
+  body.append("entry.1880389842", r.editor);
+  body.append("entry.1139236247", r.sku_id);
+  body.append("entry.661750446", r.image_id);
+  body.append("entry.1317530325", r.issue);
+  body.append("entry.1455673211", r.left);
+  body.append("entry.772576827", r.mid);
+  body.append("entry.780536997", r.right || r.mid);
+  body.append("entry.865196657", user);
 
   if (selectedOptions.length > 0) {
-    selectedOptions.forEach(val => {
-      body.append("entry.778698303", val);           // RBG issue
-    });
+    selectedOptions.forEach(val => { body.append("entry.778698303", val); });
   } else {
     body.append("entry.778698303", "None");
   }
@@ -398,14 +492,8 @@ function doSubmit(){
     .then(() => {
       _id('nextBtn').disabled = false;
       toast('Submitted successfully');
-      if(idx < group.length - 1){ 
-        idx++; 
-        showRecord(); 
-      }
-      else { 
-        alert('Review Finished.'); 
-        exitToSetup(); 
-      }
+      if(idx < group.length - 1){ idx++; showRecord(); }
+      else { alert('Review Finished.'); exitToSetup(); }
     })
     .catch(err => {
       _id('nextBtn').disabled = false;
@@ -422,21 +510,22 @@ document.addEventListener('keydown', e => {
   if (_id('reviewPage').style.display === 'flex') {
     if (e.key >= '1' && e.key <= '8') {
       const cb = _id('cb' + e.key);
-      if (cb) {
-        cb.checked = !cb.checked;
-        e.preventDefault();
-      }
+      if (cb) { cb.checked = !cb.checked; e.preventDefault(); }
     }
-    if (e.key === 'Enter') {
-      doSubmit();
-      e.preventDefault();
-    }
+    if (e.key === 'Enter') { doSubmit(); e.preventDefault(); }
   }
 });
 
 _id('loginBtn').onclick = doLogin;
 _id('startBtn').onclick = startReview;
 _id('prevBtn').onclick = () => { if(idx > 0) { idx--; showRecord(); } };
+
+// Trigger count update on any filter change
+['entFilter','qcUFilter','fqcFilter','lqcFilter','editorFilter','issueFilter'].forEach(id => {
+  const el = _id(id);
+  if (el) el.addEventListener('change', updateCount);
+});
+
 </script>
 </body>
 </html>
