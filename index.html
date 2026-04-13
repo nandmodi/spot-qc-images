@@ -92,15 +92,22 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 .issue-checkboxes{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}
 .issue-cb-row{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:500;color:var(--t2);cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid var(--line);background:var(--bg2);transition:background 0.2s}
 .issue-cb-row:has(.issue-cb:checked){background:var(--dangerlt);border-color:#FCA5A5;color:var(--danger);font-weight:600}
+/* Done style */
+.issue-cb-row.done-row:has(.issue-cb:checked){background:var(--oklt);border-color:var(--ok);color:var(--ok)}
 .issue-cb{display:none}
+.issue-cb-num{font-family:var(--mono);font-size:9.5px;font-weight:700;background:var(--bg4);border-radius:3px;padding:1px 4px;color:var(--t3);line-height:1}
+.issue-cb-row:has(.issue-cb:checked) .issue-cb-num{background:var(--danger);color:#fff}
+.issue-cb-row.done-row:has(.issue-cb:checked) .issue-cb-num{background:var(--ok);color:#fff}
 
 .btn-sub{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;background:var(--ok);color:#fff;border:none;border-radius:var(--r);padding:0 20px;height:38px;cursor:pointer}
+.btn-sub:disabled{background:var(--line2);cursor:not-allowed;color:var(--t3)}
 .btn-prev{font-family:'Inter',sans-serif;font-size:13px;font-weight:500;background:var(--bg1);border:1px solid var(--line2);padding:0 16px;height:38px;border-radius:var(--r);cursor:pointer}
 
 .toast-shelf{position:fixed;bottom:18px;left:18px;z-index:999;display:flex;flex-direction:column;gap:7px}
 .toast{background:var(--bg1);border:1px solid var(--line);border-radius:var(--r);padding:10px 14px;font-size:12.5px;box-shadow:var(--shadow-md);display:flex;align-items:center;gap:8px;animation:tIn .22s ease both}
 .toast.ok{border-left:3px solid var(--ok)}
 .toast.err{border-left:3px solid var(--danger)}
+.toast.warn{border-left:3px solid var(--warn)}
 @keyframes tIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
 @keyframes tOut{to{opacity:0;transform:translateX(-12px)}}
 
@@ -209,14 +216,15 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
     <div class="rev-footer">
       <div style="flex:1">
         <div class="issue-checkboxes">
-          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb1" value="RBG issue">1 - RBG issue</label>
-          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb2" value="See-through int">2 - See-through int</label>
-          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb3" value="See-through ext">3 - See-through ext</label>
-          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb4" value="Floor extension">4 - Floor extension</label>
-          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb5" value="Tilt">5 - Tilt</label>
-          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb6" value="Number Plate">6 - Number Plate</label>
-          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" value="Shadow" id="cb7">7 - Shadow</label>
-          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" value="Open-door RBG" id="cb8">8 - Open-door RBG</label>
+          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb1" value="RBG issue"><span class="issue-cb-num">1</span>RBG issue</label>
+          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb2" value="See-through int"><span class="issue-cb-num">2</span>See-through int</label>
+          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb3" value="See-through ext"><span class="issue-cb-num">3</span>See-through ext</label>
+          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb4" value="Floor extension"><span class="issue-cb-num">4</span>Floor extension</label>
+          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb5" value="Tilt"><span class="issue-cb-num">5</span>Tilt</label>
+          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb6" value="Number Plate"><span class="issue-cb-num">6</span>Number Plate</label>
+          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb7" value="Shadow"><span class="issue-cb-num">7</span>Shadow</label>
+          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb8" value="Open-door RBG"><span class="issue-cb-num">8</span>Open-door RBG</label>
+          <label class="issue-cb-row done-row"><input type="checkbox" class="issue-cb" id="cbDone" value="Done"><span class="issue-cb-num">9</span>Done</label>
         </div>
       </div>
       <div style="display:flex;gap:8px">
@@ -243,6 +251,10 @@ const FMAP = {
 };
 
 let raw=[], group=[], idx=0, mode='qc', user='';
+let imagesLoaded = false;
+let loadedCount = 0;
+let imgsToLoadTotal = 0;
+
 const PWDS = {"Nand Kishor":"spyne@123","Ranbir Manoranjan":"spyne@123","Nitin Kumar":"spyne@123","Praveen Agarwal":"spyne@123","Raj Tripathi":"spyne@123","Rohit Chauhan":"spyne@123","Ajay Devrani":"spyne@123"};
 
 function _id(id){ return document.getElementById(id); }
@@ -262,7 +274,8 @@ function toast(msg, type='ok') {
   const shelf = _id('toastShelf');
   const t = document.createElement('div');
   t.className = `toast ${type}`;
-  t.innerHTML = `<span>${type === 'ok' ? '✓' : '⚠'}</span><span>${msg}</span>`;
+  const ic = (type === 'ok') ? '✓' : '⚠';
+  t.innerHTML = `<span>${ic}</span><span>${msg}</span>`;
   shelf.appendChild(t);
   setTimeout(() => {
     t.style.animation = 'tOut .2s ease both';
@@ -290,14 +303,14 @@ function setMode(m){
   mode = m;
   ['tabQC','tabEdit','tabTool'].forEach(id => _id(id).classList.remove('on'));
   _id(m === 'qc' ? 'tabQC' : m === 'edited' ? 'tabEdit' : 'tabTool').classList.add('on');
-  
-  // Toggle filter UI
+  exitToSetup();
   const isQc = m === 'qc';
   const qcOnly = _id('contQcOnly');
   const editOnly = _id('contEditOnly');
   if (qcOnly) qcOnly.classList.toggle('hidden', !isQc);
   if (editOnly) editOnly.classList.toggle('hidden', isQc);
-  
+  raw = [];
+  updateCount();
   loadData();
 }
 
@@ -378,12 +391,9 @@ function getFiltered(){
   const is = _id('issueFilter').value;
 
   return raw.filter(r => {
-    // MAINTAIN STATUS CONDITION: Only show records where status is empty or 'null'
     const statusVal = (r.status || '').toString().trim().toLowerCase();
     let ok = statusVal === '' || statusVal === 'null';
-
     if(ent) ok = ok && r.enterprise === ent;
-    
     if(mode === 'qc'){
       if(qcu) ok = ok && r.user === qcu;
     } else {
@@ -392,10 +402,8 @@ function getFiltered(){
       if(ed) ok = ok && r.editor === ed;
       if(is) ok = ok && r.issue.includes(is);
     }
-    
     if(mode === 'qc_tool') ok = ok && r.action === 'qc_editingtool';
     else if(mode === 'edited') ok = ok && r.action !== 'qc_editingtool';
-    
     return ok;
   });
 }
@@ -423,25 +431,44 @@ function resetImage(imgId) {
     }
 }
 
+function checkAllLoaded() {
+  if(loadedCount >= imgsToLoadTotal) {
+    imagesLoaded = true;
+  }
+}
+
 function showRecord(){
   const r = group[idx];
+  imagesLoaded = false;
+  loadedCount = 0;
+  imgsToLoadTotal = mode === 'qc' ? 2 : 3;
+
+  const handleFinish = (e) => {
+    e.target.classList.add('loaded');
+    loadedCount++;
+    checkAllLoaded();
+  };
+
   _id('mEnt').textContent = r.enterprise;
   _id('mSku').textContent = r.sku_id;
   _id('mImg').textContent = r.image_id;
   _id('mQcUsers').textContent = r.fqc !== 'N/A' ? `${r.fqc}, ${r.lqc}` : r.user;
-  
   _id('mEditor').textContent = r.editor;
   _id('mEditorWrap').classList.toggle('hidden', mode === 'qc');
-  
   _id('mIssue').textContent = r.issue;
   _id('mIssueWrap').classList.toggle('hidden', !r.issue);
-  
   _id('progLbl').textContent = `Record ${idx+1} of ${group.length}`;
   _id('progFill').style.width = ((idx+1)/group.length*100) + '%';
   
   resetImage('imgL');
   resetImage('imgM');
   resetImage('imgR');
+
+  ['imgL','imgM','imgR'].forEach(id => {
+    const el = _id(id);
+    el.onload = handleFinish;
+    el.onerror = handleFinish;
+  });
 
   _id('imgL').src = PROXY + r.left;
   _id('imgM').src = PROXY + r.mid;
@@ -454,23 +481,31 @@ function showRecord(){
     _id('imgR').src = PROXY + (r.right || r.mid);
   }
 
-  _id('imgL').onload = e => e.target.classList.add('loaded');
-  _id('imgM').onload = e => e.target.classList.add('loaded');
-  _id('imgR').onload = e => e.target.classList.add('loaded');
-
   _id('prevBtn').disabled = idx === 0;
+  
   document.querySelectorAll('.issue-cb').forEach(cb => cb.checked = false);
+  _id('cbDone').checked = true;
 }
 
 function doSubmit(){
+  if (!imagesLoaded) {
+    toast('Wait to load images then enter', 'warn');
+    return;
+  }
+
   const r = group[idx];
-  const selectedOptions = Array.from(document.querySelectorAll('.issue-cb:checked'))
-                               .map(cb => cb.value);
+  const checkedBoxes = Array.from(document.querySelectorAll('.issue-cb:checked'));
+  
+  if (checkedBoxes.length === 0) {
+      toast('Please select an issue or Done', 'warn');
+      return;
+  }
+
   _id('nextBtn').disabled = true;
 
   const body = new URLSearchParams();
   body.append("entry.890284089", r.enterprise);
-  body.append("entry.5932044", r.fqc !== 'N/A' ? `${r.fqc}, ${r.lqc}` : r.user);
+  body.append("entry.5932044", [r.fqc, r.lqc, r.user].filter(u => u && u.toLowerCase() !== 'n/a').join(', '));
   body.append("entry.1880389842", r.editor);
   body.append("entry.1139236247", r.sku_id);
   body.append("entry.661750446", r.image_id);
@@ -480,11 +515,11 @@ function doSubmit(){
   body.append("entry.780536997", r.right || r.mid);
   body.append("entry.865196657", user);
 
-  if (selectedOptions.length > 0) {
-    selectedOptions.forEach(val => { body.append("entry.778698303", val); });
-  } else {
-    body.append("entry.778698303", "None");
-  }
+  // LOGIC: Send ALL checked issues (including "Done" if checked alone)
+  // Google Sheet will automatically separate them by comma.
+  checkedBoxes.forEach(cb => {
+      body.append("entry.778698303", cb.value);
+  });
 
   fetch(FORM_URL, { 
     method: 'POST', 
@@ -495,8 +530,14 @@ function doSubmit(){
     .then(() => {
       _id('nextBtn').disabled = false;
       toast('Submitted successfully');
-      if(idx < group.length - 1){ idx++; showRecord(); }
-      else { alert('Review Finished.'); exitToSetup(); }
+      if(idx < group.length - 1){ 
+        idx++; 
+        showRecord(); 
+      }
+      else { 
+        alert('Review Finished.'); 
+        exitToSetup(); 
+      }
     })
     .catch(err => {
       _id('nextBtn').disabled = false;
@@ -509,7 +550,6 @@ function exitToSetup(){
   _id('setupPage').style.display = 'flex';
 }
 
-// Global handleEnter to handle login from any input field
 function handleLoginEnter(e) {
   if (e.key === 'Enter') {
     e.preventDefault();
@@ -517,30 +557,57 @@ function handleLoginEnter(e) {
   }
 }
 
+// Logic: Mutual Exclusion
+document.querySelectorAll('.issue-cb').forEach(cb => {
+  cb.addEventListener('change', (e) => {
+    if (e.target.id === 'cbDone') {
+      if (e.target.checked) {
+        document.querySelectorAll('.issue-cb:not(#cbDone)').forEach(other => other.checked = false);
+      }
+    } else {
+      if (e.target.checked) {
+        _id('cbDone').checked = false;
+      } else {
+        const anyOthers = Array.from(document.querySelectorAll('.issue-cb:not(#cbDone)')).some(c => c.checked);
+        if (!anyOthers) _id('cbDone').checked = true;
+      }
+    }
+  });
+});
+
 document.addEventListener('keydown', e => {
   if (_id('reviewPage').style.display === 'flex') {
     if (e.key >= '1' && e.key <= '8') {
       const cb = _id('cb' + e.key);
-      if (cb) { cb.checked = !cb.checked; e.preventDefault(); }
+      if (cb) { 
+        cb.checked = !cb.checked; 
+        cb.dispatchEvent(new Event('change'));
+        e.preventDefault(); 
+      }
     }
-    if (e.key === 'Enter') { doSubmit(); e.preventDefault(); }
+    if (e.key === '9') {
+       const cb = _id('cbDone');
+       cb.checked = !cb.checked;
+       cb.dispatchEvent(new Event('change'));
+       e.preventDefault();
+    }
+    if (e.key === 'Enter') { 
+      doSubmit(); 
+      e.preventDefault(); 
+    }
   }
 });
 
 _id('loginBtn').onclick = doLogin;
-// Add Enter key support to login fields
 _id('loginName').addEventListener('keydown', handleLoginEnter);
 _id('loginPw').addEventListener('keydown', handleLoginEnter);
-
 _id('startBtn').onclick = startReview;
 _id('prevBtn').onclick = () => { if(idx > 0) { idx--; showRecord(); } };
 
-// Trigger count update on any filter change
 ['entFilter','qcUFilter','fqcFilter','lqcFilter','editorFilter','issueFilter'].forEach(id => {
   const el = _id(id);
   if (el) el.addEventListener('change', updateCount);
 });
-
 </script>
 </body>
 </html>
