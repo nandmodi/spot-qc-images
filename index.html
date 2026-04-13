@@ -224,6 +224,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
           <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb6" value="Number Plate"><span class="issue-cb-num">6</span>Number Plate</label>
           <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb7" value="Shadow"><span class="issue-cb-num">7</span>Shadow</label>
           <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb8" value="Open-door RBG"><span class="issue-cb-num">8</span>Open-door RBG</label>
+          <!-- Done Checkbox -->
           <label class="issue-cb-row done-row"><input type="checkbox" class="issue-cb" id="cbDone" value="Done"><span class="issue-cb-num">9</span>Done</label>
         </div>
       </div>
@@ -243,6 +244,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 const QC_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=1717039169&single=true&output=csv";
 const EDIT_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=320301246&single=true&output=csv";
 const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdrjhynjWITfOqHpkgKX8enCmDKg1b3s0Ij05Cux36kPmZEUA/formResponse";
+
 const PROXY = "https://media.spyneai.com/unsafe/0x0/filters:format(webp)/";
 
 const FMAP = {
@@ -494,9 +496,10 @@ function doSubmit(){
   }
 
   const r = group[idx];
-  const checkedBoxes = Array.from(document.querySelectorAll('.issue-cb:checked'));
+  const selectedOptions = Array.from(document.querySelectorAll('.issue-cb:checked'))
+                               .map(cb => cb.value);
   
-  if (checkedBoxes.length === 0) {
+  if (selectedOptions.length === 0) {
       toast('Please select an issue or Done', 'warn');
       return;
   }
@@ -515,11 +518,9 @@ function doSubmit(){
   body.append("entry.780536997", r.right || r.mid);
   body.append("entry.865196657", user);
 
-  // LOGIC: Send ALL checked issues (including "Done" if checked alone)
-  // Google Sheet will automatically separate them by comma.
-  checkedBoxes.forEach(cb => {
-      body.append("entry.778698303", cb.value);
-  });
+  // LOGIC: Send multiple issues as ONE comma-separated string to the field
+  const finalValue = selectedOptions.join(", ");
+  body.append("entry.778698303", finalValue);
 
   fetch(FORM_URL, { 
     method: 'POST', 
@@ -530,14 +531,8 @@ function doSubmit(){
     .then(() => {
       _id('nextBtn').disabled = false;
       toast('Submitted successfully');
-      if(idx < group.length - 1){ 
-        idx++; 
-        showRecord(); 
-      }
-      else { 
-        alert('Review Finished.'); 
-        exitToSetup(); 
-      }
+      if(idx < group.length - 1){ idx++; showRecord(); }
+      else { alert('Review Finished.'); exitToSetup(); }
     })
     .catch(err => {
       _id('nextBtn').disabled = false;
@@ -557,7 +552,6 @@ function handleLoginEnter(e) {
   }
 }
 
-// Logic: Mutual Exclusion
 document.querySelectorAll('.issue-cb').forEach(cb => {
   cb.addEventListener('change', (e) => {
     if (e.target.id === 'cbDone') {
