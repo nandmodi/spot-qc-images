@@ -6,6 +6,10 @@
 <title>Spyne · Meet Review</title>
 <link rel="icon" href="https://spyne-prod-ai.s3.us-east-1.amazonaws.com/ai-dataset/2025/logo/unnamed.png"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+<!-- Flatpickr for Date Range -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -72,20 +76,24 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 }
 .fi{display:flex;align-items:center;gap:5px}
 .fi-lbl{font-size:11.5px;font-weight:700;color:#000;white-space:nowrap}
-.fi-sel,.fi-date{
+.fi-sel, .fi-date-range{
   font-family:'Inter',sans-serif;font-size:12.5px;color:var(--t1);
   background:var(--bg2);border:1px solid var(--line);border-radius:6px;
-  padding:5px 10px;outline:none;cursor:pointer;-webkit-appearance:none;
+  padding:5px 10px;outline:none;cursor:pointer;
   transition:border-color .14s;
 }
 .fi-sel{
+  -webkit-appearance:none;
   padding-right:26px;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5'%3E%3Cpath d='M1 1l3.5 3.5L8 1' stroke='%239CA3AF' stroke-width='1.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 8px center;max-width:170px;
 }
-.fi-date{border-color:var(--accent);font-size:12.5px}
-.fi-sel:focus,.fi-date:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accentg)}
-.fi-sel option{background:#fff}
+.fi-date-range{
+    min-width: 210px;
+    border-color: var(--accent);
+}
+.fi-sel:focus, .fi-date-range:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accentg)}
+
 .btn-reset{
   font-family:'Inter',sans-serif;font-size:12px;font-weight:500;
   background:var(--dangerlt);border:1px solid #FCA5A5;color:var(--danger);
@@ -141,15 +149,15 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 .issue-val{color:var(--warn);font-weight:600;font-size:12px}
 .comment-val{color:var(--t2);font-size:12px}
 
-/* images - FIT ON WIDTH IMPROVEMENTS */
+/* images */
 .images-row{
   display:grid;
-  grid-template-columns: 1fr; /* Stacked by default for mobile */
+  grid-template-columns: 1fr; 
 }
 
 @media (min-width: 768px) {
   .images-row {
-    grid-template-columns: repeat(3, 1fr); /* Side-by-side on desktop */
+    grid-template-columns: repeat(3, 1fr); 
   }
 }
 
@@ -179,7 +187,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 .img-pane img{
   width:100%;
   height:auto;
-  max-height: 80vh; /* Prevent huge vertical stretch on mobile */
+  max-height: 80vh; 
   object-fit:contain;
   display:block;
 }
@@ -224,7 +232,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 .btn-next:hover{background:var(--accent2);box-shadow:0 3px 12px rgba(37,99,235,.3)}
 .btn-next:disabled{opacity:.35;cursor:not-allowed}
 
-/* kbd hint */
 .kbd-hint{font-size:11px;color:var(--t4);display:flex;align-items:center;gap:5px}
 @media (max-width: 600px) { .kbd-hint { display: none; } }
 .kbd{font-family:var(--mono);font-size:9.5px;background:var(--bg3);border:1px solid var(--line2);border-radius:3px;padding:1px 5px;color:var(--t3)}
@@ -256,7 +263,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 
 <!-- FILTER BAR -->
 <div class="filter-bar">
-  <div class="fi"><span class="fi-lbl">Date</span><input type="date" id="dateFilter" class="fi-date"/></div>
+  <div class="fi"><span class="fi-lbl">Date Range</span><input type="text" id="dateRangeFilter" class="fi-date-range" placeholder="Select Range"/></div>
   <div class="fi"><span class="fi-lbl">Enterprise</span><select id="enterpriseFilter" class="fi-sel"><option value="">All</option></select></div>
   <div class="fi"><span class="fi-lbl">QC User</span><select id="qcUserFilter" class="fi-sel"><option value="">All</option></select></div>
   <div class="fi"><span class="fi-lbl">Editor</span><select id="editingUserFilter" class="fi-sel"><option value="">All</option></select></div>
@@ -292,6 +299,7 @@ const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1V
 const PROXY = 'https://media.spyneai.com/unsafe/0x0/filters:format(webp)/';
 
 let allData = [], filtered = [], idx = 0;
+let fp = null; // flatpickr instance
 
 // ── LOAD
 document.getElementById('loadStrip').style.display = 'flex';
@@ -305,6 +313,8 @@ fetch(CSV_URL)
     const chip = document.getElementById('tCount');
     chip.textContent = allData.length.toLocaleString() + ' records';
     chip.classList.remove('hidden');
+    
+    initFlatpickr();
     populateFilters(allData);
     applyFilters();
   })
@@ -316,6 +326,14 @@ fetch(CSV_URL)
     </div>`;
   });
 
+function initFlatpickr() {
+    fp = flatpickr("#dateRangeFilter", {
+        mode: "range",
+        dateFormat: "Y-m-d",
+        onChange: applyFilters
+    });
+}
+
 // ── FILTERS
 function populateFilters(data) {
   const enterprises = [...new Set(data.map(r => r['Enterprise']).filter(Boolean))].sort();
@@ -326,7 +344,7 @@ function populateFilters(data) {
   fill('qcUserFilter', qcUsers);
   fill('editingUserFilter', editors);
 
-  ['enterpriseFilter','qcUserFilter','editingUserFilter','dateFilter'].forEach(id => {
+  ['enterpriseFilter','qcUserFilter','editingUserFilter'].forEach(id => {
     document.getElementById(id).addEventListener('change', applyFilters);
   });
 }
@@ -341,16 +359,25 @@ function fill(id, vals) {
 }
 
 function applyFilters() {
-  const date = document.getElementById('dateFilter').value;
-  const ent  = document.getElementById('enterpriseFilter').value;
-  const qcu  = document.getElementById('qcUserFilter').value;
-  const ed   = document.getElementById('editingUserFilter').value;
+  const selectedDates = fp ? fp.selectedDates : [];
+  const start = selectedDates[0] ? selectedDates[0].toISOString().split('T')[0] : null;
+  const end = selectedDates[1] ? selectedDates[1].toISOString().split('T')[0] : start;
+
+  const ent      = document.getElementById('enterpriseFilter').value;
+  const qcu      = document.getElementById('qcUserFilter').value;
+  const ed       = document.getElementById('editingUserFilter').value;
 
   filtered = allData.filter(r => {
-    if(date && r['Timestamp'] && r['Timestamp'].split(' ')[0] !== date) return false;
-    if(ent  && r['Enterprise'] !== ent) return false;
-    if(qcu  && !(r['qc-user']||'').includes(qcu)) return false;
-    if(ed   && r['editing user'] !== ed) return false;
+    if (!r['Timestamp']) return false;
+    const recDate = r['Timestamp'].split(' ')[0];
+    
+    // Date Range Logic
+    if(start && recDate < start) return false;
+    if(end && recDate > end) return false;
+
+    if(ent && r['Enterprise'] !== ent) return false;
+    if(qcu && !(r['qc-user']||'').includes(qcu)) return false;
+    if(ed && r['editing user'] !== ed) return false;
     return true;
   });
 
@@ -425,7 +452,7 @@ function render() {
 document.getElementById('prevBtn').addEventListener('click', () => { if(idx>0){ idx--; render(); } });
 document.getElementById('nextBtn').addEventListener('click', () => { if(idx<filtered.length-1){ idx++; render(); } });
 document.getElementById('resetBtn').addEventListener('click', () => {
-  document.getElementById('dateFilter').value = '';
+  if (fp) fp.clear();
   document.getElementById('enterpriseFilter').value = '';
   document.getElementById('qcUserFilter').value = '';
   document.getElementById('editingUserFilter').value = '';
@@ -434,12 +461,10 @@ document.getElementById('resetBtn').addEventListener('click', () => {
 
 // ── KEYBOARD
 document.addEventListener('keydown', e => {
-  // ArrowRight or Enter to go Next
   if((e.key === 'ArrowRight' || e.key === 'Enter') && idx < filtered.length - 1){ 
     idx++; 
     render(); 
   }
-  // ArrowLeft to go Prev
   if(e.key === 'ArrowLeft' && idx > 0){ 
     idx--; 
     render(); 
