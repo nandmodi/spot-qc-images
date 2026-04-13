@@ -276,6 +276,7 @@ const FMAP = {
 let raw=[], group=[], idx=0, mode='qc', user='';
 let imagesLoaded = false, loadedCount = 0, imgsToLoadTotal = 0;
 let safetyTimer = null; 
+let currentDoneCount = 0; // Local counter for instant UI updates
 const preloadedIndices = new Set();
 
 const PWDS = {"Nand Kishor":"spyne@123","Ranbir Manoranjan":"spyne@123","Nitin Kumar":"spyne@123","Praveen Agarwal":"spyne@123","Raj Tripathi":"spyne@123","Rohit Chauhan":"spyne@123","Ajay Devrani":"spyne@123"};
@@ -320,21 +321,33 @@ function getShiftBoundaries() {
 async function fetchProductionCount() {
   if (!user) return;
   try {
-    const response = await fetch(DONE_COUNT_URL);
+    const response = await fetch(DONE_COUNT_URL + '&cb=' + Date.now());
     if (!response.ok) return;
     const csvData = await response.text();
     const boundaries = getShiftBoundaries();
+    
     Papa.parse(csvData, {
       header: true,
+      skipEmptyLines: true,
       complete: res => {
+        const keys = res.meta.fields;
+        const tsKey = keys.find(k => k.trim().toLowerCase() === 'timestamp');
+        const userKey = keys.find(k => k.trim().toLowerCase() === 'login user');
+
+        if (!tsKey || !userKey) return;
+
         const userProduction = res.data.filter(row => {
-          if (row['login user'] !== user) return false;
-          const timestampStr = row['Timestamp']; 
+          if (row[userKey] !== user) return false;
+          const timestampStr = row[tsKey]; 
           if (!timestampStr) return false;
           const entryDate = new Date(timestampStr);
+          if (isNaN(entryDate.getTime())) return false;
           return entryDate >= boundaries.start && entryDate < boundaries.end;
         });
-        _id('doneCounter').textContent = `Done: ${userProduction.length}`;
+        
+        // Sync local counter with actual sheet data
+        currentDoneCount = userProduction.length;
+        _id('doneCounter').textContent = `Done: ${currentDoneCount}`;
       }
     });
   } catch (err) { console.error("Count fetch failed:", err); }
@@ -563,7 +576,14 @@ function doSubmit(){
   }).then(() => {
     _id('nextBtn').disabled = false;
     toast('Submitted successfully');
-    fetchProductionCount();
+    
+    // FEATURE: Instant local count update
+    currentDoneCount++;
+    _id('doneCounter').textContent = `Done: ${currentDoneCount}`;
+    
+    // Refresh background sync after a short delay
+    setTimeout(fetchProductionCount, 5000);
+    
     if(idx < group.length - 1){ idx++; showRecord(); }
     else { alert('Review Finished.'); exitToSetup(); }
   }).catch(() => { _id('nextBtn').disabled = false; toast('Error submitting', 'err'); });
