@@ -284,6 +284,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
   <button class="btn-prev" id="prevBtn" disabled>← Prev</button>
   <button class="btn-next" id="nextBtn">Next →</button>
   <div class="kbd-hint"><span class="kbd">→</span>Next</div>
+  <div class="kbd-hint"><span class="kbd">Enter</span>Next</div>
 </div>
 
 <script>
@@ -433,8 +434,16 @@ document.getElementById('resetBtn').addEventListener('click', () => {
 
 // ── KEYBOARD
 document.addEventListener('keydown', e => {
-  if(e.key==='ArrowRight'&&idx<filtered.length-1){ idx++; render(); }
-  if(e.key==='ArrowLeft' &&idx>0){ idx--; render(); }
+  // ArrowRight or Enter to go Next
+  if((e.key === 'ArrowRight' || e.key === 'Enter') && idx < filtered.length - 1){ 
+    idx++; 
+    render(); 
+  }
+  // ArrowLeft to go Prev
+  if(e.key === 'ArrowLeft' && idx > 0){ 
+    idx--; 
+    render(); 
+  }
 });
 </script>
 </body>
