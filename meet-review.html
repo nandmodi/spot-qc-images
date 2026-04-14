@@ -104,7 +104,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 .rec-count{font-family:var(--mono);font-size:11px;color:var(--t3)}
 
 /* ── CONTENT ── */
-.content{padding:18px;max-width:auto;margin:0 auto}
+.content{padding:18px;max-width:1400px;margin:0 auto}
 
 /* empty state */
 .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;text-align:center;color:var(--t3)}
@@ -301,6 +301,25 @@ const PROXY = 'https://media.spyneai.com/unsafe/0x0/filters:format(webp)/';
 let allData = [], filtered = [], idx = 0;
 let fp = null; // flatpickr instance
 
+// Helper to normalize dates from CSV Timestamp column to YYYY-MM-DD
+function normalizeDate(dateStr) {
+    if (!dateStr) return null;
+    // Extract only the date part before any spaces (handling "YYYY-MM-DD HH:MM:SS")
+    const datePart = dateStr.trim().split(' ')[0];
+    
+    // If it's already YYYY-MM-DD
+    if (/^\d{4}-\d{2}-\d{2}$/.test(datePart)) return datePart;
+    
+    // Attempt to handle DD/MM/YYYY or MM/DD/YYYY
+    // Native Date.parse is often unreliable for different locales, 
+    // but here we just need a common ground for string comparison.
+    const d = new Date(datePart);
+    if (!isNaN(d.getTime())) {
+        return d.toISOString().split('T')[0];
+    }
+    return datePart; 
+}
+
 // ── LOAD
 document.getElementById('loadStrip').style.display = 'flex';
 fetch(CSV_URL)
@@ -360,6 +379,7 @@ function fill(id, vals) {
 
 function applyFilters() {
   const selectedDates = fp ? fp.selectedDates : [];
+  // Standardize selected range
   const start = selectedDates[0] ? selectedDates[0].toISOString().split('T')[0] : null;
   const end = selectedDates[1] ? selectedDates[1].toISOString().split('T')[0] : start;
 
@@ -369,9 +389,10 @@ function applyFilters() {
 
   filtered = allData.filter(r => {
     if (!r['Timestamp']) return false;
-    const recDate = r['Timestamp'].split(' ')[0];
     
-    // Date Range Logic
+    const recDate = normalizeDate(r['Timestamp']);
+    
+    // Date Range Logic (String comparison YYYY-MM-DD)
     if(start && recDate < start) return false;
     if(end && recDate > end) return false;
 
