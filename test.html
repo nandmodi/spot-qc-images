@@ -62,7 +62,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 .t-chip{font-family:var(--mono);font-size:11px;color:var(--t3);background:var(--bg2);border:1px solid var(--line);border-radius:5px;padding:3px 9px;white-space:nowrap;display:flex;align-items:center}
 .t-chip.done-count{background:var(--oklt);color:var(--ok);border-color:var(--ok);font-weight:700}
 
-/* User Avatar UI matching image_35642b.png */
+/* Avatar NK circle */
 .t-avatar{width:28px;height:28px;background:var(--accentlt);border:1.5px solid var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--accent);flex-shrink:0;margin-right:6px}
 .t-uname{font-size:13px;font-weight:500;color:var(--t1)}
 
@@ -75,18 +75,18 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 .filter-bar{background:var(--bg1);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;align-items:center;flex-wrap:wrap;gap:12px;flex-shrink:0}
 .fi-sel, .fi-in{font-family:'Inter',sans-serif;font-size:12px;color:var(--t1);background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:4px 8px;outline:none;cursor:pointer; height: 32px;}
 
-/* Date Range UI - Improved for single box */
+/* Date Range UI */
 .range-box-container {
     display: flex; align-items: center; background: var(--bg1); border: 1.5px solid var(--accent); border-radius: 6px; padding: 0 10px; height: 32px; gap: 8px; cursor: pointer; transition: box-shadow 0.2s;
 }
 .range-box-container label { font-size: 13px; font-weight: 700; color: #000; white-space: nowrap; margin-right: 4px; }
 .range-box-container input { border: none; background: transparent; font-size: 13px; color: var(--t2); outline: none; width: 170px; cursor: pointer; }
 
-/* Start Review Button matching image_356104.png */
+/* Start Review Button */
 .btn-start{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;background:var(--accent);color:#fff;border:none;border-radius:6px;padding:0 18px;height:34px;cursor:pointer;transition:background .14s;display:flex;align-items:center;gap:6px}
 .btn-start:hover{background:var(--accent2)}
 
-/* ── 360 DASHBOARD TABLE ── */
+/* ── DASHBOARD TABLE ── */
 .table-wrap{flex:1;overflow:auto;background:var(--bg1);margin:12px 18px;border-radius:var(--rlg);border:1px solid var(--line);box-shadow:var(--shadow)}
 table{width:100%;border-collapse:collapse;min-width:900px}
 th{position:sticky;top:0;background:#f8fafc;padding:12px 16px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--accent);border-bottom:2px solid #edf2f7;z-index:5}
@@ -104,7 +104,7 @@ tr:hover td{background:var(--bg2)}
 .prog-track{flex:1;max-width:280px;height:4px;background:var(--line);border-radius:2px;overflow:hidden}
 .prog-fill{height:100%;background:var(--accent);transition:width .4s ease}
 
-/* Media Areas */
+/* Views */
 .img-area{flex:1;display:grid;grid-template-columns:repeat(3,1fr);overflow:hidden;min-height:0}
 .img-area.two-col{grid-template-columns:1fr 1fr}
 .img-panel{position:relative;display:flex;flex-direction:column;background:#1A1C23;overflow:hidden;border-right:1px solid #2A2D38}
@@ -233,11 +233,11 @@ tr:hover td{background:var(--bg2)}
   <div id="reviewPage">
     <div class="rev-top">
       <div class="rmc"><div class="rmc-l">Enterprise</div><div class="rmc-v" id="mEnt">-</div></div>
-      <div class="rmc"><div class="rmc-l" id="labelSku">SKU ID</div><div class="rmc-v" id="mSku">-</div></div>
+      <div class="rmc"><div class="rmc-l">SKU ID</div><div class="rmc-v" id="mSku">-</div></div>
       <div class="rmc"><div class="rmc-l" id="labelImg">Image ID</div><div class="rmc-v" id="mImg">-</div></div>
       <div class="rmc"><div class="rmc-l" id="labelUser">QC Users</div><div class="rmc-v" id="mQcUsers">-</div></div>
       <div class="rmc hidden" id="mEditorWrap"><div class="rmc-l">Editor</div><div class="rmc-v" id="mEditor">-</div></div>
-      <div class="rmc hidden" id="mIssueWrap" style="color:var(--warn)"><div class="rmc-l" id="labelIssue">Issues</div><div class="rmc-v" id="mIssue">-</div></div>
+      <div class="rmc hidden" id="mIssueWrap" style="color:var(--warn)"><div class="rmc-l">Previous Issue</div><div class="rmc-v" id="mIssue">-</div></div>
     </div>
     
     <div class="prog-row">
@@ -245,7 +245,7 @@ tr:hover td{background:var(--bg2)}
       <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
     </div>
 
-    <!-- Content Sections -->
+    <!-- Viewport Area -->
     <div class="img-area" id="imgArea">
       <div class="img-panel"><div class="img-label">Input</div><img id="imgL" src="" alt="Input"/></div>
       <div class="img-panel"><div class="img-label">AI Output</div><img id="imgM" src="" alt="Output"/></div>
@@ -329,21 +329,30 @@ function toast(msg, type='ok') {
   setTimeout(() => { t.style.animation = 'tOut .2s ease both'; setTimeout(() => t.remove(), 200); }, 2500);
 }
 
-// 7 AM Shift Logic: 7:00:00 AM to 6:59:59 AM next day
+// Resilient Row Value Getter
+function getRowVal(row, keysArray) {
+    if (!row) return '';
+    const keys = Object.keys(row);
+    if (!Array.isArray(keysArray)) keysArray = [keysArray];
+    for(let key of keysArray) {
+        const foundKey = keys.find(k => k.trim().toLowerCase() === key.toLowerCase());
+        if(foundKey && row[foundKey] !== undefined && row[foundKey] !== null) return row[foundKey].toString().trim();
+    }
+    return '';
+}
+
+// Fixed Shift Logic: 7 AM to 6:59:59 AM next day
 function getShiftBoundaries() {
   const now = new Date();
   const start = new Date(now);
   start.setHours(7, 0, 0, 0);
-  if (now.getHours() < 7) {
-    start.setDate(start.getDate() - 1);
-  }
+  if (now.getHours() < 7) { start.setDate(start.getDate() - 1); }
   const end = new Date(start);
   end.setDate(start.getDate() + 1);
-  end.setTime(end.getTime() - 1); // 6:59:59.999
   return { start, end };
 }
 
-// Custom parser for GSheet Timestamp format: 4/16/2026 1:31:17
+// Robust Timestamp Parser for GSheet format: "4/16/2026 1:31:17"
 function parseGSheetTimestamp(str) {
     if (!str) return null;
     str = str.trim();
@@ -351,24 +360,19 @@ function parseGSheetTimestamp(str) {
     if (parts.length < 1) return null;
     const dateParts = parts[0].split('/');
     if (dateParts.length !== 3) return null;
+    
     const month = parseInt(dateParts[0]) - 1;
     const day = parseInt(dateParts[1]);
     const year = parseInt(dateParts[2]);
-    let h=0, m=0, s=0;
+    
+    let hour = 0, minute = 0, second = 0;
     if (parts.length > 1) {
         const timeParts = parts[1].split(':');
-        h = parseInt(timeParts[0]) || 0;
-        m = parseInt(timeParts[1]) || 0;
-        s = parseInt(timeParts[2]) || 0;
+        hour = parseInt(timeParts[0]) || 0;
+        minute = parseInt(timeParts[1]) || 0;
+        second = parseInt(timeParts[2]) || 0;
     }
-    return new Date(year, month, day, h, m, s);
-}
-
-// Helper to get val from row by key (resilient to case and whitespace)
-function getRowVal(row, key) {
-    const keys = Object.keys(row);
-    const foundKey = keys.find(k => k.trim().toLowerCase() === key.toLowerCase());
-    return foundKey ? (row[foundKey] || '').trim() : '';
+    return new Date(year, month, day, hour, minute, second);
 }
 
 async function fetchProductionCount() {
@@ -393,18 +397,16 @@ async function fetchProductionCount() {
         if (!userKey || !tsKey) return;
         
         const filteredEntries = res.data.filter(row => {
-          if (getRowVal(row, userKey.trim()) !== user) return false;
-          const entryDate = parseGSheetTimestamp(getRowVal(row, tsKey.trim()));
-          return entryDate && entryDate >= boundaries.start && entryDate <= boundaries.end;
+          if (getRowVal(row, userKey) !== user) return false;
+          const entryDate = parseGSheetTimestamp(getRowVal(row, tsKey));
+          return entryDate && entryDate >= boundaries.start && entryDate < boundaries.end;
         });
         
         currentDoneCount = filteredEntries.length;
         _id('doneCounter').textContent = `Done: ${currentDoneCount}`;
       }
     });
-  } catch (err) {
-      console.error("Count Error:", err);
-  }
+  } catch (err) {}
 }
 
 function setMode(m){
@@ -417,7 +419,6 @@ function setMode(m){
   _id('cont360Filters').classList.toggle('hidden', m !== '360');
   _id('emptySetupMsg').classList.toggle('hidden', m === '360');
   _id('tableContainer').classList.toggle('hidden', m !== '360');
-  
   _id('startBtn').classList.remove('hidden');
 
   exitToSetup();
@@ -436,22 +437,35 @@ async function loadData() {
       complete: res => {
         raw = res.data.map(r => {
           if (mode === '360') {
-            const issueField = getRowVal(r, 'Issues') || getRowVal(r, 'validation_failure_reason') || getRowVal(r, 'vdp_validation_failure_reason');
+            const issueField = getRowVal(r, ['Issues', 'validation_failure_reason', 'vdp_validation_failure_reason']);
             return { 
-                ...r, ent: getRowVal(r, 'Enterprise'), sku: getRowVal(r, 'SKU_ID'), img: getRowVal(r, 'Spin_ID'), 
-                issue: issueField, u: getRowVal(r, 'User'), spin_url: getRowVal(r, 'spin_url'), 
-                status: getRowVal(r, 'status') || getRowVal(r, 'Status'), date: getRowVal(r, 'Date')
+                ...r, 
+                ent: getRowVal(r, 'Enterprise'), 
+                sku: getRowVal(r, 'SKU_ID'), 
+                img: getRowVal(r, 'Spin_ID'), 
+                issue: issueField, 
+                u: getRowVal(r, 'User'), 
+                spin_url: getRowVal(r, 'spin_url'), 
+                status: getRowVal(r, ['status', 'Status']), 
+                date: getRowVal(r, 'Date'),
+                editor: '', l: '', m: '', r: '', fqc: '', lqc: ''
             };
           }
           const isQc = mode === 'qc';
           const map = isQc ? FMAP.qc : FMAP.edited;
           return {
-            ent: getRowVal(r, map.ent), img: getRowVal(r, map.img), sku: getRowVal(r, map.sku),
-            l: getRowVal(r, map.l), m: getRowVal(r, map.m), r: getRowVal(r, map.r),
-            u: getRowVal(r, map.u) || 'N/A', editor: getRowVal(r, 'last_editor_user') || 'N/A',
-            fqc: getRowVal(r, 'first_qc_user') || 'N/A', lqc: getRowVal(r, 'last_qc_user') || 'N/A',
+            ent: getRowVal(r, map.ent), 
+            img: getRowVal(r, map.img), 
+            sku: getRowVal(r, map.sku),
+            l: getRowVal(r, [map.l, 'input_image']), 
+            m: getRowVal(r, [map.m, 'ai_output', 'ai_image']), 
+            r: getRowVal(r, [map.r, 'final_output', 'final_image']),
+            u: getRowVal(r, [map.u, 'qc_user_name']) || 'N/A', 
+            editor: getRowVal(r, ['last_editor_user', 'editor']) || 'N/A',
+            fqc: getRowVal(r, 'first_qc_user') || 'N/A', 
+            lqc: getRowVal(r, 'last_qc_user') || 'N/A',
             issue: isQc ? '' : getRowVal(r, 'rejected_comments'), 
-            status: getRowVal(r, 'status') || getRowVal(r, 'Status'),
+            status: getRowVal(r, ['status', 'Status']),
             action: getRowVal(r, 'latest_image_action')
           };
         });
@@ -484,24 +498,22 @@ function getFiltered(){
     const userF = _id('userFilter360').value;
     const entF = _id('entFilter360').value;
     const issueType = _id('issueFilter360').value.toLowerCase();
-
     return raw.filter(row => {
-      if (row.status !== '') return false;
+      if (row.status !== '' && row.status.toLowerCase() !== 'null') return false;
       const rowDate = row.date;
       if (startStr && rowDate < startStr) return false;
       if (endStr && rowDate > endStr) return false;
       if (userF && row.u !== userF) return false;
       if (entF && row.ent !== entF) return false;
       if (issueType) {
-        const rowIssues = row.issue.toLowerCase();
+        const rowIssues = (row.issue || '').toLowerCase();
         if (issueType === 'nullblank') { if (rowIssues.length > 0) return false; }
         else if (!rowIssues.includes(issueType)) return false;
       }
       return true;
     });
   } else {
-    const ent = _id('entFilter').value;
-    const qcu = _id('qcUFilter').value;
+    const ent = _id('entFilter').value, qcu = _id('qcUFilter').value;
     return raw.filter(r => {
       if (r.status !== '' && r.status.toLowerCase() !== 'null') return false;
       if (ent && r.ent !== ent) return false;
@@ -521,19 +533,15 @@ function updateCount(){
 
 function renderTable(data) {
   let html = `<table><thead><tr><th>Date</th><th>Spin ID</th><th>SKU</th><th>Issues</th><th>Enterprise</th><th>User</th></tr></thead><tbody>`;
-  // Optimized for 144k records - only show first 500 in dashboard table to avoid crash
   const previewData = data.slice(0, 500);
   previewData.forEach((row) => {
     html += `<tr><td>${row.date}</td><td><code>${row.img}</code></td><td>${row.sku}</td><td>${row.issue}</td><td>${row.ent}</td><td>${row.u}</td></tr>`;
   });
-  if(data.length > 500) {
-      html += `<tr><td colspan="6" style="text-align:center; color:var(--t4); font-style:italic; padding:20px;">Displaying first 500 of ${data.length.toLocaleString()} records. Use filters to narrow down.</td></tr>`;
-  }
+  if(data.length > 500) html += `<tr><td colspan="6" style="text-align:center; color:var(--t4); padding:20px;">Displaying first 500. Use filters.</td></tr>`;
   _id('tableContainer').innerHTML = html + '</tbody></table>';
 }
 
 function startReview(){
-  // Randomized picked
   group = getFiltered().sort(() => Math.random() - 0.5);
   if(!group.length) return alert('No records');
   idx = 0;
@@ -548,7 +556,6 @@ function preloadFuture(count = 15) {
     if (targetIdx < group.length && !preloadedIndices.has(targetIdx)) {
       const item = group[targetIdx];
       if(item.l) new Image().src = PROXY + item.l;
-      if(item.m) new Image().src = PROXY + item.m;
       preloadedIndices.add(targetIdx);
     }
   }
@@ -573,19 +580,16 @@ function showRecord(){
   const is360 = mode === '360';
   _id('imgArea').classList.toggle('hidden', is360);
   _id('spinArea').classList.toggle('hidden', !is360);
-  _id('standardIssues').classList.toggle('hidden', is360);
   _id('three60Issues').classList.toggle('hidden', !is360);
+  _id('standardIssues').classList.toggle('hidden', is360);
   _id('doneLabel').classList.toggle('hidden', is360);
 
-  _id('labelSku').textContent = is360 ? "Date" : "SKU ID";
-  _id('labelImg').textContent = is360 ? "Spin ID" : "Image ID";
-  _id('labelUser').textContent = is360 ? "User" : "QC Users";
-  _id('labelIssue').textContent = is360 ? "Original Issues" : "Issues";
-
   _id('mEnt').textContent = r.ent;
-  _id('mSku').textContent = is360 ? r.date : r.sku;
+  _id('mSku').textContent = r.sku;
   _id('mImg').textContent = r.img;
-  _id('mQcUsers').textContent = is360 ? r.u : [r.fqc, r.lqc, r.u].filter(u=>u&&u!=='N/A').join(', ');
+  _id('mQcUsers').textContent = [r.fqc, r.lqc, r.u].filter(u=>u&&u!=='N/A').join(', ');
+  _id('mEditor').textContent = r.editor;
+  _id('mEditorWrap').classList.toggle('hidden', !r.editor || mode === 'qc');
   _id('mIssue').textContent = r.issue;
   _id('mIssueWrap').classList.toggle('hidden', !r.issue);
   _id('progLbl').textContent = `Record ${idx+1} of ${group.length}`;
@@ -598,7 +602,7 @@ function showRecord(){
   } else {
     ['imgL','imgM','imgR'].forEach(id => {
       const el = _id(id); el.classList.remove('loaded'); el.src = "";
-      el.onload = () => { if (el.src) { el.classList.add('loaded'); loadedCount++; if(loadedCount >= (mode==='qc'?2:3)) checkAllLoaded(); } };
+      el.onload = () => { el.classList.add('loaded'); loadedCount++; if(loadedCount >= (mode==='qc'?2:3)) checkAllLoaded(); };
       el.onerror = () => { loadedCount++; if(loadedCount >= (mode==='qc'?2:3)) checkAllLoaded(); };
     });
     _id('imgL').src = PROXY + r.l; _id('imgM').src = PROXY + r.m;
@@ -606,7 +610,6 @@ function showRecord(){
     else { _id('panelR').style.display = 'flex'; _id('imgArea').className = 'img-area'; _id('imgR').src = PROXY + (r.r||r.m); }
   }
   _id('prevBtn').disabled = idx === 0;
-  
   document.querySelectorAll('.issue-cb').forEach(cb => cb.checked = false);
   _id(is360?'qc360_done':'cbDone').checked = true;
 }
@@ -616,23 +619,24 @@ function handleFinalSubmit() {
     const r = group[idx];
     const is360 = mode === '360';
     const btn = _id('nextBtn');
-    
-    btn.disabled = true;
-    btn.textContent = 'Submitting...';
+    btn.disabled = true; btn.textContent = 'Submitting...';
+
+    // Update local count immediately for feedback
+    currentDoneCount++;
+    _id('doneCounter').textContent = `Done: ${currentDoneCount}`;
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = is360 ? FORM_360 : FORM_STD;
+    form.target = 'hidden_iframe';
+
+    const addField = (name, value) => {
+        const input = document.createElement('input');
+        input.type = 'hidden'; input.name = name; input.value = value;
+        form.appendChild(input);
+    };
 
     if (is360) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = FORM_360;
-        form.target = 'hidden_iframe';
-
-        const addField = (name, value) => {
-            const input = document.createElement('input');
-            input.type = 'hidden'; input.name = name; input.value = value;
-            form.appendChild(input);
-        };
-
-        // Strict mappings for 360 Form
         addField('entry.703277665', r.sku || '');
         addField('entry.179295275', r.date || '');
         addField('entry.1125049159', r.img || '');
@@ -641,48 +645,37 @@ function handleFinalSubmit() {
         addField('entry.582537694', r.u || '');
         addField('entry.1372347436', r.spin_url || '');
         addField('entry.1243416507', user || ''); 
-
         const checkedBoxes = Array.from(document.querySelectorAll('#three60Issues .issue-cb:checked')).map(cb => cb.value);
         checkedBoxes.forEach(val => addField('entry.1751143375', val));
-
         const comment = _id('modalComment360').value.trim();
-        if (comment) {
-            addField('entry.1751143375', '__other_option__');
-            addField('entry.1751143375.other_option_response', comment);
-        }
-
-        document.body.appendChild(form);
-        form.submit();
-        
-        setTimeout(() => {
-            if (form.parentNode) document.body.removeChild(form);
-            afterSubmitActions();
-        }, 1500);
+        if (comment) { addField('entry.1751143375', '__other_option__'); addField('entry.1751143375.other_option_response', comment); }
     } else {
-        const checkedBoxes = Array.from(document.querySelectorAll('#standardIssues .issue-cb:checked, #doneLabel .issue-cb:checked'));
-        const body = new URLSearchParams();
-        body.append("entry.890284089", r.ent);
-        body.append("entry.5932044", [r.fqc, r.lqc, r.u].filter(u=>u&&u!=='N/A').join(', '));
-        body.append("entry.1139236247", r.sku); body.append("entry.661750446", r.img);
-        body.append("entry.865196657", user);
-        checkedBoxes.forEach(cb => body.append("entry.778698303", cb.value));
-
-        fetch(FORM_STD, { method: 'POST', mode: 'no-cors', body: body.toString() })
-            .then(() => afterSubmitActions());
+        // IDs from working imagespotqc.html
+        addField("entry.890284089", r.ent || '');
+        addField("entry.5932044", [r.fqc, r.lqc, r.u].filter(x => x && x !== 'N/A').join(', '));
+        addField("entry.1880389842", r.editor || '');
+        addField("entry.1139236247", r.sku || '');
+        addField("entry.661750446", r.img || '');
+        addField("entry.1317530325", r.issue || '');
+        addField("entry.1455673211", r.l || '');
+        addField("entry.772576827", r.m || '');
+        addField("entry.780536997", r.r || r.m);
+        addField("entry.865196657", user || '');
+        const checkedBoxes = Array.from(document.querySelectorAll('#standardIssues .issue-cb:checked, #doneLabel .issue-cb:checked')).map(cb => cb.value);
+        checkedBoxes.forEach(val => addField("entry.778698303", val));
     }
+
+    document.body.appendChild(form);
+    form.submit();
+    setTimeout(() => { if (form.parentNode) document.body.removeChild(form); afterSubmitActions(); }, 1500);
 }
 
 function afterSubmitActions() {
     toast('Submitted!'); 
-    setTimeout(fetchProductionCount, 3000);
-    if (idx < group.length - 1) {
-        idx++;
-        showRecord();
-    } else {
-        alert('Finished');
-        exitToSetup();
-        loadData();
-    }
+    // background sync after 5s to ensure GSheet processes submission
+    setTimeout(fetchProductionCount, 5000);
+    if (idx < group.length - 1) { idx++; showRecord(); } 
+    else { alert('Review Finished.'); exitToSetup(); loadData(); }
 }
 
 function setLoading(s) { _id('loadStrip').style.display = s ? 'flex' : 'none'; }
@@ -699,49 +692,30 @@ const doLogin = () => {
     } else _id('loginErr').style.display='block';
 };
 
-function handleLoginEnter(e) {
-    if (e.key === 'Enter') { e.preventDefault(); doLogin(); }
-}
-
 _id('loginBtn').onclick = doLogin;
-_id('loginName').addEventListener('keydown', handleLoginEnter);
-_id('loginPw').addEventListener('keydown', handleLoginEnter);
+_id('loginPw').onkeydown = e => { if(e.key==='Enter') doLogin(); };
 
 document.querySelectorAll('.issue-cb').forEach(cb => {
   cb.addEventListener('change', e => {
     const is360 = mode === '360';
     const doneId = is360 ? 'qc360_done' : 'cbDone';
-    
     if(e.target.id === doneId && e.target.checked) {
-        if (is360) {
-            document.querySelectorAll('#three60Issues .issue-cb:not(#qc360_done)').forEach(o => o.checked = false);
-            _id('modalComment360').value = '';
-        } else {
-            document.querySelectorAll('#standardIssues .issue-cb').forEach(o => o.checked = false);
-        }
-    } else if(e.target.checked) {
-        _id(doneId).checked = false;
-    } else {
-        const issuesContainer = is360 ? '#three60Issues' : '#standardIssues';
-        const othersChecked = Array.from(document.querySelectorAll(`${issuesContainer} .issue-cb:not(#${doneId})`)).some(o=>o.checked);
-        if(!othersChecked && (mode !== '360' || !_id('modalComment360').value)) _id(doneId).checked = true;
+        const q = is360 ? '#three60Issues .issue-cb:not(#qc360_done)' : '#standardIssues .issue-cb';
+        document.querySelectorAll(q).forEach(o => o.checked = false);
+        if(is360) _id('modalComment360').value = '';
+    } else if(e.target.checked) { _id(doneId).checked = false; }
+    else {
+        const others = is360 ? '#three60Issues .issue-cb:not(#qc360_done)' : '#standardIssues .issue-cb';
+        const checked = Array.from(document.querySelectorAll(others)).some(o=>o.checked);
+        if(!checked && (mode !== '360' || !_id('modalComment360').value)) _id(doneId).checked = true;
     }
   });
 });
 
 document.addEventListener('keydown', e => {
   if (_id('reviewPage').style.display === 'flex') {
-    if (mode === '360') {
-      if (e.key >= '1' && e.key <= '3') {
-        const cb = _id('qc360_' + e.key);
-        if (cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); e.preventDefault(); }
-      }
-    } else {
-      if (e.key >= '1' && e.key <= '9') {
-        const cb = _id('cb' + e.key);
-        if (cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); e.preventDefault(); }
-      }
-    }
+    if (mode === '360') { if (e.key >= '1' && e.key <= '3') { const cb = _id('qc360_' + e.key); if (cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); e.preventDefault(); } } }
+    else { if (e.key >= '1' && e.key <= '9') { const cb = _id('cb' + e.key); if (cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); e.preventDefault(); } } }
     if (e.key === 'Enter') { handleFinalSubmit(); e.preventDefault(); }
   }
 });
@@ -750,15 +724,10 @@ _id('startBtn').onclick = startReview;
 _id('prevBtn').onclick = () => { if(idx > 0) { idx--; showRecord(); } };
 
 window.onload = () => {
-    fp360 = flatpickr("#dateRange360", {
-        mode: "range",
-        dateFormat: "Y-m-d",
-        defaultDate: null, 
-        onClose: () => updateCount()
-    });
+    fp360 = flatpickr("#dateRange360", { mode: "range", dateFormat: "Y-m-d", defaultDate: null, onClose: () => updateCount() });
 };
 
-['userFilter360','entFilter360', 'issueFilter360'].forEach(id => {
+['userFilter360','entFilter360', 'issueFilter360', 'entFilter', 'qcUFilter'].forEach(id => {
   const el = _id(id); if (el) el.addEventListener('change', updateCount);
 });
 </script>
