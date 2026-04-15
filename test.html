@@ -193,7 +193,7 @@ tr:hover td{background:var(--bg2)}
 
   <div id="setupPage">
     <div class="filter-bar">
-      <!-- 360 Specific Filter Bar -->
+      <!-- 360 Filter Bar -->
       <div id="cont360Filters" class="hidden" style="display:contents">
         <label style="font-weight: 700; font-size: 13px;">Date Range</label>
         <div class="range-box-container">
@@ -245,7 +245,7 @@ tr:hover td{background:var(--bg2)}
       <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
     </div>
 
-    <!-- Viewport Area -->
+    <!-- Media Area -->
     <div class="img-area" id="imgArea">
       <div class="img-panel"><div class="img-label">Input</div><img id="imgL" src="" alt="Input"/></div>
       <div class="img-panel"><div class="img-label">AI Output</div><img id="imgM" src="" alt="Output"/></div>
@@ -352,7 +352,7 @@ function getShiftBoundaries() {
   return { start, end };
 }
 
-// Robust Timestamp Parser for GSheet format: "4/16/2026 1:31:17"
+// Precise Date Parser for GSheet format: "4/16/2026 1:31:17"
 function parseGSheetTimestamp(str) {
     if (!str) return null;
     str = str.trim();
@@ -360,19 +360,17 @@ function parseGSheetTimestamp(str) {
     if (parts.length < 1) return null;
     const dateParts = parts[0].split('/');
     if (dateParts.length !== 3) return null;
-    
     const month = parseInt(dateParts[0]) - 1;
     const day = parseInt(dateParts[1]);
     const year = parseInt(dateParts[2]);
-    
-    let hour = 0, minute = 0, second = 0;
+    let h=0, m=0, s=0;
     if (parts.length > 1) {
         const timeParts = parts[1].split(':');
-        hour = parseInt(timeParts[0]) || 0;
-        minute = parseInt(timeParts[1]) || 0;
-        second = parseInt(timeParts[2]) || 0;
+        h = parseInt(timeParts[0]) || 0;
+        m = parseInt(timeParts[1]) || 0;
+        s = parseInt(timeParts[2]) || 0;
     }
-    return new Date(year, month, day, hour, minute, second);
+    return new Date(year, month, day, h, m, s);
 }
 
 async function fetchProductionCount() {
@@ -389,17 +387,27 @@ async function fetchProductionCount() {
       header: true, skipEmptyLines: true,
       complete: res => {
         const fields = res.meta.fields || [];
-        const userKey = is360 
-          ? fields.find(k => k.trim().toLowerCase() === 'qc by') 
-          : fields.find(k => k.trim().toLowerCase() === 'login user');
-        const tsKey = fields.find(k => k.trim().toLowerCase() === 'timestamp');
+        
+        // Flexible key finder for columns like "QC  By" or "Timestamp"
+        const findFlexKey = (name) => {
+            const regex = new RegExp(name.replace(/\s+/g, '\\s*'), 'i');
+            return fields.find(k => regex.test(k.trim()));
+        };
+
+        const userKey = is360 ? findFlexKey('QC By') : findFlexKey('Login User');
+        const tsKey = findFlexKey('Timestamp');
         
         if (!userKey || !tsKey) return;
         
         const filteredEntries = res.data.filter(row => {
-          if (getRowVal(row, userKey) !== user) return false;
-          const entryDate = parseGSheetTimestamp(getRowVal(row, tsKey));
-          return entryDate && entryDate >= boundaries.start && entryDate < boundaries.end;
+          const rowUser = (row[userKey] || '').trim();
+          if (rowUser !== user) return false;
+          
+          const rawTs = (row[tsKey] || '').trim();
+          const entryDate = parseGSheetTimestamp(rawTs);
+          if (!entryDate || isNaN(entryDate.getTime())) return false;
+          
+          return entryDate >= boundaries.start && entryDate < boundaries.end;
         });
         
         currentDoneCount = filteredEntries.length;
@@ -439,34 +447,21 @@ async function loadData() {
           if (mode === '360') {
             const issueField = getRowVal(r, ['Issues', 'validation_failure_reason', 'vdp_validation_failure_reason']);
             return { 
-                ...r, 
-                ent: getRowVal(r, 'Enterprise'), 
-                sku: getRowVal(r, 'SKU_ID'), 
-                img: getRowVal(r, 'Spin_ID'), 
-                issue: issueField, 
-                u: getRowVal(r, 'User'), 
-                spin_url: getRowVal(r, 'spin_url'), 
-                status: getRowVal(r, ['status', 'Status']), 
-                date: getRowVal(r, 'Date'),
+                ...r, ent: getRowVal(r, 'Enterprise'), sku: getRowVal(r, 'SKU_ID'), img: getRowVal(r, 'Spin_ID'), 
+                issue: issueField, u: getRowVal(r, 'User'), spin_url: getRowVal(r, 'spin_url'), 
+                status: getRowVal(r, ['status', 'Status']), date: getRowVal(r, 'Date'),
                 editor: '', l: '', m: '', r: '', fqc: '', lqc: ''
             };
           }
           const isQc = mode === 'qc';
           const map = isQc ? FMAP.qc : FMAP.edited;
           return {
-            ent: getRowVal(r, map.ent), 
-            img: getRowVal(r, map.img), 
-            sku: getRowVal(r, map.sku),
-            l: getRowVal(r, [map.l, 'input_image']), 
-            m: getRowVal(r, [map.m, 'ai_output', 'ai_image']), 
-            r: getRowVal(r, [map.r, 'final_output', 'final_image']),
-            u: getRowVal(r, [map.u, 'qc_user_name']) || 'N/A', 
-            editor: getRowVal(r, ['last_editor_user', 'editor']) || 'N/A',
-            fqc: getRowVal(r, 'first_qc_user') || 'N/A', 
-            lqc: getRowVal(r, 'last_qc_user') || 'N/A',
+            ent: getRowVal(r, map.ent), img: getRowVal(r, map.img), sku: getRowVal(r, map.sku),
+            l: getRowVal(r, map.l), m: getRowVal(r, map.m), r: getRowVal(r, map.r),
+            u: getRowVal(r, map.u) || 'N/A', editor: getRowVal(r, ['last_editor_user', 'editor']) || 'N/A',
+            fqc: getRowVal(r, 'first_qc_user') || 'N/A', lqc: getRowVal(r, 'last_qc_user') || 'N/A',
             issue: isQc ? '' : getRowVal(r, 'rejected_comments'), 
-            status: getRowVal(r, ['status', 'Status']),
-            action: getRowVal(r, 'latest_image_action')
+            status: getRowVal(r, ['status', 'Status']), action: getRowVal(r, 'latest_image_action')
           };
         });
         fillFilters(); updateCount(); setLoading(false);
@@ -621,7 +616,7 @@ function handleFinalSubmit() {
     const btn = _id('nextBtn');
     btn.disabled = true; btn.textContent = 'Submitting...';
 
-    // Update local count immediately for feedback
+    // Optimistically update local count
     currentDoneCount++;
     _id('doneCounter').textContent = `Done: ${currentDoneCount}`;
 
@@ -650,7 +645,7 @@ function handleFinalSubmit() {
         const comment = _id('modalComment360').value.trim();
         if (comment) { addField('entry.1751143375', '__other_option__'); addField('entry.1751143375.other_option_response', comment); }
     } else {
-        // IDs from working imagespotqc.html
+        // IDs from original working source
         addField("entry.890284089", r.ent || '');
         addField("entry.5932044", [r.fqc, r.lqc, r.u].filter(x => x && x !== 'N/A').join(', '));
         addField("entry.1880389842", r.editor || '');
@@ -672,7 +667,7 @@ function handleFinalSubmit() {
 
 function afterSubmitActions() {
     toast('Submitted!'); 
-    // background sync after 5s to ensure GSheet processes submission
+    // Trigger background sync after 5 seconds to ensure GSheet has committed the change
     setTimeout(fetchProductionCount, 5000);
     if (idx < group.length - 1) { idx++; showRecord(); } 
     else { alert('Review Finished.'); exitToSetup(); loadData(); }
