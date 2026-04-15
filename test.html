@@ -61,13 +61,18 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 .t-space{flex:1}
 .t-chip{font-family:var(--mono);font-size:11px;color:var(--t3);background:var(--bg2);border:1px solid var(--line);border-radius:5px;padding:3px 9px;white-space:nowrap;display:flex;align-items:center}
 .t-chip.done-count{background:var(--oklt);color:var(--ok);border-color:var(--ok);font-weight:700}
+
+/* Avatar UI matching image_35642b.png */
+.t-avatar{width:28px;height:28px;background:var(--accentlt);border:1.5px solid var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--accent);flex-shrink:0;margin-right:6px}
+.t-uname{font-size:13px;font-weight:500;color:var(--t1)}
+
 .btn-sm{font-family:'Inter',sans-serif;font-size:12px;font-weight:500;background:transparent;border:1px solid var(--line2);border-radius:6px;color:var(--t3);padding:0 11px;height:28px;cursor:pointer;transition:all .14s;display:flex;align-items:center;justify-content:center}
 .btn-top-link{text-decoration:none;background:var(--bg2);border-color:var(--line2);color:var(--t2)}
 .btn-top-link:hover{background:var(--accentlt);border-color:var(--accent);color:var(--accent)}
 
 /* ── SETUP PAGE ── */
 #setupPage{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.filter-bar{background:var(--bg1);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;align-items:center;flex-wrap:wrap;gap:8px;flex-shrink:0}
+.filter-bar{background:var(--bg1);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;align-items:center;flex-wrap:wrap;gap:12px;flex-shrink:0}
 .fi-sel, .fi-in{font-family:'Inter',sans-serif;font-size:12px;color:var(--t1);background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:4px 8px;outline:none;cursor:pointer; height: 32px;}
 
 /* Date Range UI - Single Box Styling */
@@ -76,6 +81,10 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 }
 .range-box-container label { font-size: 13px; font-weight: 700; color: #000; white-space: nowrap; margin-right: 4px; }
 .range-box-container input { border: none; background: transparent; font-size: 13px; color: var(--t2); outline: none; width: 170px; cursor: pointer; }
+
+/* Start Review Button matching image_356104.png */
+.btn-start{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;background:var(--accent);color:#fff;border:none;border-radius:6px;padding:0 18px;height:34px;cursor:pointer;transition:background .14s;display:flex;align-items:center;gap:6px}
+.btn-start:hover{background:var(--accent2)}
 
 /* ── 360 DASHBOARD TABLE ── */
 .table-wrap{flex:1;overflow:auto;background:var(--bg1);margin:12px 18px;border-radius:var(--rlg);border:1px solid var(--line);box-shadow:var(--shadow)}
@@ -97,7 +106,7 @@ tr:hover td{background:var(--bg2)}
 .prog-track{flex:1;max-width:280px;height:4px;background:var(--line);border-radius:2px;overflow:hidden}
 .prog-fill{height:100%;background:var(--accent);transition:width .4s ease}
 
-/* Views */
+/* Media Views */
 .img-area{flex:1;display:grid;grid-template-columns:repeat(3,1fr);overflow:hidden;min-height:0}
 .img-area.two-col{grid-template-columns:1fr 1fr}
 .img-panel{position:relative;display:flex;flex-direction:column;background:#1A1C23;overflow:hidden;border-right:1px solid #2A2D38}
@@ -177,14 +186,17 @@ tr:hover td{background:var(--bg2)}
     <div class="t-space"></div>
     <div class="t-chip done-count" id="doneCounter" style="margin-right:6px">Done: 0</div>
     <a href="https://nandmodi.github.io/spot-qc-images/meet-review.html" target="_blank" class="btn-sm btn-top-link" style="margin-right:12px">Review</a>
+    
+    <!-- User Profile matching image_35642b.png -->
     <div class="t-avatar" id="tAvatar">–</div>
     <div class="t-uname" id="tUser" style="margin-right:12px">–</div>
+    
     <button class="btn-sm" onclick="doLogout()">Logout</button>
   </div>
 
   <div id="setupPage">
     <div class="filter-bar">
-      <!-- 360 Filter Bar -->
+      <!-- 360 Specific Filter Bar -->
       <div id="cont360Filters" class="hidden" style="display:contents">
         <div class="range-box-container">
           <label>Date Range</label>
@@ -212,6 +224,7 @@ tr:hover td{background:var(--bg2)}
 
       <div class="t-space"></div>
       <span id="fcount" class="t-chip"></span>
+      <!-- Start Review matching image_356104.png -->
       <button class="btn-start" id="startBtn">▶ Start Review</button>
     </div>
     
@@ -261,7 +274,7 @@ tr:hover td{background:var(--bg2)}
           <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb8" value="Open-door RBG"><span class="issue-cb-num">8</span>Open-door RBG</label>
           <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb9" value="Wrong Marking"><span class="issue-cb-num">9</span>Wrong Marking</label>
         </div>
-        <!-- 360 Specific Issue Panel -->
+        <!-- 360 Specific Issue Panel with Shortcuts -->
         <div id="three60Issues" class="issue-checkboxes hidden">
           <label class="issue-cb-row done-row"><input type="checkbox" class="issue-cb" id="qc360_done" name="qcReason" value="Done">Done</label>
           <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="qc360_1" name="qcReason" value="Wrong QC"><span class="issue-cb-num">1</span>Wrong QC</label>
@@ -385,7 +398,9 @@ async function loadData() {
             return { 
                 ...r, ent: r['Enterprise'] || '', sku: r['SKU_ID'] || '', img: r['Spin_ID'] || '', 
                 issue: issueField, 
-                u: r['User'] || '', spin_url: r['spin_url'] || '', status: (r['Status'] || r['status'] || '').trim(), date: (r['Date'] || '').trim()
+                u: r['User'] || '', spin_url: r['spin_url'] || '', 
+                status: (r['Status'] || r['status'] || '').trim(), 
+                date: (r['Date'] || '').trim()
             };
           }
           const isQc = mode === 'qc';
@@ -395,7 +410,8 @@ async function loadData() {
             l: r[map.l] || '', m: r[map.m] || '', r: r[map.r] || '',
             u: r[map.u] || 'N/A', editor: r['last_editor_user'] || 'N/A',
             fqc: r['first_qc_user'] || 'N/A', lqc: r['last_qc_user'] || 'N/A',
-            issue: isQc ? '' : r['rejected_comments'] || '', status: r['status'] || '',
+            issue: isQc ? '' : r['rejected_comments'] || '', 
+            status: (r['Status'] || r['status'] || '').trim(),
             action: r['latest_image_action'] || ''
           };
         });
@@ -429,8 +445,9 @@ function getFiltered(){
     const issueType = _id('issueFilter360').value.toLowerCase();
 
     return raw.filter(row => {
-      const rowStatus = row.status || '';
-      if (rowStatus !== '') return false;
+      // 360 Tab New Logic: Hide data if status is filled
+      if (row.status !== '') return false;
+      
       const rowDate = row.date;
       if (start && rowDate < start) return false;
       if (end && rowDate > end) return false;
@@ -447,7 +464,9 @@ function getFiltered(){
     const ent = _id('entFilter').value;
     const qcu = _id('qcUFilter').value;
     return raw.filter(r => {
-      if (r.status && r.status.toLowerCase() !== 'null' && r.status !== '') return false;
+      // Hide if status is filled
+      if (r.status !== '' && r.status.toLowerCase() !== 'null') return false;
+      
       if (ent && r.ent !== ent) return false;
       if (qcu && r.u !== qcu) return false;
       if (mode === 'qc_tool') { if (r.action !== 'qc_editingtool') return false; }
@@ -566,7 +585,7 @@ function handleFinalSubmit() {
     btn.textContent = 'Submitting...';
 
     if (is360) {
-        // Form submission logic from 360.html
+        // FORM SUBMISSION TO HIDDEN IFRAME (As per 360.html)
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = FORM_360;
@@ -587,7 +606,7 @@ function handleFinalSubmit() {
         addField('entry.1815472287', r.ent || '');
         addField('entry.582537694', r.u || '');
         addField('entry.1372347436', r.spin_url || '');
-        addField('entry.1243416507', user || ''); // Reviewer
+        addField('entry.1243416507', user || ''); // Reviewer automatically logged-in user
 
         const checkedBoxes = Array.from(document.querySelectorAll('#three60Issues .issue-cb:checked')).map(cb => cb.value);
         checkedBoxes.forEach(val => addField('entry.1751143375', val));
@@ -643,6 +662,7 @@ const doLogin = () => {
     const name = _id('loginName').value, pw = _id('loginPw').value;
     if(PWDS[name] === pw){
         user = name; _id('tUser').textContent = name;
+        _id('tAvatar').textContent = name.split(' ').map(n=>n[0]).join('').toUpperCase();
         _id('loginPage').style.display = 'none'; _id('app').style.display = 'flex';
         setMode('qc'); fetchProductionCount();
     } else _id('loginErr').style.display='block';
@@ -661,15 +681,24 @@ _id('loginPw').addEventListener('keydown', handleLoginEnter);
 
 document.querySelectorAll('.issue-cb').forEach(cb => {
   cb.addEventListener('change', e => {
-    const doneId = mode === '360' ? 'qc360_done' : 'cbDone';
+    const is360 = mode === '360';
+    const doneId = is360 ? 'qc360_done' : 'cbDone';
+    
     if(e.target.id === doneId && e.target.checked) {
-        document.querySelectorAll(`.issue-cb[name="qcReason"]:not(#${doneId}), #standardIssues .issue-cb`).forEach(o => o.checked = false);
-        if(mode === '360') _id('modalComment360').value = '';
+        // Uncheck all issues if "Done" is checked
+        if (is360) {
+            document.querySelectorAll('#three60Issues .issue-cb:not(#qc360_done)').forEach(o => o.checked = false);
+            _id('modalComment360').value = '';
+        } else {
+            document.querySelectorAll('#standardIssues .issue-cb').forEach(o => o.checked = false);
+        }
     } else if(e.target.checked) {
+        // Uncheck "Done" if any issue is checked
         _id(doneId).checked = false;
     } else {
-        const issuesContainer = mode === '360' ? '#three60Issues' : '#standardIssues';
-        const othersChecked = Array.from(document.querySelectorAll(`${issuesContainer} .issue-cb:not(#${doneId})`)).some(o=>o.checked);
+        // Auto-check "Done" if all issues are unchecked
+        const container = is360 ? '#three60Issues' : '#standardIssues';
+        const othersChecked = Array.from(document.querySelectorAll(`${container} .issue-cb:not(#${doneId})`)).some(o=>o.checked);
         if(!othersChecked && (mode !== '360' || !_id('modalComment360').value)) _id(doneId).checked = true;
     }
   });
@@ -702,7 +731,7 @@ window.onload = () => {
         mode: "range",
         dateFormat: "Y-m-d",
         defaultDate: [lastFortnight, today],
-        onChange: () => updateCount()
+        onClose: () => updateCount()
     });
 };
 
