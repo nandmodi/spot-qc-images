@@ -5,7 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Spyne QC</title>
 <link rel="icon" href="https://spyne-prod-ai.s3.us-east-1.amazonaws.com/ai-dataset/2025/logo/unnamed.png"/>
+<!-- Libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -32,6 +36,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 @keyframes tIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
 @keyframes tOut{to{opacity:0;transform:translateX(-12px)}}
 @keyframes slideUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes rot{to{transform:rotate(360deg)}}
 
 /* ── LOGIN ── */
 #loginPage{height:100%;display:flex;align-items:center;justify-content:center;background:var(--bg0);padding-bottom:30px}
@@ -63,7 +68,14 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 /* ── SETUP PAGE ── */
 #setupPage{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .filter-bar{background:var(--bg1);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;align-items:center;flex-wrap:wrap;gap:8px;flex-shrink:0}
-.fi-sel, .fi-in{font-family:'Inter',sans-serif;font-size:12.5px;color:var(--t1);background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:4px 8px;outline:none;cursor:pointer; height: 32px;}
+.fi-sel, .fi-in{font-family:'Inter',sans-serif;font-size:12px;color:var(--t1);background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:4px 8px;outline:none;cursor:pointer; height: 32px;}
+
+/* Date Range UI - Single Box Styling */
+.range-box-container {
+    display: flex; align-items: center; background: var(--bg1); border: 1.5px solid var(--accent); border-radius: 6px; padding: 0 10px; height: 32px; gap: 8px; cursor: pointer; transition: box-shadow 0.2s;
+}
+.range-box-container label { font-size: 13px; font-weight: 700; color: #000; white-space: nowrap; margin-right: 4px; }
+.range-box-container input { border: none; background: transparent; font-size: 13px; color: var(--t2); outline: none; width: 170px; cursor: pointer; }
 
 /* ── 360 DASHBOARD TABLE ── */
 .table-wrap{flex:1;overflow:auto;background:var(--bg1);margin:12px 18px;border-radius:var(--rlg);border:1px solid var(--line);box-shadow:var(--shadow)}
@@ -123,6 +135,10 @@ tr:hover td{background:var(--bg2)}
 }
 .bottom-ribbon a { color: var(--accent); text-decoration: none; font-weight: 600; margin-left: 4px; }
 .bottom-ribbon a:hover { text-decoration: underline; }
+
+.load-strip{display:none;align-items:center;gap:10px;padding:9px 18px;background:var(--accentlt);border-bottom:1px solid var(--line);font-size:12.5px;font-weight:500;color:var(--accent);flex-shrink:0}
+.spin{width:14px;height:14px;border:2px solid var(--line2);border-top-color:var(--accent);border-radius:50%;animation:rot .7s linear infinite;flex-shrink:0}
+@keyframes rot{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -168,16 +184,17 @@ tr:hover td{background:var(--bg2)}
 
   <div id="setupPage">
     <div class="filter-bar">
-      <!-- 360 Specific Filter Bar -->
+      <!-- 360 Filter Bar -->
       <div id="cont360Filters" class="hidden" style="display:contents">
-        <label style="font-size:10px; color:var(--t3); display:flex; flex-direction:column">Start<input type="date" id="startDate" class="fi-in"></label>
-        <label style="font-size:10px; color:var(--t3); display:flex; flex-direction:column">End<input type="date" id="endDate" class="fi-in"></label>
-        <select id="qcPersonnel360" class="fi-sel">
-          <option value="Nand Kishor">Nand Kishor</option><option value="Bhanu Pratap">Bhanu Pratap</option>
-          <option value="Sarika">Sarika</option><option value="Ajay Devrani">Ajay Devrani</option>
-        </select>
+        <div class="range-box-container">
+          <label>Date Range</label>
+          <input type="text" id="dateRange360" placeholder="Select Range">
+        </div>
+        <label style="font-weight: 700; font-size: 13px; margin-left: 8px;">User</label>
         <select id="userFilter360" class="fi-sel"><option value="">All Users</option></select>
+        <label style="font-weight: 700; font-size: 13px; margin-left: 8px;">Enterprise</label>
         <select id="entFilter360" class="fi-sel"><option value="">All Enterprises</option></select>
+        <label style="font-weight: 700; font-size: 13px; margin-left: 8px;">Issue Level</label>
         <select id="issueFilter360" class="fi-sel">
           <option value="">All Issues</option>
           <option value="nullblank">None / Blank</option>
@@ -219,7 +236,7 @@ tr:hover td{background:var(--bg2)}
       <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
     </div>
 
-    <!-- Media Sections -->
+    <!-- Media -->
     <div class="img-area" id="imgArea">
       <div class="img-panel"><div class="img-label">Input</div><img id="imgL" src="" alt="Input"/></div>
       <div class="img-panel"><div class="img-label">AI Output</div><img id="imgM" src="" alt="Output"/></div>
@@ -244,13 +261,13 @@ tr:hover td{background:var(--bg2)}
           <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb8" value="Open-door RBG"><span class="issue-cb-num">8</span>Open-door RBG</label>
           <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb9" value="Wrong Marking"><span class="issue-cb-num">9</span>Wrong Marking</label>
         </div>
-        <!-- 360 Issue Panel -->
+        <!-- 360 Specific Issue Panel -->
         <div id="three60Issues" class="issue-checkboxes hidden">
-          <label class="issue-cb-row done-row"><input type="checkbox" class="issue-cb" id="qc360_done" value="Done">Done</label>
-          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb9_360" value="Wrong QC"><span class="issue-cb-num">9</span>Wrong QC</label>
-          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" value="To Be Edited">To Be Edited</label>
-          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" value="Missing Issue Marking">Missing Issue Marking</label>
-          <input type="text" id="modalComment360" class="comment-in" placeholder="Add comments here (Other option)...">
+          <label class="issue-cb-row done-row"><input type="checkbox" class="issue-cb" id="qc360_done" name="qcReason" value="Done">Done</label>
+          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="qc360_1" name="qcReason" value="Wrong QC"><span class="issue-cb-num">1</span>Wrong QC</label>
+          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="qc360_2" name="qcReason" value="To Be Edited"><span class="issue-cb-num">2</span>To Be Edited</label>
+          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="qc360_3" name="qcReason" value="Missing Issue Marking"><span class="issue-cb-num">3</span>Missing Issue Marking</label>
+          <input type="text" id="modalComment360" class="comment-in" placeholder="Add comments here (Submits as Other option)...">
         </div>
       </div>
       
@@ -258,7 +275,7 @@ tr:hover td{background:var(--bg2)}
       
       <div style="display:flex;gap:8px">
         <button class="btn-prev" id="prevBtn" disabled>← Prev</button>
-        <button class="btn-sub" id="nextBtn" onclick="doSubmit()">Submit & Next →</button>
+        <button class="btn-sub" id="nextBtn" onclick="handleFinalSubmit()">Submit & Next →</button>
         <button class="btn-prev" onclick="exitToSetup()">Exit</button>
       </div>
     </div>
@@ -267,6 +284,7 @@ tr:hover td{background:var(--bg2)}
 
 <div class="bottom-ribbon">Managed by <a href="mailto:kishor@spyne.ai">kishor@spyne.ai</a></div>
 <div class="toast-shelf" id="toastShelf"></div>
+<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
 
 <script>
 const QC_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=1717039169&single=true&output=csv";
@@ -279,7 +297,12 @@ const FORM_360 = 'https://docs.google.com/forms/d/e/1FAIpQLSeQH6R9-rYr1Kh2rwUBKu
 
 const PROXY = "https://media.spyneai.com/unsafe/0x0/filters:format(webp)/";
 
-let raw=[], group=[], idx=0, mode='qc', user='';
+const FMAP = {
+  qc: { ent:'enterprise_name', img:'ai.image_id', sku:'sku_id', l:'input_image_hres_url', m:'output_image_hres_url', r:'manual_image_hres_url', u:'qc_user_name' },
+  edited: { ent:'enterprise_name', img:'ai.image_id', sku:'sku_id', l:'input_image_hres_url', m:'ai_output', r:'final_output', u:'last_qc_user' }
+};
+
+let raw=[], group=[], idx=0, mode='qc', user='', fp360=null;
 let imagesLoaded = false, loadedCount = 0, currentDoneCount = 0;
 let safetyTimer = null;
 const preloadedIndices = new Set();
@@ -294,6 +317,40 @@ function toast(msg, type='ok') {
   t.innerHTML = `<span>${type==='ok'?'✓':'⚠'}</span><span>${msg}</span>`;
   shelf.appendChild(t);
   setTimeout(() => { t.style.animation = 'tOut .2s ease both'; setTimeout(() => t.remove(), 200); }, 2500);
+}
+
+function getShiftBoundaries() {
+  const now = new Date();
+  const start = new Date(now);
+  start.setMinutes(0, 0, 0); start.setSeconds(0, 0);
+  if (now.getHours() < 7) { start.setDate(now.getDate() - 1); start.setHours(7); } else { start.setHours(7); }
+  const end = new Date(start); end.setDate(start.getDate() + 1);
+  return { start, end };
+}
+
+async function fetchProductionCount() {
+  if (!user) return;
+  try {
+    const response = await fetch(DONE_COUNT_URL + '&cb=' + Date.now());
+    if (!response.ok) return;
+    const csvData = await response.text();
+    const boundaries = getShiftBoundaries();
+    Papa.parse(csvData, {
+      header: true, skipEmptyLines: true,
+      complete: res => {
+        const tsKey = res.meta.fields.find(k => k.trim().toLowerCase() === 'timestamp');
+        const userKey = res.meta.fields.find(k => k.trim().toLowerCase() === 'login user');
+        if (!tsKey || !userKey) return;
+        const userProduction = res.data.filter(row => {
+          if (row[userKey] !== user) return false;
+          const entryDate = new Date(row[tsKey]);
+          return !isNaN(entryDate.getTime()) && entryDate >= boundaries.start && entryDate < boundaries.end;
+        });
+        currentDoneCount = userProduction.length;
+        _id('doneCounter').textContent = `Done: ${currentDoneCount}`;
+      }
+    });
+  } catch (err) {}
 }
 
 function setMode(m){
@@ -324,21 +381,19 @@ async function loadData() {
       complete: res => {
         raw = res.data.map(r => {
           if (mode === '360') {
+            const issueField = r['Issues'] || r['validation_failure_reason'] || r['vdp_validation_failure_reason'] || '';
             return { 
-                ...r, ent: r['Enterprise'], sku: r['SKU_ID'], img: r['Spin_ID'], 
-                issue: r['Issues'] || r['validation_failure_reason'] || r['vdp_validation_failure_reason'] || '', 
-                u: r['User'], spin_url: r['spin_url'], status: (r['Status'] || r['status'] || '').trim(), date: r['Date'] || ''
+                ...r, ent: r['Enterprise'] || '', sku: r['SKU_ID'] || '', img: r['Spin_ID'] || '', 
+                issue: issueField, 
+                u: r['User'] || '', spin_url: r['spin_url'] || '', status: (r['Status'] || r['status'] || '').trim(), date: (r['Date'] || '').trim()
             };
           }
           const isQc = mode === 'qc';
+          const map = isQc ? FMAP.qc : FMAP.edited;
           return {
-            ent: r[isQc?'enterprise_name':'enterprise_name'] || '', 
-            img: r[isQc?'ai.image_id':'ai.image_id'] || '', 
-            sku: r[isQc?'sku_id':'sku_id'] || '',
-            l: r[isQc?'input_image_hres_url':'input_image_hres_url'] || '', 
-            m: r[isQc?'output_image_hres_url':'ai_output'] || '', 
-            r: r[isQc?'manual_image_hres_url':'final_output'] || '',
-            u: r[isQc?'qc_user_name':'last_qc_user'] || 'N/A', editor: r['last_editor_user'] || 'N/A',
+            ent: r[map.ent] || '', img: r[map.img] || '', sku: r[map.sku] || '',
+            l: r[map.l] || '', m: r[map.m] || '', r: r[map.r] || '',
+            u: r[map.u] || 'N/A', editor: r['last_editor_user'] || 'N/A',
             fqc: r['first_qc_user'] || 'N/A', lqc: r['last_qc_user'] || 'N/A',
             issue: isQc ? '' : r['rejected_comments'] || '', status: r['status'] || '',
             action: r['latest_image_action'] || ''
@@ -353,7 +408,7 @@ async function loadData() {
 function fillFilters(){
   const populate = (id, list) => {
     const sel = _id(id); if (!sel) return;
-    sel.innerHTML = `<option value="">${sel.options[0].text}</option>` + [...new Set(list)].sort().map(v => `<option value="${v}">${v}</option>`).join('');
+    sel.innerHTML = `<option value="">${sel.options[0].text}</option>` + [...new Set(list.filter(Boolean).map(s=>s.trim()))].sort().map(v => `<option value="${v}">${v}</option>`).join('');
   };
   if (mode === '360') {
     populate('userFilter360', raw.map(r=>r.u));
@@ -366,16 +421,19 @@ function fillFilters(){
 
 function getFiltered(){
   if (mode === '360') {
-    const start = _id('startDate').value;
-    const end = _id('endDate').value;
+    const dates = fp360 ? fp360.selectedDates : [];
+    const start = dates[0] ? dates[0].toISOString().split('T')[0] : null;
+    const end = dates[1] ? dates[1].toISOString().split('T')[0] : null;
     const userF = _id('userFilter360').value;
     const entF = _id('entFilter360').value;
     const issueType = _id('issueFilter360').value.toLowerCase();
 
     return raw.filter(row => {
-      if (row.status !== '') return false;
-      if (start && row.date < start) return false;
-      if (end && row.date > end) return false;
+      const rowStatus = row.status || '';
+      if (rowStatus !== '') return false;
+      const rowDate = row.date;
+      if (start && rowDate < start) return false;
+      if (end && rowDate > end) return false;
       if (userF && row.u !== userF) return false;
       if (entF && row.ent !== entF) return false;
       if (issueType) {
@@ -406,9 +464,9 @@ function updateCount(){
 }
 
 function renderTable(data) {
-  let html = `<table><thead><tr><th>Date</th><th>Spin ID</th><th>SKU</th><th>Enterprise</th><th>User</th><th>Action</th></tr></thead><tbody>`;
+  let html = `<table><thead><tr><th>Date</th><th>Spin ID</th><th>SKU</th><th>Issues</th><th>Enterprise</th><th>User</th><th>Action</th></tr></thead><tbody>`;
   data.forEach((row, i) => {
-    html += `<tr><td>${row.date}</td><td><code>${row.img}</code></td><td>${row.sku}</td><td>${row.ent}</td><td>${row.u}</td>
+    html += `<tr><td>${row.date}</td><td><code>${row.img}</code></td><td>${row.sku}</td><td>${row.issue}</td><td>${row.ent}</td><td>${row.u}</td>
              <td><a class="btn-tbl" onclick="startSingleReview(${i})">Start Review</a></td></tr>`;
   });
   _id('tableContainer').innerHTML = html + '</tbody></table>';
@@ -434,7 +492,8 @@ function preloadFuture(count = 15) {
     const targetIdx = idx + i;
     if (targetIdx < group.length && !preloadedIndices.has(targetIdx)) {
       const item = group[targetIdx];
-      [item.l, item.m, item.r].forEach(url => { if (url) new Image().src = PROXY + url; });
+      if(item.l) new Image().src = PROXY + item.l;
+      if(item.m) new Image().src = PROXY + item.m;
       preloadedIndices.add(targetIdx);
     }
   }
@@ -466,7 +525,7 @@ function showRecord(){
   _id('labelSku').textContent = is360 ? "Date" : "SKU ID";
   _id('labelImg').textContent = is360 ? "Spin ID" : "Image ID";
   _id('labelUser').textContent = is360 ? "User" : "QC Users";
-  _id('labelIssue').textContent = is360 ? "Issues (Dashboard)" : "Issues";
+  _id('labelIssue').textContent = is360 ? "Original Issues" : "Issues";
 
   _id('mEnt').textContent = r.ent;
   _id('mSku').textContent = is360 ? r.date : r.sku;
@@ -492,92 +551,125 @@ function showRecord(){
     else { _id('panelR').style.display = 'flex'; _id('imgArea').className = 'img-area'; _id('imgR').src = PROXY + (r.r||r.m); }
   }
   _id('prevBtn').disabled = idx === 0;
+  
   document.querySelectorAll('.issue-cb').forEach(cb => cb.checked = false);
   _id(is360?'qc360_done':'cbDone').checked = true;
 }
 
-function doSubmit(){
-  if (!imagesLoaded) return;
-  const r = group[idx];
-  const is360 = mode === '360';
-  const checkedBoxes = Array.from(document.querySelectorAll(`${is360?'#three60Issues':'#standardIssues, #doneLabel'} .issue-cb:checked`));
-  
-  _id('nextBtn').disabled = true;
-  const body = new URLSearchParams();
-
-  if (is360) {
-    body.append('entry.703277665', r.sku);
-    body.append('entry.179295275', r.date);
-    body.append('entry.1125049159', r.img);
-    body.append('entry.575622617', r.issue);
-    body.append('entry.1815472287', r.ent);
-    body.append('entry.582537694', r.u);
-    body.append('entry.1372347436', r.spin_url);
-    body.append('entry.1243416507', _id('qcPersonnel360').value);
+function handleFinalSubmit() {
+    if (!imagesLoaded) return;
+    const r = group[idx];
+    const is360 = mode === '360';
+    const btn = _id('nextBtn');
     
-    checkedBoxes.forEach(cb => body.append('entry.1751143375', cb.value));
-    const comment = _id('modalComment360').value.trim();
-    if(comment) { 
-        body.append('entry.1751143375', '__other_option__'); 
-        body.append('entry.1751143375.other_option_response', comment); 
-    }
-  } else {
-    body.append("entry.890284089", r.ent);
-    body.append("entry.5932044", [r.fqc, r.lqc, r.u].filter(u=>u&&u!=='N/A').join(', '));
-    body.append("entry.1139236247", r.sku); body.append("entry.661750446", r.img);
-    body.append("entry.865196657", user);
-    checkedBoxes.forEach(cb => body.append("entry.778698303", cb.value));
-  }
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
 
-  fetch(is360 ? FORM_360 : FORM_STD, { method: 'POST', mode: 'no-cors', body: body.toString() })
-    .then(() => {
-      toast('Submitted!'); currentDoneCount++; _id('doneCounter').textContent = `Done: ${currentDoneCount}`;
-      if(idx < group.length - 1){ idx++; showRecord(); } 
-      else { alert('Finished'); exitToSetup(); loadData(); }
-    });
+    if (is360) {
+        // Form submission logic from 360.html
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = FORM_360;
+        form.target = 'hidden_iframe';
+
+        const addField = (name, value) => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = name;
+            input.value = value;
+            form.appendChild(input);
+        };
+
+        addField('entry.703277665', r.sku || '');
+        addField('entry.179295275', r.date || '');
+        addField('entry.1125049159', r.img || '');
+        addField('entry.575622617', r.issue || '');
+        addField('entry.1815472287', r.ent || '');
+        addField('entry.582537694', r.u || '');
+        addField('entry.1372347436', r.spin_url || '');
+        addField('entry.1243416507', user || ''); // Reviewer
+
+        const checkedBoxes = Array.from(document.querySelectorAll('#three60Issues .issue-cb:checked')).map(cb => cb.value);
+        checkedBoxes.forEach(val => addField('entry.1751143375', val));
+
+        const comment = _id('modalComment360').value.trim();
+        if (comment) {
+            addField('entry.1751143375', '__other_option__');
+            addField('entry.1751143375.other_option_response', comment);
+        }
+
+        document.body.appendChild(form);
+        form.submit();
+        
+        setTimeout(() => {
+            if (form.parentNode) document.body.removeChild(form);
+            afterSubmitActions();
+        }, 1500);
+    } else {
+        // Standard submission
+        const checkedBoxes = Array.from(document.querySelectorAll('#standardIssues .issue-cb:checked, #doneLabel .issue-cb:checked'));
+        const body = new URLSearchParams();
+        body.append("entry.890284089", r.ent);
+        body.append("entry.5932044", [r.fqc, r.lqc, r.u].filter(u=>u&&u!=='N/A').join(', '));
+        body.append("entry.1139236247", r.sku); body.append("entry.661750446", r.img);
+        body.append("entry.865196657", user);
+        checkedBoxes.forEach(cb => body.append("entry.778698303", cb.value));
+
+        fetch(FORM_STD, { method: 'POST', mode: 'no-cors', body: body.toString() })
+            .then(() => afterSubmitActions());
+    }
+}
+
+function afterSubmitActions() {
+    toast('Submitted!'); 
+    currentDoneCount++; 
+    _id('doneCounter').textContent = `Done: ${currentDoneCount}`;
+    if (idx < group.length - 1) {
+        idx++;
+        showRecord();
+    } else {
+        alert('Finished');
+        exitToSetup();
+        loadData();
+    }
 }
 
 function setLoading(s) { _id('loadStrip').style.display = s ? 'flex' : 'none'; }
 function exitToSetup(){ _id('reviewPage').style.display = 'none'; _id('setupPage').style.display = 'flex'; }
 function doLogout(){ location.reload(); }
 
-_id('loginBtn').onclick = () => {
+// CENTRAL LOGIN LOGIC
+const doLogin = () => {
     const name = _id('loginName').value, pw = _id('loginPw').value;
     if(PWDS[name] === pw){
         user = name; _id('tUser').textContent = name;
         _id('loginPage').style.display = 'none'; _id('app').style.display = 'flex';
-        setMode('qc');
-        fetchProductionCount();
+        setMode('qc'); fetchProductionCount();
     } else _id('loginErr').style.display='block';
 };
 
-async function fetchProductionCount() {
-  if (!user) return;
-  try {
-    const response = await fetch(DONE_COUNT_URL + '&cb=' + Date.now());
-    if (!response.ok) return;
-    const csvData = await response.text();
-    Papa.parse(csvData, {
-      header: true, skipEmptyLines: true,
-      complete: res => {
-        const userProduction = res.data.filter(row => row['login user'] === user);
-        currentDoneCount = userProduction.length;
-        _id('doneCounter').textContent = `Done: ${currentDoneCount}`;
-      }
-    });
-  } catch (err) {}
+function handleLoginEnter(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        doLogin();
+    }
 }
+
+_id('loginBtn').onclick = doLogin;
+_id('loginName').addEventListener('keydown', handleLoginEnter);
+_id('loginPw').addEventListener('keydown', handleLoginEnter);
 
 document.querySelectorAll('.issue-cb').forEach(cb => {
   cb.addEventListener('change', e => {
     const doneId = mode === '360' ? 'qc360_done' : 'cbDone';
     if(e.target.id === doneId && e.target.checked) {
-        document.querySelectorAll(`.issue-cb:not(#${doneId})`).forEach(o => o.checked = false);
+        document.querySelectorAll(`.issue-cb[name="qcReason"]:not(#${doneId}), #standardIssues .issue-cb`).forEach(o => o.checked = false);
         if(mode === '360') _id('modalComment360').value = '';
     } else if(e.target.checked) {
         _id(doneId).checked = false;
     } else {
-        const othersChecked = Array.from(document.querySelectorAll(`.issue-cb:not(#${doneId})`)).some(o=>o.checked);
+        const issuesContainer = mode === '360' ? '#three60Issues' : '#standardIssues';
+        const othersChecked = Array.from(document.querySelectorAll(`${issuesContainer} .issue-cb:not(#${doneId})`)).some(o=>o.checked);
         if(!othersChecked && (mode !== '360' || !_id('modalComment360').value)) _id(doneId).checked = true;
     }
   });
@@ -585,25 +677,38 @@ document.querySelectorAll('.issue-cb').forEach(cb => {
 
 document.addEventListener('keydown', e => {
   if (_id('reviewPage').style.display === 'flex') {
-    if (e.key >= '1' && e.key <= '9') {
-      const cb = _id(mode === '360' ? (e.key === '9' ? 'cb9_360' : '') : 'cb' + e.key);
-      if (cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); e.preventDefault(); }
+    if (mode === '360') {
+      if (e.key >= '1' && e.key <= '3') {
+        const cb = _id('qc360_' + e.key);
+        if (cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); e.preventDefault(); }
+      }
+    } else {
+      if (e.key >= '1' && e.key <= '9') {
+        const cb = _id('cb' + e.key);
+        if (cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); e.preventDefault(); }
+      }
     }
-    if (e.key === 'Enter') { doSubmit(); e.preventDefault(); }
+    if (e.key === 'Enter') { handleFinalSubmit(); e.preventDefault(); }
   }
 });
 
 _id('startBtn').onclick = startReview;
 _id('prevBtn').onclick = () => { if(idx > 0) { idx--; showRecord(); } };
-['entFilter','qcUFilter','startDate','endDate','userFilter360','entFilter360', 'issueFilter360', 'qcPersonnel360'].forEach(id => {
-  const el = _id(id); if (el) el.addEventListener('change', updateCount);
-});
 
+// Range Select Init
 window.onload = () => {
     const today = new Date(); const lastFortnight = new Date(); lastFortnight.setDate(today.getDate() - 14);
-    _id('endDate').value = today.toISOString().split('T')[0];
-    _id('startDate').value = lastFortnight.toISOString().split('T')[0];
+    fp360 = flatpickr("#dateRange360", {
+        mode: "range",
+        dateFormat: "Y-m-d",
+        defaultDate: [lastFortnight, today],
+        onChange: () => updateCount()
+    });
 };
+
+['userFilter360','entFilter360', 'issueFilter360'].forEach(id => {
+  const el = _id(id); if (el) el.addEventListener('change', updateCount);
+});
 </script>
 </body>
 </html>
