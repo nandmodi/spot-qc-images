@@ -62,12 +62,12 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 .t-chip{font-family:var(--mono);font-size:11px;color:var(--t3);background:var(--bg2);border:1px solid var(--line);border-radius:5px;padding:3px 9px;white-space:nowrap;display:flex;align-items:center}
 .t-chip.done-count{background:var(--oklt);color:var(--ok);border-color:var(--ok);font-weight:700}
 
-/* Avatar UI matching image_35642b.png */
+/* User Avatar UI matching image_35642b.png */
 .t-avatar{width:28px;height:28px;background:var(--accentlt);border:1.5px solid var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--accent);flex-shrink:0;margin-right:6px}
 .t-uname{font-size:13px;font-weight:500;color:var(--t1)}
 
 .btn-sm{font-family:'Inter',sans-serif;font-size:12px;font-weight:500;background:transparent;border:1px solid var(--line2);border-radius:6px;color:var(--t3);padding:0 11px;height:28px;cursor:pointer;transition:all .14s;display:flex;align-items:center;justify-content:center}
-.btn-top-link{text-decoration:none;background:var(--bg2);border-color:var(--line2);color:var(--t2)}
+.btn-top-link{text-decoration:none;background:var(--bg2);border-color:var(--line2);color:var(--t2); font-family:inherit;}
 .btn-top-link:hover{background:var(--accentlt);border-color:var(--accent);color:var(--accent)}
 
 /* ── SETUP PAGE ── */
@@ -75,7 +75,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 .filter-bar{background:var(--bg1);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;align-items:center;flex-wrap:wrap;gap:12px;flex-shrink:0}
 .fi-sel, .fi-in{font-family:'Inter',sans-serif;font-size:12px;color:var(--t1);background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:4px 8px;outline:none;cursor:pointer; height: 32px;}
 
-/* Date Range UI - Single Box Styling */
+/* Date Range UI - Improved for single box */
 .range-box-container {
     display: flex; align-items: center; background: var(--bg1); border: 1.5px solid var(--accent); border-radius: 6px; padding: 0 10px; height: 32px; gap: 8px; cursor: pointer; transition: box-shadow 0.2s;
 }
@@ -92,8 +92,6 @@ table{width:100%;border-collapse:collapse;min-width:900px}
 th{position:sticky;top:0;background:#f8fafc;padding:12px 16px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--accent);border-bottom:2px solid #edf2f7;z-index:5}
 td{padding:12px 16px;border-bottom:1px solid #edf2f7;font-size:13px;color:var(--t2)}
 tr:hover td{background:var(--bg2)}
-.btn-tbl{color:var(--accent);font-weight:600;cursor:pointer;text-decoration:none}
-.btn-tbl:hover{text-decoration:underline}
 
 /* ── REVIEW PAGE ── */
 #reviewPage{display:none;flex-direction:column;flex:1;overflow:hidden;min-height:0}
@@ -106,7 +104,7 @@ tr:hover td{background:var(--bg2)}
 .prog-track{flex:1;max-width:280px;height:4px;background:var(--line);border-radius:2px;overflow:hidden}
 .prog-fill{height:100%;background:var(--accent);transition:width .4s ease}
 
-/* Media Views */
+/* Media Areas */
 .img-area{flex:1;display:grid;grid-template-columns:repeat(3,1fr);overflow:hidden;min-height:0}
 .img-area.two-col{grid-template-columns:1fr 1fr}
 .img-panel{position:relative;display:flex;flex-direction:column;background:#1A1C23;overflow:hidden;border-right:1px solid #2A2D38}
@@ -115,7 +113,7 @@ tr:hover td{background:var(--bg2)}
 .img-label{position:absolute;top:10px;left:10px;z-index:5;font-size:10.5px;font-weight:600;text-transform:uppercase;background:rgba(255,255,255,0.88);padding:3px 9px;border-radius:5px}
 .spin-frame{flex:1;width:100%;height:100%;border:none;background:#000}
 
-/* Footer */
+/* Footer Control Area */
 .rev-footer{background:var(--bg1);border-top:1px solid var(--line);padding:10px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0; position:relative; z-index:50}
 .issue-checkboxes{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center}
 .issue-cb-row{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:var(--t2);cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid var(--line);background:var(--bg2);transition:background 0.2s}
@@ -187,7 +185,6 @@ tr:hover td{background:var(--bg2)}
     <div class="t-chip done-count" id="doneCounter" style="margin-right:6px">Done: 0</div>
     <a href="https://nandmodi.github.io/spot-qc-images/meet-review.html" target="_blank" class="btn-sm btn-top-link" style="margin-right:12px">Review</a>
     
-    <!-- User Profile matching image_35642b.png -->
     <div class="t-avatar" id="tAvatar">–</div>
     <div class="t-uname" id="tUser" style="margin-right:12px">–</div>
     
@@ -198,8 +195,8 @@ tr:hover td{background:var(--bg2)}
     <div class="filter-bar">
       <!-- 360 Specific Filter Bar -->
       <div id="cont360Filters" class="hidden" style="display:contents">
+        <label style="font-weight: 700; font-size: 13px;">Date Range</label>
         <div class="range-box-container">
-          <label>Date Range</label>
           <input type="text" id="dateRange360" placeholder="Select Range">
         </div>
         <label style="font-weight: 700; font-size: 13px; margin-left: 8px;">User</label>
@@ -224,7 +221,6 @@ tr:hover td{background:var(--bg2)}
 
       <div class="t-space"></div>
       <span id="fcount" class="t-chip"></span>
-      <!-- Start Review matching image_356104.png -->
       <button class="btn-start" id="startBtn">▶ Start Review</button>
     </div>
     
@@ -249,7 +245,7 @@ tr:hover td{background:var(--bg2)}
       <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
     </div>
 
-    <!-- Media -->
+    <!-- Content Sections -->
     <div class="img-area" id="imgArea">
       <div class="img-panel"><div class="img-label">Input</div><img id="imgL" src="" alt="Input"/></div>
       <div class="img-panel"><div class="img-label">AI Output</div><img id="imgM" src="" alt="Output"/></div>
@@ -274,7 +270,7 @@ tr:hover td{background:var(--bg2)}
           <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb8" value="Open-door RBG"><span class="issue-cb-num">8</span>Open-door RBG</label>
           <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb9" value="Wrong Marking"><span class="issue-cb-num">9</span>Wrong Marking</label>
         </div>
-        <!-- 360 Specific Issue Panel with Shortcuts -->
+        <!-- 360 Specific Issue Panel -->
         <div id="three60Issues" class="issue-checkboxes hidden">
           <label class="issue-cb-row done-row"><input type="checkbox" class="issue-cb" id="qc360_done" name="qcReason" value="Done">Done</label>
           <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="qc360_1" name="qcReason" value="Wrong QC"><span class="issue-cb-num">1</span>Wrong QC</label>
@@ -304,6 +300,7 @@ const QC_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VO
 const EDIT_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=320301246&single=true&output=csv";
 const THREE60_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThoeXNovzUYQaHoFqHYY8p4hxrGTJWUPF8dQs0cinxvypfUVwAzFu74l06jhqXm0x611kRke13fa2t/pub?gid=0&single=true&output=csv';
 const DONE_COUNT_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=2128295653&single=true&output=csv";
+const DONE_COUNT_360_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vThoeXNovzUYQaHoFqHYY8p4hxrGTJWUPF8dQs0cinxvypfUVwAzFu74l06jhqXm0x611kRke13fa2t/pub?gid=1009592102&single=true&output=csv";
 
 const FORM_STD = "https://docs.google.com/forms/d/e/1FAIpQLSdrjhynjWITfOqHpkgKX8enCmDKg1b3s0Ij05Cux36kPmZEUA/formResponse";
 const FORM_360 = 'https://docs.google.com/forms/d/e/1FAIpQLSeQH6R9-rYr1Kh2rwUBKu7uGvJAkRrvx8fnxF6jfkac7sNL2A/formResponse';
@@ -332,38 +329,82 @@ function toast(msg, type='ok') {
   setTimeout(() => { t.style.animation = 'tOut .2s ease both'; setTimeout(() => t.remove(), 200); }, 2500);
 }
 
+// 7 AM Shift Logic: 7:00:00 AM to 6:59:59 AM next day
 function getShiftBoundaries() {
   const now = new Date();
   const start = new Date(now);
-  start.setMinutes(0, 0, 0); start.setSeconds(0, 0);
-  if (now.getHours() < 7) { start.setDate(now.getDate() - 1); start.setHours(7); } else { start.setHours(7); }
-  const end = new Date(start); end.setDate(start.getDate() + 1);
+  start.setHours(7, 0, 0, 0);
+  if (now.getHours() < 7) {
+    start.setDate(start.getDate() - 1);
+  }
+  const end = new Date(start);
+  end.setDate(start.getDate() + 1);
+  end.setTime(end.getTime() - 1); // 6:59:59.999
   return { start, end };
+}
+
+// Custom parser for GSheet Timestamp format: 4/16/2026 1:31:17
+function parseGSheetTimestamp(str) {
+    if (!str) return null;
+    str = str.trim();
+    const parts = str.split(' ');
+    if (parts.length < 1) return null;
+    const dateParts = parts[0].split('/');
+    if (dateParts.length !== 3) return null;
+    const month = parseInt(dateParts[0]) - 1;
+    const day = parseInt(dateParts[1]);
+    const year = parseInt(dateParts[2]);
+    let h=0, m=0, s=0;
+    if (parts.length > 1) {
+        const timeParts = parts[1].split(':');
+        h = parseInt(timeParts[0]) || 0;
+        m = parseInt(timeParts[1]) || 0;
+        s = parseInt(timeParts[2]) || 0;
+    }
+    return new Date(year, month, day, h, m, s);
+}
+
+// Helper to get val from row by key (resilient to case and whitespace)
+function getRowVal(row, key) {
+    const keys = Object.keys(row);
+    const foundKey = keys.find(k => k.trim().toLowerCase() === key.toLowerCase());
+    return foundKey ? (row[foundKey] || '').trim() : '';
 }
 
 async function fetchProductionCount() {
   if (!user) return;
   try {
-    const response = await fetch(DONE_COUNT_URL + '&cb=' + Date.now());
+    const is360 = mode === '360';
+    const countUrl = is360 ? DONE_COUNT_360_URL : DONE_COUNT_URL;
+    const response = await fetch(countUrl + (countUrl.includes('?') ? '&' : '?') + 'cb=' + Date.now());
     if (!response.ok) return;
     const csvData = await response.text();
     const boundaries = getShiftBoundaries();
+    
     Papa.parse(csvData, {
       header: true, skipEmptyLines: true,
       complete: res => {
-        const tsKey = res.meta.fields.find(k => k.trim().toLowerCase() === 'timestamp');
-        const userKey = res.meta.fields.find(k => k.trim().toLowerCase() === 'login user');
-        if (!tsKey || !userKey) return;
-        const userProduction = res.data.filter(row => {
-          if (row[userKey] !== user) return false;
-          const entryDate = new Date(row[tsKey]);
-          return !isNaN(entryDate.getTime()) && entryDate >= boundaries.start && entryDate < boundaries.end;
+        const fields = res.meta.fields || [];
+        const userKey = is360 
+          ? fields.find(k => k.trim().toLowerCase() === 'qc by') 
+          : fields.find(k => k.trim().toLowerCase() === 'login user');
+        const tsKey = fields.find(k => k.trim().toLowerCase() === 'timestamp');
+        
+        if (!userKey || !tsKey) return;
+        
+        const filteredEntries = res.data.filter(row => {
+          if (getRowVal(row, userKey.trim()) !== user) return false;
+          const entryDate = parseGSheetTimestamp(getRowVal(row, tsKey.trim()));
+          return entryDate && entryDate >= boundaries.start && entryDate <= boundaries.end;
         });
-        currentDoneCount = userProduction.length;
+        
+        currentDoneCount = filteredEntries.length;
         _id('doneCounter').textContent = `Done: ${currentDoneCount}`;
       }
     });
-  } catch (err) {}
+  } catch (err) {
+      console.error("Count Error:", err);
+  }
 }
 
 function setMode(m){
@@ -376,7 +417,8 @@ function setMode(m){
   _id('cont360Filters').classList.toggle('hidden', m !== '360');
   _id('emptySetupMsg').classList.toggle('hidden', m === '360');
   _id('tableContainer').classList.toggle('hidden', m !== '360');
-  _id('startBtn').classList.toggle('hidden', m === '360');
+  
+  _id('startBtn').classList.remove('hidden');
 
   exitToSetup();
   raw = []; preloadedIndices.clear();
@@ -394,28 +436,27 @@ async function loadData() {
       complete: res => {
         raw = res.data.map(r => {
           if (mode === '360') {
-            const issueField = r['Issues'] || r['validation_failure_reason'] || r['vdp_validation_failure_reason'] || '';
+            const issueField = getRowVal(r, 'Issues') || getRowVal(r, 'validation_failure_reason') || getRowVal(r, 'vdp_validation_failure_reason');
             return { 
-                ...r, ent: r['Enterprise'] || '', sku: r['SKU_ID'] || '', img: r['Spin_ID'] || '', 
-                issue: issueField, 
-                u: r['User'] || '', spin_url: r['spin_url'] || '', 
-                status: (r['Status'] || r['status'] || '').trim(), 
-                date: (r['Date'] || '').trim()
+                ...r, ent: getRowVal(r, 'Enterprise'), sku: getRowVal(r, 'SKU_ID'), img: getRowVal(r, 'Spin_ID'), 
+                issue: issueField, u: getRowVal(r, 'User'), spin_url: getRowVal(r, 'spin_url'), 
+                status: getRowVal(r, 'status') || getRowVal(r, 'Status'), date: getRowVal(r, 'Date')
             };
           }
           const isQc = mode === 'qc';
           const map = isQc ? FMAP.qc : FMAP.edited;
           return {
-            ent: r[map.ent] || '', img: r[map.img] || '', sku: r[map.sku] || '',
-            l: r[map.l] || '', m: r[map.m] || '', r: r[map.r] || '',
-            u: r[map.u] || 'N/A', editor: r['last_editor_user'] || 'N/A',
-            fqc: r['first_qc_user'] || 'N/A', lqc: r['last_qc_user'] || 'N/A',
-            issue: isQc ? '' : r['rejected_comments'] || '', 
-            status: (r['Status'] || r['status'] || '').trim(),
-            action: r['latest_image_action'] || ''
+            ent: getRowVal(r, map.ent), img: getRowVal(r, map.img), sku: getRowVal(r, map.sku),
+            l: getRowVal(r, map.l), m: getRowVal(r, map.m), r: getRowVal(r, map.r),
+            u: getRowVal(r, map.u) || 'N/A', editor: getRowVal(r, 'last_editor_user') || 'N/A',
+            fqc: getRowVal(r, 'first_qc_user') || 'N/A', lqc: getRowVal(r, 'last_qc_user') || 'N/A',
+            issue: isQc ? '' : getRowVal(r, 'rejected_comments'), 
+            status: getRowVal(r, 'status') || getRowVal(r, 'Status'),
+            action: getRowVal(r, 'latest_image_action')
           };
         });
         fillFilters(); updateCount(); setLoading(false);
+        fetchProductionCount();
       }
     });
   } catch (err) { toast('Error loading data', 'err'); setLoading(false); }
@@ -438,19 +479,17 @@ function fillFilters(){
 function getFiltered(){
   if (mode === '360') {
     const dates = fp360 ? fp360.selectedDates : [];
-    const start = dates[0] ? dates[0].toISOString().split('T')[0] : null;
-    const end = dates[1] ? dates[1].toISOString().split('T')[0] : null;
+    const startStr = dates[0] ? dates[0].toISOString().split('T')[0] : null;
+    const endStr = dates[1] ? dates[1].toISOString().split('T')[0] : null;
     const userF = _id('userFilter360').value;
     const entF = _id('entFilter360').value;
     const issueType = _id('issueFilter360').value.toLowerCase();
 
     return raw.filter(row => {
-      // 360 Tab New Logic: Hide data if status is filled
       if (row.status !== '') return false;
-      
       const rowDate = row.date;
-      if (start && rowDate < start) return false;
-      if (end && rowDate > end) return false;
+      if (startStr && rowDate < startStr) return false;
+      if (endStr && rowDate > endStr) return false;
       if (userF && row.u !== userF) return false;
       if (entF && row.ent !== entF) return false;
       if (issueType) {
@@ -464,9 +503,7 @@ function getFiltered(){
     const ent = _id('entFilter').value;
     const qcu = _id('qcUFilter').value;
     return raw.filter(r => {
-      // Hide if status is filled
       if (r.status !== '' && r.status.toLowerCase() !== 'null') return false;
-      
       if (ent && r.ent !== ent) return false;
       if (qcu && r.u !== qcu) return false;
       if (mode === 'qc_tool') { if (r.action !== 'qc_editingtool') return false; }
@@ -483,21 +520,20 @@ function updateCount(){
 }
 
 function renderTable(data) {
-  let html = `<table><thead><tr><th>Date</th><th>Spin ID</th><th>SKU</th><th>Issues</th><th>Enterprise</th><th>User</th><th>Action</th></tr></thead><tbody>`;
-  data.forEach((row, i) => {
-    html += `<tr><td>${row.date}</td><td><code>${row.img}</code></td><td>${row.sku}</td><td>${row.issue}</td><td>${row.ent}</td><td>${row.u}</td>
-             <td><a class="btn-tbl" onclick="startSingleReview(${i})">Start Review</a></td></tr>`;
+  let html = `<table><thead><tr><th>Date</th><th>Spin ID</th><th>SKU</th><th>Issues</th><th>Enterprise</th><th>User</th></tr></thead><tbody>`;
+  // Optimized for 144k records - only show first 500 in dashboard table to avoid crash
+  const previewData = data.slice(0, 500);
+  previewData.forEach((row) => {
+    html += `<tr><td>${row.date}</td><td><code>${row.img}</code></td><td>${row.sku}</td><td>${row.issue}</td><td>${row.ent}</td><td>${row.u}</td></tr>`;
   });
+  if(data.length > 500) {
+      html += `<tr><td colspan="6" style="text-align:center; color:var(--t4); font-style:italic; padding:20px;">Displaying first 500 of ${data.length.toLocaleString()} records. Use filters to narrow down.</td></tr>`;
+  }
   _id('tableContainer').innerHTML = html + '</tbody></table>';
 }
 
-function startSingleReview(i) {
-  group = getFiltered(); idx = i;
-  _id('setupPage').style.display = 'none'; _id('reviewPage').style.display = 'flex';
-  showRecord();
-}
-
 function startReview(){
+  // Randomized picked
   group = getFiltered().sort(() => Math.random() - 0.5);
   if(!group.length) return alert('No records');
   idx = 0;
@@ -585,7 +621,6 @@ function handleFinalSubmit() {
     btn.textContent = 'Submitting...';
 
     if (is360) {
-        // FORM SUBMISSION TO HIDDEN IFRAME (As per 360.html)
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = FORM_360;
@@ -593,12 +628,11 @@ function handleFinalSubmit() {
 
         const addField = (name, value) => {
             const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = name;
-            input.value = value;
+            input.type = 'hidden'; input.name = name; input.value = value;
             form.appendChild(input);
         };
 
+        // Strict mappings for 360 Form
         addField('entry.703277665', r.sku || '');
         addField('entry.179295275', r.date || '');
         addField('entry.1125049159', r.img || '');
@@ -606,7 +640,7 @@ function handleFinalSubmit() {
         addField('entry.1815472287', r.ent || '');
         addField('entry.582537694', r.u || '');
         addField('entry.1372347436', r.spin_url || '');
-        addField('entry.1243416507', user || ''); // Reviewer automatically logged-in user
+        addField('entry.1243416507', user || ''); 
 
         const checkedBoxes = Array.from(document.querySelectorAll('#three60Issues .issue-cb:checked')).map(cb => cb.value);
         checkedBoxes.forEach(val => addField('entry.1751143375', val));
@@ -625,7 +659,6 @@ function handleFinalSubmit() {
             afterSubmitActions();
         }, 1500);
     } else {
-        // Standard submission
         const checkedBoxes = Array.from(document.querySelectorAll('#standardIssues .issue-cb:checked, #doneLabel .issue-cb:checked'));
         const body = new URLSearchParams();
         body.append("entry.890284089", r.ent);
@@ -641,8 +674,7 @@ function handleFinalSubmit() {
 
 function afterSubmitActions() {
     toast('Submitted!'); 
-    currentDoneCount++; 
-    _id('doneCounter').textContent = `Done: ${currentDoneCount}`;
+    setTimeout(fetchProductionCount, 3000);
     if (idx < group.length - 1) {
         idx++;
         showRecord();
@@ -657,22 +689,18 @@ function setLoading(s) { _id('loadStrip').style.display = s ? 'flex' : 'none'; }
 function exitToSetup(){ _id('reviewPage').style.display = 'none'; _id('setupPage').style.display = 'flex'; }
 function doLogout(){ location.reload(); }
 
-// CENTRAL LOGIN LOGIC
 const doLogin = () => {
     const name = _id('loginName').value, pw = _id('loginPw').value;
     if(PWDS[name] === pw){
         user = name; _id('tUser').textContent = name;
         _id('tAvatar').textContent = name.split(' ').map(n=>n[0]).join('').toUpperCase();
         _id('loginPage').style.display = 'none'; _id('app').style.display = 'flex';
-        setMode('qc'); fetchProductionCount();
+        setMode('qc');
     } else _id('loginErr').style.display='block';
 };
 
 function handleLoginEnter(e) {
-    if (e.key === 'Enter') {
-        e.preventDefault();
-        doLogin();
-    }
+    if (e.key === 'Enter') { e.preventDefault(); doLogin(); }
 }
 
 _id('loginBtn').onclick = doLogin;
@@ -685,7 +713,6 @@ document.querySelectorAll('.issue-cb').forEach(cb => {
     const doneId = is360 ? 'qc360_done' : 'cbDone';
     
     if(e.target.id === doneId && e.target.checked) {
-        // Uncheck all issues if "Done" is checked
         if (is360) {
             document.querySelectorAll('#three60Issues .issue-cb:not(#qc360_done)').forEach(o => o.checked = false);
             _id('modalComment360').value = '';
@@ -693,12 +720,10 @@ document.querySelectorAll('.issue-cb').forEach(cb => {
             document.querySelectorAll('#standardIssues .issue-cb').forEach(o => o.checked = false);
         }
     } else if(e.target.checked) {
-        // Uncheck "Done" if any issue is checked
         _id(doneId).checked = false;
     } else {
-        // Auto-check "Done" if all issues are unchecked
-        const container = is360 ? '#three60Issues' : '#standardIssues';
-        const othersChecked = Array.from(document.querySelectorAll(`${container} .issue-cb:not(#${doneId})`)).some(o=>o.checked);
+        const issuesContainer = is360 ? '#three60Issues' : '#standardIssues';
+        const othersChecked = Array.from(document.querySelectorAll(`${issuesContainer} .issue-cb:not(#${doneId})`)).some(o=>o.checked);
         if(!othersChecked && (mode !== '360' || !_id('modalComment360').value)) _id(doneId).checked = true;
     }
   });
@@ -724,13 +749,11 @@ document.addEventListener('keydown', e => {
 _id('startBtn').onclick = startReview;
 _id('prevBtn').onclick = () => { if(idx > 0) { idx--; showRecord(); } };
 
-// Range Select Init
 window.onload = () => {
-    const today = new Date(); const lastFortnight = new Date(); lastFortnight.setDate(today.getDate() - 14);
     fp360 = flatpickr("#dateRange360", {
         mode: "range",
         dateFormat: "Y-m-d",
-        defaultDate: [lastFortnight, today],
+        defaultDate: null, 
         onClose: () => updateCount()
     });
 };
