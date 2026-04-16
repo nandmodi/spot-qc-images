@@ -41,7 +41,7 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;min-height:100%}
-body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--t1);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--t1);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased; display: flex; flex-direction: column;}
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--line2);border-radius:3px}
@@ -104,7 +104,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 .rec-count{font-family:var(--mono);font-size:11px;color:var(--t3)}
 
 /* ── CONTENT ── */
-.content{padding:18px;max-width:auto;margin:0 auto}
+.content{padding:18px;max-width:auto;margin:0 auto; flex: 1;}
 
 /* empty state */
 .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;text-align:center;color:var(--t3)}
@@ -115,6 +115,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 .record-card{
   background:var(--bg1);border:1px solid var(--line);border-radius:var(--rlg);
   overflow:hidden;box-shadow:var(--shadow-md);
+  margin-bottom: 20px;
 }
 
 /* meta strip */
@@ -208,11 +209,19 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 }
 .img-err span{font-size:12px;opacity:.4;color:#aaa}
 
+/* ── STICKY BOTTOM WRAPPER ── */
+.bottom-stick {
+  position: sticky;
+  bottom: 0;
+  z-index: 40;
+  background: var(--bg1);
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+}
+
 /* progress + nav */
 .nav-bar{
-  background:var(--bg1);border-top:1px solid var(--line);
+  border-top:1px solid var(--line);
   padding:10px 18px;display:flex;align-items:center;gap:12px;
-  position:sticky;bottom:0;box-shadow:0 -2px 8px rgba(0,0,0,.06);
   flex-wrap: wrap;
 }
 .prog-lbl{font-family:var(--mono);font-size:11px;color:#000;font-weight:700;min-width:110px}
@@ -235,6 +244,20 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 .kbd-hint{font-size:11px;color:var(--t4);display:flex;align-items:center;gap:5px}
 @media (max-width: 600px) { .kbd-hint { display: none; } }
 .kbd{font-family:var(--mono);font-size:9.5px;background:var(--bg3);border:1px solid var(--line2);border-radius:3px;padding:1px 5px;color:var(--t3)}
+
+/* ── RIBBON ── */
+.managed-ribbon {
+  background: var(--bg2);
+  border-top: 1px solid var(--line);
+  color: var(--t3);
+  font-size: 10.5px;
+  text-align: center;
+  padding: 5px 18px;
+}
+.managed-ribbon span {
+  color: var(--accent);
+  font-weight: 600;
+}
 
 /* loading overlay */
 .load-strip{display:none;align-items:center;gap:10px;padding:10px 18px;background:var(--accentlt);border-bottom:1px solid var(--line);font-size:12.5px;font-weight:500;color:var(--accent)}
@@ -281,18 +304,27 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
   </div>
 </div>
 
-<!-- NAV BAR -->
-<div class="nav-bar" id="navBar" style="display:none">
-  <div class="prog-lbl" id="progLbl">Record 1 of 0</div>
-  <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
-  <div class="prog-pct" id="progPct">0%</div>
-  <div class="nav-space"></div>
-  <div class="kbd-hint"><span class="kbd">←</span>Prev</div>
-  <button class="btn-prev" id="prevBtn" disabled>← Prev</button>
-  <button class="btn-next" id="nextBtn">Next →</button>
-  <div class="kbd-hint"><span class="kbd">→</span>Next</div>
-  <div class="kbd-hint"><span class="kbd">Enter</span>Next</div>
+<!-- STICKY BOTTOM SECTION -->
+<div class="bottom-stick" id="bottomStick" style="display:none">
+  <!-- NAV BAR -->
+  <div class="nav-bar" id="navBar">
+    <div class="prog-lbl" id="progLbl">Record 1 of 0</div>
+    <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    <div class="prog-pct" id="progPct">0%</div>
+    <div class="nav-space"></div>
+    <div class="kbd-hint"><span class="kbd">←</span>Prev</div>
+    <button class="btn-prev" id="prevBtn" disabled>← Prev</button>
+    <button class="btn-next" id="nextBtn">Next →</button>
+    <div class="kbd-hint"><span class="kbd">→</span>Next</div>
+    <div class="kbd-hint"><span class="kbd">Enter</span>Next</div>
+  </div>
+
+  <!-- SLEEK RIBBON -->
+  <div class="managed-ribbon">
+    Managed by <span>kishor@spyne.ai</span>
+  </div>
 </div>
+
 <script>
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=2128295653&single=true&output=csv';
 const PROXY = 'https://media.spyneai.com/unsafe/0x0/filters:format(webp)/';
@@ -303,15 +335,8 @@ let fp = null; // flatpickr instance
 // Helper to normalize dates from CSV Timestamp column to YYYY-MM-DD
 function normalizeDate(dateStr) {
     if (!dateStr) return null;
-    // Extract only the date part before any spaces (handling "YYYY-MM-DD HH:MM:SS")
     const datePart = dateStr.trim().split(' ')[0];
-    
-    // If it's already YYYY-MM-DD
     if (/^\d{4}-\d{2}-\d{2}$/.test(datePart)) return datePart;
-    
-    // Attempt to handle DD/MM/YYYY or MM/DD/YYYY
-    // Native Date.parse is often unreliable for different locales, 
-    // but here we just need a common ground for string comparison.
     const d = new Date(datePart);
     if (!isNaN(d.getTime())) {
         return d.toISOString().split('T')[0];
@@ -378,7 +403,6 @@ function fill(id, vals) {
 
 function applyFilters() {
   const selectedDates = fp ? fp.selectedDates : [];
-  // Standardize selected range
   const start = selectedDates[0] ? selectedDates[0].toISOString().split('T')[0] : null;
   const end = selectedDates[1] ? selectedDates[1].toISOString().split('T')[0] : start;
 
@@ -388,13 +412,9 @@ function applyFilters() {
 
   filtered = allData.filter(r => {
     if (!r['Timestamp']) return false;
-    
     const recDate = normalizeDate(r['Timestamp']);
-    
-    // Date Range Logic (String comparison YYYY-MM-DD)
     if(start && recDate < start) return false;
     if(end && recDate > end) return false;
-
     if(ent && r['Enterprise'] !== ent) return false;
     if(qcu && !(r['qc-user']||'').includes(qcu)) return false;
     if(ed && r['editing user'] !== ed) return false;
@@ -409,18 +429,18 @@ function applyFilters() {
 // ── RENDER
 function render() {
   const content = document.getElementById('content');
-  const navBar  = document.getElementById('navBar');
+  const bottomStick = document.getElementById('bottomStick');
 
   if(filtered.length === 0) {
     content.innerHTML = `<div class="empty">
       <div class="empty-t">No records found</div>
       <div class="empty-b">Try adjusting the filters above.</div>
     </div>`;
-    navBar.style.display = 'none';
+    bottomStick.style.display = 'none';
     return;
   }
 
-  navBar.style.display = 'flex';
+  bottomStick.style.display = 'block';
   const r = filtered[idx];
   const total = filtered.length;
   const pct = Math.round(((idx+1)/total)*100);
@@ -466,6 +486,9 @@ function render() {
         ${imgEl(r['Final Image'], 'Final Output')}
       </div>
     </div>`;
+    
+    // Ensure the scroll position is reset to top when changing records
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ── NAV
@@ -482,12 +505,10 @@ document.getElementById('resetBtn').addEventListener('click', () => {
 // ── KEYBOARD
 document.addEventListener('keydown', e => {
   if((e.key === 'ArrowRight' || e.key === 'Enter') && idx < filtered.length - 1){ 
-    idx++; 
-    render(); 
+    idx++; render(); 
   }
   if(e.key === 'ArrowLeft' && idx > 0){ 
-    idx--; 
-    render(); 
+    idx--; render(); 
   }
 });
 </script>
