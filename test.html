@@ -385,8 +385,9 @@ function parseGSheetTimestamp(str) {
 
 async function fetchProductionCount() {
   if (!user) return;
+  // Capture mode at the time of call — avoids stale closure if user switches tabs
+  const is360 = mode === '360';
   try {
-    const is360 = mode === '360';
     const countUrl = is360 ? DONE_COUNT_360_URL : DONE_COUNT_URL;
     const response = await fetch(countUrl + (countUrl.includes('?') ? '&' : '?') + 'cb=' + Date.now());
     if (!response.ok) return;
@@ -397,17 +398,23 @@ async function fetchProductionCount() {
       header: true, skipEmptyLines: true,
       complete: res => {
         const fields = res.meta.fields || [];
-        
-        // Flexible key finder for columns like "QC  By" or "Timestamp"
+
+        // Flexible key finder — trims whitespace, case-insensitive, handles double spaces
         const findFlexKey = (name) => {
-            const regex = new RegExp(name.replace(/\s+/g, '\\s*'), 'i');
-            return fields.find(k => regex.test(k.trim()));
+            const needle = name.trim().toLowerCase().replace(/\s+/g, ' ');
+            return fields.find(k => k.trim().toLowerCase().replace(/\s+/g, ' ') === needle);
         };
 
-        const userKey = is360 ? findFlexKey('QC By') : findFlexKey('Login User');
-        const tsKey = findFlexKey('Timestamp');
-        
-        if (!userKey || !tsKey) return;
+        // 360 sheet column is "QC  By" (double space possible) — try multiple variants
+        const userKey = is360
+          ? (findFlexKey('QC By') || findFlexKey('QC  By') || findFlexKey('Login User') || fields.find(k => /qc\s*by/i.test(k.trim())))
+          : (findFlexKey('Login User') || fields.find(k => /login\s*user/i.test(k.trim())));
+        const tsKey = findFlexKey('Timestamp') || fields.find(k => /timestamp/i.test(k.trim()));
+
+        if (!userKey || !tsKey) {
+          console.warn('[DoneCount] Could not find columns. Available fields:', fields, '| is360:', is360);
+          return;
+        }
         
         const filteredEntries = res.data.filter(row => {
           const rowUser = (row[userKey] || '').trim();
@@ -420,11 +427,16 @@ async function fetchProductionCount() {
           return entryDate >= boundaries.start && entryDate < boundaries.end;
         });
         
-        currentDoneCount = filteredEntries.length;
-        _id('doneCounter').textContent = `Done: ${currentDoneCount}`;
+        // Only update if still in same mode — avoid overwriting count if user switched tabs
+        if (is360 === (mode === '360')) {
+          currentDoneCount = filteredEntries.length;
+          _id('doneCounter').textContent = `Done: ${currentDoneCount}`;
+        }
       }
     });
-  } catch (err) {}
+  } catch (err) {
+    console.warn('[DoneCount] Fetch failed:', err);
+  }
 }
 
 function setMode(m){
@@ -438,6 +450,10 @@ function setMode(m){
   _id('emptySetupMsg').classList.toggle('hidden', m === '360');
   _id('tableContainer').classList.toggle('hidden', m !== '360');
   _id('startBtn').classList.remove('hidden');
+
+  // Reset done count display immediately on mode switch — fresh fetch will update it
+  currentDoneCount = 0;
+  _id('doneCounter').textContent = 'Done: …';
 
   exitToSetup();
   raw = []; preloadedIndices.clear();
@@ -708,6 +724,7 @@ function handleFinalSubmit() {
 function afterSubmitActions() {
     toast('Submitted!'); 
     // Trigger background sync after 5 seconds to ensure GSheet has committed the change
+    // fetchProductionCount captures mode at call time, so delay is safe
     setTimeout(fetchProductionCount, 5000);
     if (idx < group.length - 1) { idx++; showRecord(); } 
     else { alert('Review Finished.'); exitToSetup(); loadData(); }
