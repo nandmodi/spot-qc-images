@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Spyne QC</title>
 <link rel="icon" href="https://spyne-prod-ai.s3.us-east-1.amazonaws.com/ai-dataset/2025/logo/unnamed.png"/>
+<link rel="preconnect" href="https://media.spyneai.com" crossorigin>
+<link rel="dns-prefetch" href="https://media.spyneai.com">
+<link rel="preconnect" href="https://spyne-prod-ai.s3.us-east-1.amazonaws.com" crossorigin>
 <!-- Libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -108,7 +111,7 @@ tr:hover td{background:var(--bg2)}
 .img-area{flex:1;display:grid;grid-template-columns:repeat(3,1fr);overflow:hidden;min-height:0}
 .img-area.two-col{grid-template-columns:1fr 1fr}
 .img-panel{position:relative;display:flex;flex-direction:column;background:#1A1C23;overflow:hidden;border-right:1px solid #2A2D38}
-.img-panel img{width:100%;height:100%;object-fit:contain;display:block;opacity:0;transition:opacity .2s ease;position:absolute;inset:0}
+.img-panel img{width:100%;height:100%;object-fit:contain;display:block;opacity:0;transition:opacity .15s ease;position:absolute;inset:0;image-rendering:auto;will-change:opacity}
 .img-panel img.loaded{opacity:1}
 .img-label{position:absolute;top:10px;left:10px;z-index:5;font-size:10.5px;font-weight:600;text-transform:uppercase;background:rgba(255,255,255,0.88);padding:3px 9px;border-radius:5px}
 .spin-frame{flex:1;width:100%;height:100%;border:none;background:#000}
@@ -247,9 +250,9 @@ tr:hover td{background:var(--bg2)}
 
     <!-- Media Area -->
     <div class="img-area" id="imgArea">
-      <div class="img-panel"><div class="img-label">Input</div><img id="imgL" src="" alt="Input"/></div>
-      <div class="img-panel"><div class="img-label">AI Output</div><img id="imgM" src="" alt="Output"/></div>
-      <div class="img-panel" id="panelR"><div class="img-label">Final Output</div><img id="imgR" src="" alt="Final"/></div>
+      <div class="img-panel"><div class="img-label">Input</div><img id="imgL" src="" alt="Input" decoding="async" loading="eager"/></div>
+      <div class="img-panel"><div class="img-label">AI Output</div><img id="imgM" src="" alt="Output" decoding="async" loading="eager"/></div>
+      <div class="img-panel" id="panelR"><div class="img-label">Final Output</div><img id="imgR" src="" alt="Final" decoding="async" loading="eager"/></div>
     </div>
 
     <div id="spinArea" class="hidden" style="flex:1; display:flex">
@@ -305,7 +308,7 @@ const DONE_COUNT_360_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTho
 const FORM_STD = "https://docs.google.com/forms/d/e/1FAIpQLSdrjhynjWITfOqHpkgKX8enCmDKg1b3s0Ij05Cux36kPmZEUA/formResponse";
 const FORM_360 = 'https://docs.google.com/forms/d/e/1FAIpQLSeQH6R9-rYr1Kh2rwUBKu7uGvJAkRrvx8fnxF6jfkac7sNL2A/formResponse';
 
-const PROXY = "https://media.spyneai.com/unsafe/0x0/filters:format(webp)/";
+const PROXY = "https://media.spyneai.com/unsafe/1280x0/filters:format(webp):quality(85)/";
 
 const FMAP = {
   qc: { ent:'enterprise_name', img:'ai.image_id', sku:'sku_id', l:'input_image_hres_url', m:'output_image_hres_url', r:'manual_image_hres_url', u:'qc_user_name' },
@@ -316,6 +319,13 @@ let raw=[], group=[], idx=0, mode='qc', user='', fp360=null;
 let imagesLoaded = false, loadedCount = 0, currentDoneCount = 0;
 let safetyTimer = null;
 const preloadedIndices = new Set();
+// Lightweight image prefetch cache — avoids duplicate network requests
+const prefetchCache = new Set();
+function prefetch(src) {
+  if (!src || prefetchCache.has(src)) return;
+  prefetchCache.add(src);
+  const i = new Image(); i.src = src;
+}
 const PWDS = {"Nand Kishor":"spyne@123","Ranbir Manoranjan":"spyne@123","Nitin Kumar":"spyne@123","Praveen Agarwal":"spyne@123","Raj Tripathi":"spyne@123","Rohit Chauhan":"spyne@123","Ajay Devrani":"spyne@123"};
 
 function _id(id){ return document.getElementById(id); }
@@ -540,30 +550,50 @@ function startReview(){
   group = getFiltered().sort(() => Math.random() - 0.5);
   if(!group.length) return alert('No records');
   idx = 0;
+  preloadedIndices.clear();
+  // Eagerly prefetch first 5 records before page transition
+  if (mode !== '360') {
+    for (let i = 0; i < Math.min(5, group.length); i++) {
+      const item = group[i];
+      prefetch(PROXY + item.l);
+      prefetch(PROXY + item.m);
+      if (mode !== 'qc') prefetch(PROXY + (item.r || item.m));
+      preloadedIndices.add(i);
+    }
+  }
   _id('setupPage').style.display = 'none'; _id('reviewPage').style.display = 'flex';
   showRecord();
 }
 
-function preloadFuture(count = 15) {
+function preloadFuture(count = 20) {
   if (mode === '360') return;
   for (let i = 1; i <= count; i++) {
     const targetIdx = idx + i;
-    if (targetIdx < group.length && !preloadedIndices.has(targetIdx)) {
+    if (targetIdx >= group.length) break;
+    if (!preloadedIndices.has(targetIdx)) {
       const item = group[targetIdx];
-      if(item.l) new Image().src = PROXY + item.l;
+      prefetch(PROXY + item.l);
+      prefetch(PROXY + item.m);
+      if (mode !== 'qc') prefetch(PROXY + (item.r || item.m));
       preloadedIndices.add(targetIdx);
     }
   }
 }
 
-function checkAllLoaded() {
+function enableSubmit() {
+    if (imagesLoaded) return;
+    imagesLoaded = true;
     if (safetyTimer) clearTimeout(safetyTimer);
-    safetyTimer = setTimeout(() => {
-        imagesLoaded = true;
-        _id('nextBtn').disabled = false;
-        _id('nextBtn').textContent = "Submit & Next →";
-        preloadFuture(15);
-    }, 1000);
+    _id('nextBtn').disabled = false;
+    _id('nextBtn').textContent = "Submit & Next →";
+    // Start preloading next records the moment current is ready
+    preloadFuture(20);
+}
+
+function checkAllLoaded() {
+    // Safety fallback: enable after 400ms max even if images stall
+    if (safetyTimer) clearTimeout(safetyTimer);
+    safetyTimer = setTimeout(enableSubmit, 100);
 }
 
 function showRecord(){
@@ -595,14 +625,22 @@ function showRecord(){
     _id('modalComment360').value = '';
     checkAllLoaded();
   } else {
-    ['imgL','imgM','imgR'].forEach(id => {
-      const el = _id(id); el.classList.remove('loaded'); el.src = "";
-      el.onload = () => { el.classList.add('loaded'); loadedCount++; if(loadedCount >= (mode==='qc'?2:3)) checkAllLoaded(); };
-      el.onerror = () => { loadedCount++; if(loadedCount >= (mode==='qc'?2:3)) checkAllLoaded(); };
+    const required = mode === 'qc' ? 2 : 3;
+    const imgs = [
+      { el: _id('imgL'), src: PROXY + r.l },
+      { el: _id('imgM'), src: PROXY + r.m },
+      ...(mode !== 'qc' ? [{ el: _id('imgR'), src: PROXY + (r.r || r.m) }] : [])
+    ];
+    // Reset state first, then assign all srcs in parallel (no blank src reset)
+    imgs.forEach(({ el, src }) => {
+      el.classList.remove('loaded');
+      el.onload = () => { el.classList.add('loaded'); loadedCount++; if (loadedCount >= required) enableSubmit(); };
+      el.onerror = () => { loadedCount++; if (loadedCount >= required) enableSubmit(); };
+      if (el.src !== src) el.src = src; // skip re-assign if already cached & same src
     });
-    _id('imgL').src = PROXY + r.l; _id('imgM').src = PROXY + r.m;
+    checkAllLoaded(); // safety net
     if(mode === 'qc'){ _id('panelR').style.display = 'none'; _id('imgArea').className = 'img-area two-col'; }
-    else { _id('panelR').style.display = 'flex'; _id('imgArea').className = 'img-area'; _id('imgR').src = PROXY + (r.r||r.m); }
+    else { _id('panelR').style.display = 'flex'; _id('imgArea').className = 'img-area'; }
   }
   _id('prevBtn').disabled = idx === 0;
   document.querySelectorAll('.issue-cb').forEach(cb => cb.checked = false);
@@ -662,7 +700,9 @@ function handleFinalSubmit() {
 
     document.body.appendChild(form);
     form.submit();
-    setTimeout(() => { if (form.parentNode) document.body.removeChild(form); afterSubmitActions(); }, 1500);
+    // Form posts async via hidden_iframe — move to next record immediately, no need to wait
+    requestAnimationFrame(() => { if (form.parentNode) document.body.removeChild(form); });
+    afterSubmitActions();
 }
 
 function afterSubmitActions() {
