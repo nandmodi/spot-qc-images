@@ -65,7 +65,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 .t-chip{font-family:var(--mono);font-size:11px;color:var(--t3);background:var(--bg2);border:1px solid var(--line);border-radius:5px;padding:3px 9px;white-space:nowrap;display:flex;align-items:center}
 .t-chip.done-count{background:var(--oklt);color:var(--ok);border-color:var(--ok);font-weight:700}
 
-/* Avatar NK circle */
 .t-avatar{width:28px;height:28px;background:var(--accentlt);border:1.5px solid var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--accent);flex-shrink:0;margin-right:6px}
 .t-uname{font-size:13px;font-weight:500;color:var(--t1)}
 
@@ -78,14 +77,12 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 .filter-bar{background:var(--bg1);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;align-items:center;flex-wrap:wrap;gap:12px;flex-shrink:0}
 .fi-sel, .fi-in{font-family:'Inter',sans-serif;font-size:12px;color:var(--t1);background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:4px 8px;outline:none;cursor:pointer; height: 32px;}
 
-/* Date Range UI */
 .range-box-container {
     display: flex; align-items: center; background: var(--bg1); border: 1.5px solid var(--accent); border-radius: 6px; padding: 0 10px; height: 32px; gap: 8px; cursor: pointer; transition: box-shadow 0.2s;
 }
 .range-box-container label { font-size: 13px; font-weight: 700; color: #000; white-space: nowrap; margin-right: 4px; }
 .range-box-container input { border: none; background: transparent; font-size: 13px; color: var(--t2); outline: none; width: 170px; cursor: pointer; }
 
-/* Start Review Button */
 .btn-start{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;background:var(--accent);color:#fff;border:none;border-radius:6px;padding:0 18px;height:34px;cursor:pointer;transition:background .14s;display:flex;align-items:center;gap:6px}
 .btn-start:hover{background:var(--accent2)}
 
@@ -107,7 +104,6 @@ tr:hover td{background:var(--bg2)}
 .prog-track{flex:1;max-width:280px;height:4px;background:var(--line);border-radius:2px;overflow:hidden}
 .prog-fill{height:100%;background:var(--accent);transition:width .4s ease}
 
-/* Views */
 .img-area{flex:1;display:grid;grid-template-columns:repeat(3,1fr);overflow:hidden;min-height:0}
 .img-area.two-col{grid-template-columns:1fr 1fr}
 .img-panel{position:relative;display:flex;flex-direction:column;background:#1A1C23;overflow:hidden;border-right:1px solid #2A2D38}
@@ -116,7 +112,6 @@ tr:hover td{background:var(--bg2)}
 .img-label{position:absolute;top:10px;left:10px;z-index:5;font-size:10.5px;font-weight:600;text-transform:uppercase;background:rgba(255,255,255,0.88);padding:3px 9px;border-radius:5px}
 .spin-frame{flex:1;width:100%;height:100%;border:none;background:#000}
 
-/* Footer Control Area */
 .rev-footer{background:var(--bg1);border-top:1px solid var(--line);padding:10px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0; position:relative; z-index:50}
 .issue-checkboxes{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center}
 .issue-cb-row{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:var(--t2);cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid var(--line);background:var(--bg2);transition:background 0.2s}
@@ -148,7 +143,6 @@ tr:hover td{background:var(--bg2)}
 
 .load-strip{display:none;align-items:center;gap:10px;padding:9px 18px;background:var(--accentlt);border-bottom:1px solid var(--line);font-size:12.5px;font-weight:500;color:var(--accent);flex-shrink:0}
 .spin{width:14px;height:14px;border:2px solid var(--line2);border-top-color:var(--accent);border-radius:50%;animation:rot .7s linear infinite;flex-shrink:0}
-@keyframes rot{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -296,6 +290,7 @@ tr:hover td{background:var(--bg2)}
 
 <div class="bottom-ribbon">Managed by <a href="mailto:kishor@spyne.ai">kishor@spyne.ai</a></div>
 <div class="toast-shelf" id="toastShelf"></div>
+<!-- HIDDEN IFRAME FOR GOOGLE FORM SUBMISSION -->
 <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
 
 <script>
@@ -319,13 +314,14 @@ let raw=[], group=[], idx=0, mode='qc', user='', fp360=null;
 let imagesLoaded = false, loadedCount = 0, currentDoneCount = 0;
 let safetyTimer = null;
 const preloadedIndices = new Set();
-// Lightweight image prefetch cache — avoids duplicate network requests
 const prefetchCache = new Set();
+
 function prefetch(src) {
   if (!src || prefetchCache.has(src)) return;
   prefetchCache.add(src);
   const i = new Image(); i.src = src;
 }
+
 const PWDS = {"Nand Kishor":"spyne@123","Ranbir Manoranjan":"spyne@123","Nitin Kumar":"spyne@123","Praveen Agarwal":"spyne@123","Raj Tripathi":"spyne@123","Rohit Chauhan":"spyne@123","Ajay Devrani":"spyne@123"};
 
 function _id(id){ return document.getElementById(id); }
@@ -339,7 +335,6 @@ function toast(msg, type='ok') {
   setTimeout(() => { t.style.animation = 'tOut .2s ease both'; setTimeout(() => t.remove(), 200); }, 2500);
 }
 
-// Resilient Row Value Getter
 function getRowVal(row, keysArray) {
     if (!row) return '';
     const keys = Object.keys(row);
@@ -351,7 +346,6 @@ function getRowVal(row, keysArray) {
     return '';
 }
 
-// Fixed Shift Logic: 7 AM to 6:59:59 AM next day
 function getShiftBoundaries() {
   const now = new Date();
   const start = new Date(now);
@@ -362,7 +356,6 @@ function getShiftBoundaries() {
   return { start, end };
 }
 
-// Precise Date Parser for GSheet format: "4/16/2026 1:31:17"
 function parseGSheetTimestamp(str) {
     if (!str) return null;
     str = str.trim();
@@ -385,7 +378,6 @@ function parseGSheetTimestamp(str) {
 
 async function fetchProductionCount() {
   if (!user) return;
-  // Capture mode at the time of call — avoids stale closure if user switches tabs
   const is360 = mode === '360';
   try {
     const countUrl = is360 ? DONE_COUNT_360_URL : DONE_COUNT_URL;
@@ -398,45 +390,32 @@ async function fetchProductionCount() {
       header: true, skipEmptyLines: true,
       complete: res => {
         const fields = res.meta.fields || [];
-
-        // Flexible key finder — trims whitespace, case-insensitive, handles double spaces
         const findFlexKey = (name) => {
             const needle = name.trim().toLowerCase().replace(/\s+/g, ' ');
             return fields.find(k => k.trim().toLowerCase().replace(/\s+/g, ' ') === needle);
         };
-
-        // 360 sheet column is "QC  By" (double space possible) — try multiple variants
         const userKey = is360
-          ? (findFlexKey('QC By') || findFlexKey('QC  By') || findFlexKey('Login User') || fields.find(k => /qc\s*by/i.test(k.trim())))
-          : (findFlexKey('Login User') || fields.find(k => /login\s*user/i.test(k.trim())));
-        const tsKey = findFlexKey('Timestamp') || fields.find(k => /timestamp/i.test(k.trim()));
+          ? (findFlexKey('QC By') || findFlexKey('QC  By') || findFlexKey('Login User'))
+          : (findFlexKey('Login User'));
+        const tsKey = findFlexKey('Timestamp');
 
-        if (!userKey || !tsKey) {
-          console.warn('[DoneCount] Could not find columns. Available fields:', fields, '| is360:', is360);
-          return;
-        }
+        if (!userKey || !tsKey) return;
         
         const filteredEntries = res.data.filter(row => {
           const rowUser = (row[userKey] || '').trim();
           if (rowUser !== user) return false;
-          
           const rawTs = (row[tsKey] || '').trim();
           const entryDate = parseGSheetTimestamp(rawTs);
-          if (!entryDate || isNaN(entryDate.getTime())) return false;
-          
-          return entryDate >= boundaries.start && entryDate < boundaries.end;
+          return entryDate && entryDate >= boundaries.start && entryDate < boundaries.end;
         });
         
-        // Only update if still in same mode — avoid overwriting count if user switched tabs
         if (is360 === (mode === '360')) {
           currentDoneCount = filteredEntries.length;
           _id('doneCounter').textContent = `Done: ${currentDoneCount}`;
         }
       }
     });
-  } catch (err) {
-    console.warn('[DoneCount] Fetch failed:', err);
-  }
+  } catch (err) {}
 }
 
 function setMode(m){
@@ -451,7 +430,6 @@ function setMode(m){
   _id('tableContainer').classList.toggle('hidden', m !== '360');
   _id('startBtn').classList.remove('hidden');
 
-  // Reset done count display immediately on mode switch — fresh fetch will update it
   currentDoneCount = 0;
   _id('doneCounter').textContent = 'Done: …';
 
@@ -475,8 +453,7 @@ async function loadData() {
             return { 
                 ...r, ent: getRowVal(r, 'Enterprise'), sku: getRowVal(r, 'SKU_ID'), img: getRowVal(r, 'Spin_ID'), 
                 issue: issueField, u: getRowVal(r, 'User'), spin_url: getRowVal(r, 'spin_url'), 
-                status: getRowVal(r, ['status', 'Status']), date: getRowVal(r, 'Date'),
-                editor: '', l: '', m: '', r: '', fqc: '', lqc: ''
+                status: getRowVal(r, ['status', 'Status']), date: getRowVal(r, 'Date')
             };
           }
           const isQc = mode === 'qc';
@@ -554,33 +531,39 @@ function updateCount(){
 
 function renderTable(data) {
   let html = `<table><thead><tr><th>Date</th><th>Spin ID</th><th>SKU</th><th>Issues</th><th>Enterprise</th><th>User</th></tr></thead><tbody>`;
-  const previewData = data.slice(0, 500);
-  previewData.forEach((row) => {
+  data.slice(0, 500).forEach((row) => {
     html += `<tr><td>${row.date}</td><td><code>${row.img}</code></td><td>${row.sku}</td><td>${row.issue}</td><td>${row.ent}</td><td>${row.u}</td></tr>`;
   });
-  if(data.length > 500) html += `<tr><td colspan="6" style="text-align:center; color:var(--t4); padding:20px;">Displaying first 500. Use filters.</td></tr>`;
   _id('tableContainer').innerHTML = html + '</tbody></table>';
 }
 
+/**
+ * UPDATED: Claude logic - Eager preload first 5 immediately
+ */
 function startReview(){
   group = getFiltered().sort(() => Math.random() - 0.5);
   if(!group.length) return alert('No records');
-  idx = 0;
+  idx = 0; 
   preloadedIndices.clear();
-  // Eagerly prefetch first 5 records before page transition
+
+  // Claude: Preload first 5 records immediately before switching view
   if (mode !== '360') {
     for (let i = 0; i < Math.min(5, group.length); i++) {
-      const item = group[i];
-      prefetch(PROXY + item.l);
-      prefetch(PROXY + item.m);
-      if (mode !== 'qc') prefetch(PROXY + (item.r || item.m));
-      preloadedIndices.add(i);
+        const item = group[i];
+        prefetch(PROXY + item.l);
+        prefetch(PROXY + item.m);
+        if (mode !== 'qc') prefetch(PROXY + (item.r || item.m));
+        preloadedIndices.add(i);
     }
   }
+
   _id('setupPage').style.display = 'none'; _id('reviewPage').style.display = 'flex';
   showRecord();
 }
 
+/**
+ * UPDATED: Claude logic - Preload next 20 immediately
+ */
 function preloadFuture(count = 20) {
   if (mode === '360') return;
   for (let i = 1; i <= count; i++) {
@@ -602,21 +585,24 @@ function enableSubmit() {
     if (safetyTimer) clearTimeout(safetyTimer);
     _id('nextBtn').disabled = false;
     _id('nextBtn').textContent = "Submit & Next →";
-    // Start preloading next records the moment current is ready
-    preloadFuture(20);
 }
 
 function checkAllLoaded() {
-    // Safety fallback: enable after 400ms max even if images stall
     if (safetyTimer) clearTimeout(safetyTimer);
+    // Claude: More aggressive 100ms safety timer
     safetyTimer = setTimeout(enableSubmit, 100);
 }
 
+/**
+ * UPDATED: Claude logic - Efficient src assignment
+ */
 function showRecord(){
   const r = group[idx];
   imagesLoaded = false; loadedCount = 0;
   if (safetyTimer) clearTimeout(safetyTimer);
-  _id('nextBtn').disabled = true; _id('nextBtn').textContent = "⌛ Loading...";
+  
+  _id('nextBtn').disabled = true; 
+  _id('nextBtn').textContent = "⌛ Loading...";
 
   const is360 = mode === '360';
   _id('imgArea').classList.toggle('hidden', is360);
@@ -647,20 +633,36 @@ function showRecord(){
       { el: _id('imgM'), src: PROXY + r.m },
       ...(mode !== 'qc' ? [{ el: _id('imgR'), src: PROXY + (r.r || r.m) }] : [])
     ];
-    // Reset state first, then assign all srcs in parallel (no blank src reset)
+    
+    // Claude: Parallel assignment and no el.src = "" resets
     imgs.forEach(({ el, src }) => {
-      el.classList.remove('loaded');
+      // Re-use handlers if possible, but keep simple for this structure
       el.onload = () => { el.classList.add('loaded'); loadedCount++; if (loadedCount >= required) enableSubmit(); };
       el.onerror = () => { loadedCount++; if (loadedCount >= required) enableSubmit(); };
-      if (el.src !== src) el.src = src; // skip re-assign if already cached & same src
+      
+      // Only assign if src changed to avoid network cancel
+      if (el.src !== src) {
+          el.classList.remove('loaded');
+          el.src = src;
+      } else if (el.complete) {
+          el.classList.add('loaded');
+          loadedCount++;
+          if (loadedCount >= required) enableSubmit();
+      }
     });
-    checkAllLoaded(); // safety net
+
+    checkAllLoaded();
+    
     if(mode === 'qc'){ _id('panelR').style.display = 'none'; _id('imgArea').className = 'img-area two-col'; }
     else { _id('panelR').style.display = 'flex'; _id('imgArea').className = 'img-area'; }
   }
+  
   _id('prevBtn').disabled = idx === 0;
   document.querySelectorAll('.issue-cb').forEach(cb => cb.checked = false);
   _id(is360?'qc360_done':'cbDone').checked = true;
+
+  // Claude: Preload future records immediately upon showing current
+  preloadFuture(20);
 }
 
 function handleFinalSubmit() {
@@ -668,64 +670,83 @@ function handleFinalSubmit() {
     const r = group[idx];
     const is360 = mode === '360';
     const btn = _id('nextBtn');
-    btn.disabled = true; btn.textContent = 'Submitting...';
+    
+    btn.disabled = true; 
+    btn.textContent = 'Submitting...';
 
-    // Optimistically update local count
-    currentDoneCount++;
-    _id('doneCounter').textContent = `Done: ${currentDoneCount}`;
-
+    const formUrl = is360 ? FORM_360 : FORM_STD;
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = is360 ? FORM_360 : FORM_STD;
+    form.action = formUrl;
     form.target = 'hidden_iframe';
 
-    const addField = (name, value) => {
-        const input = document.createElement('input');
-        input.type = 'hidden'; input.name = name; input.value = value;
-        form.appendChild(input);
-    };
-
+    const data = {};
     if (is360) {
-        addField('entry.703277665', r.sku || '');
-        addField('entry.179295275', r.date || '');
-        addField('entry.1125049159', r.img || '');
-        addField('entry.575622617', r.issue || '');
-        addField('entry.1815472287', r.ent || '');
-        addField('entry.582537694', r.u || '');
-        addField('entry.1372347436', r.spin_url || '');
-        addField('entry.1243416507', user || ''); 
+        data['entry.703277665'] = r.sku || '';
+        data['entry.179295275'] = r.date || '';
+        data['entry.1125049159'] = r.img || '';
+        data['entry.575622617'] = r.issue || '';
+        data['entry.1815472287'] = r.ent || '';
+        data['entry.582537694'] = r.u || '';
+        data['entry.1372347436'] = r.spin_url || '';
+        data['entry.1243416507'] = user || '';
+        
         const checkedBoxes = Array.from(document.querySelectorAll('#three60Issues .issue-cb:checked')).map(cb => cb.value);
-        checkedBoxes.forEach(val => addField('entry.1751143375', val));
+        checkedBoxes.forEach(val => {
+            const input = document.createElement('input');
+            input.type = 'hidden'; input.name = 'entry.1751143375'; input.value = val;
+            form.appendChild(input);
+        });
+        
         const comment = _id('modalComment360').value.trim();
-        if (comment) { addField('entry.1751143375', '__other_option__'); addField('entry.1751143375.other_option_response', comment); }
+        if (comment) {
+            const other = document.createElement('input');
+            other.type = 'hidden'; other.name = 'entry.1751143375'; other.value = '__other_option__';
+            form.appendChild(other);
+            const otherVal = document.createElement('input');
+            otherVal.type = 'hidden'; otherVal.name = 'entry.1751143375.other_option_response'; otherVal.value = comment;
+            form.appendChild(otherVal);
+        }
     } else {
-        // IDs from original working source
-        addField("entry.890284089", r.ent || '');
-        addField("entry.5932044", [r.fqc, r.lqc, r.u].filter(x => x && x !== 'N/A').join(', '));
-        addField("entry.1880389842", r.editor || '');
-        addField("entry.1139236247", r.sku || '');
-        addField("entry.661750446", r.img || '');
-        addField("entry.1317530325", r.issue || '');
-        addField("entry.1455673211", r.l || '');
-        addField("entry.772576827", r.m || '');
-        addField("entry.780536997", r.r || r.m);
-        addField("entry.865196657", user || '');
+        data['entry.890284089'] = r.ent || '';
+        data['entry.5932044'] = [r.fqc, r.lqc, r.u].filter(x => x && x !== 'N/A').join(', ');
+        data['entry.1880389842'] = r.editor || '';
+        data['entry.1139236247'] = r.sku || '';
+        data['entry.661750446'] = r.img || '';
+        data['entry.1317530325'] = r.issue || '';
+        data['entry.1455673211'] = r.l || '';
+        data['entry.772576827'] = r.m || '';
+        data['entry.780536997'] = r.r || r.m;
+        data['entry.865196657'] = user || '';
+        
         const checkedBoxes = Array.from(document.querySelectorAll('#standardIssues .issue-cb:checked, #doneLabel .issue-cb:checked')).map(cb => cb.value);
-        checkedBoxes.forEach(val => addField("entry.778698303", val));
+        checkedBoxes.forEach(val => {
+            const input = document.createElement('input');
+            input.type = 'hidden'; input.name = 'entry.778698303'; input.value = val;
+            form.appendChild(input);
+        });
+    }
+
+    for (const key in data) {
+        const input = document.createElement('input');
+        input.type = 'hidden'; input.name = key; input.value = data[key];
+        form.appendChild(input);
     }
 
     document.body.appendChild(form);
     form.submit();
-    // Form posts async via hidden_iframe — move to next record immediately, no need to wait
-    requestAnimationFrame(() => { if (form.parentNode) document.body.removeChild(form); });
-    afterSubmitActions();
+    
+    // Claude: Minimal delay to move on almost instantly
+    setTimeout(() => {
+        if (form.parentNode) document.body.removeChild(form);
+        afterSubmitActions();
+    }, 100);
 }
 
 function afterSubmitActions() {
     toast('Submitted!'); 
-    // Trigger background sync after 5 seconds to ensure GSheet has committed the change
-    // fetchProductionCount captures mode at call time, so delay is safe
-    setTimeout(fetchProductionCount, 5000);
+    currentDoneCount++;
+    _id('doneCounter').textContent = `Done: ${currentDoneCount}`;
     if (idx < group.length - 1) { idx++; showRecord(); } 
     else { alert('Review Finished.'); exitToSetup(); loadData(); }
 }
@@ -769,6 +790,9 @@ document.addEventListener('keydown', e => {
     if (mode === '360') { if (e.key >= '1' && e.key <= '3') { const cb = _id('qc360_' + e.key); if (cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); e.preventDefault(); } } }
     else { if (e.key >= '1' && e.key <= '9') { const cb = _id('cb' + e.key); if (cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); e.preventDefault(); } } }
     if (e.key === 'Enter') { handleFinalSubmit(); e.preventDefault(); }
+    if (e.key === 'Backspace' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+      if (idx > 0) { idx--; showRecord(); } e.preventDefault();
+    }
   }
 });
 
