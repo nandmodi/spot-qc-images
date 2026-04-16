@@ -5,7 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Spyne QC</title>
 <link rel="icon" href="https://spyne-prod-ai.s3.us-east-1.amazonaws.com/ai-dataset/2025/logo/unnamed.png"/>
+<link rel="preconnect" href="https://media.spyneai.com" crossorigin>
+<link rel="dns-prefetch" href="https://media.spyneai.com">
+<link rel="preconnect" href="https://spyne-prod-ai.s3.us-east-1.amazonaws.com" crossorigin>
+<!-- Libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -29,7 +36,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 .hidden{display:none!important}
 
 /* ── ANIMATIONS ── */
-@keyframes shimmer{0%{background-position:-800px 0}100%{background-position:800px 0}}
 @keyframes tIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
 @keyframes tOut{to{opacity:0;transform:translateX(-12px)}}
 @keyframes slideUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
@@ -58,21 +64,34 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 .t-space{flex:1}
 .t-chip{font-family:var(--mono);font-size:11px;color:var(--t3);background:var(--bg2);border:1px solid var(--line);border-radius:5px;padding:3px 9px;white-space:nowrap;display:flex;align-items:center}
 .t-chip.done-count{background:var(--oklt);color:var(--ok);border-color:var(--ok);font-weight:700}
-.t-avatar{width:28px;height:28px;background:var(--accentlt);border:1.5px solid var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--accent);flex-shrink:0}
-.t-uname{font-size:13px;font-weight:500;color:var(--t2)}
+
+.t-avatar{width:28px;height:28px;background:var(--accentlt);border:1.5px solid var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--accent);flex-shrink:0;margin-right:6px}
+.t-uname{font-size:13px;font-weight:500;color:var(--t1)}
+
 .btn-sm{font-family:'Inter',sans-serif;font-size:12px;font-weight:500;background:transparent;border:1px solid var(--line2);border-radius:6px;color:var(--t3);padding:0 11px;height:28px;cursor:pointer;transition:all .14s;display:flex;align-items:center;justify-content:center}
-.btn-top-link{text-decoration:none;background:var(--bg2);border-color:var(--line2);color:var(--t2)}
+.btn-top-link{text-decoration:none;background:var(--bg2);border-color:var(--line2);color:var(--t2); font-family:inherit;}
 .btn-top-link:hover{background:var(--accentlt);border-color:var(--accent);color:var(--accent)}
 
 /* ── SETUP PAGE ── */
 #setupPage{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.filter-bar{background:var(--bg1);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;align-items:center;flex-wrap:wrap;gap:8px;flex-shrink:0}
-.fi-sel{font-family:'Inter',sans-serif;font-size:12.5px;color:var(--t1);background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:5px 10px;outline:none;cursor:pointer}
-.btn-start{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;background:var(--accent);color:#fff;border:none;border-radius:var(--r);padding:0 18px;height:34px;cursor:pointer;transition:background .14s}
+.filter-bar{background:var(--bg1);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;align-items:center;flex-wrap:wrap;gap:12px;flex-shrink:0}
+.fi-sel, .fi-in{font-family:'Inter',sans-serif;font-size:12px;color:var(--t1);background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:4px 8px;outline:none;cursor:pointer; height: 32px;}
 
-/* ── DATA LOADER ── */
-.load-strip{display:none;align-items:center;gap:10px;padding:9px 18px;background:var(--accentlt);border-bottom:1px solid var(--line);font-size:12.5px;font-weight:500;color:var(--accent);flex-shrink:0}
-.spin{width:14px;height:14px;border:2px solid var(--line2);border-top-color:var(--accent);border-radius:50%;animation:rot .7s linear infinite;flex-shrink:0}
+.range-box-container {
+    display: flex; align-items: center; background: var(--bg1); border: 1.5px solid var(--accent); border-radius: 6px; padding: 0 10px; height: 32px; gap: 8px; cursor: pointer; transition: box-shadow 0.2s;
+}
+.range-box-container label { font-size: 13px; font-weight: 700; color: #000; white-space: nowrap; margin-right: 4px; }
+.range-box-container input { border: none; background: transparent; font-size: 13px; color: var(--t2); outline: none; width: 170px; cursor: pointer; }
+
+.btn-start{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;background:var(--accent);color:#fff;border:none;border-radius:6px;padding:0 18px;height:34px;cursor:pointer;transition:background .14s;display:flex;align-items:center;gap:6px}
+.btn-start:hover{background:var(--accent2)}
+
+/* ── DASHBOARD TABLE ── */
+.table-wrap{flex:1;overflow:auto;background:var(--bg1);margin:12px 18px;border-radius:var(--rlg);border:1px solid var(--line);box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;min-width:900px}
+th{position:sticky;top:0;background:#f8fafc;padding:12px 16px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--accent);border-bottom:2px solid #edf2f7;z-index:5}
+td{padding:12px 16px;border-bottom:1px solid #edf2f7;font-size:13px;color:var(--t2)}
+tr:hover td{background:var(--bg2)}
 
 /* ── REVIEW PAGE ── */
 #reviewPage{display:none;flex-direction:column;flex:1;overflow:hidden;min-height:0}
@@ -88,61 +107,46 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 .img-area{flex:1;display:grid;grid-template-columns:repeat(3,1fr);overflow:hidden;min-height:0}
 .img-area.two-col{grid-template-columns:1fr 1fr}
 .img-panel{position:relative;display:flex;flex-direction:column;background:#1A1C23;overflow:hidden;border-right:1px solid #2A2D38}
-.img-panel img{width:100%;height:100%;object-fit:contain;display:block;opacity:0;transition:opacity .2s ease;position:absolute;inset:0}
+.img-panel img{width:100%;height:100%;object-fit:contain;display:block;opacity:0;transition:opacity .15s ease;position:absolute;inset:0;image-rendering:auto;will-change:opacity}
 .img-panel img.loaded{opacity:1}
 .img-label{position:absolute;top:10px;left:10px;z-index:5;font-size:10.5px;font-weight:600;text-transform:uppercase;background:rgba(255,255,255,0.88);padding:3px 9px;border-radius:5px}
+.spin-frame{flex:1;width:100%;height:100%;border:none;background:#000}
 
-.rev-footer{background:var(--bg1);border-top:1px solid var(--line);padding:10px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0}
-.issue-checkboxes{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}
+.rev-footer{background:var(--bg1);border-top:1px solid var(--line);padding:10px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0; position:relative; z-index:50}
+.issue-checkboxes{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center}
 .issue-cb-row{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:var(--t2);cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid var(--line);background:var(--bg2);transition:background 0.2s}
 .issue-cb-row:has(.issue-cb:checked){background:var(--dangerlt);border-color:#FCA5A5;color:var(--danger);font-weight:600}
 .issue-cb-row.done-row:has(.issue-cb:checked){background:var(--oklt);border-color:var(--ok);color:var(--ok)}
 .issue-cb{display:none}
 .issue-cb-num{font-family:var(--mono);font-size:9.5px;font-weight:700;background:var(--bg4);border-radius:3px;padding:1px 4px;color:var(--t3);line-height:1}
 .issue-cb-row:has(.issue-cb:checked) .issue-cb-num{background:var(--danger);color:#fff}
-.issue-cb-row.done-row:has(.issue-cb:checked) .issue-cb-num{background:var(--ok);color:#fff}
 
 .btn-sub{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;background:var(--ok);color:#fff;border:none;border-radius:var(--r);padding:0 20px;height:38px;cursor:pointer}
 .btn-sub:disabled{background:var(--line2);cursor:not-allowed;color:var(--t3);opacity:0.8}
 .btn-prev{font-family:'Inter',sans-serif;font-size:13px;font-weight:500;background:var(--bg1);border:1px solid var(--line2);padding:0 16px;height:38px;border-radius:var(--r);cursor:pointer}
 
+.comment-in{flex:1;height:38px;border-radius:6px;border:1px solid var(--line);padding:0 12px;font-size:13px; font-family:inherit; outline:none}
+.comment-in:focus{border-color:var(--accent)}
+
 .toast-shelf{position:fixed;bottom:35px;left:18px;z-index:999;display:flex;flex-direction:column;gap:7px}
 .toast{background:var(--bg1);border:1px solid var(--line);border-radius:var(--r);padding:10px 14px;font-size:12.5px;box-shadow:var(--shadow-md);display:flex;align-items:center;gap:8px;animation:tIn .22s ease both}
 .toast.ok{border-left:3px solid var(--ok)}
 .toast.err{border-left:3px solid var(--danger)}
-.toast.warn{border-left:3px solid var(--warn)}
 
-/* ── RIBBON STRIPE ── */
 .bottom-ribbon {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 24px;
-  background: var(--bg1);
-  border-top: 1px solid var(--line);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  color: var(--t3);
-  z-index: 1000;
-  pointer-events: auto;
+  bottom: 0; left: 0; right: 0; height: 24px; background: var(--bg1); border-top: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--t3); z-index: 1000;
 }
-.bottom-ribbon a {
-  color: var(--accent);
-  text-decoration: none;
-  font-weight: 600;
-  margin-left: 4px;
-}
-.bottom-ribbon a:hover {
-  text-decoration: underline;
-}
+.bottom-ribbon a { color: var(--accent); text-decoration: none; font-weight: 600; margin-left: 4px; }
+.bottom-ribbon a:hover { text-decoration: underline; }
+
+.load-strip{display:none;align-items:center;gap:10px;padding:9px 18px;background:var(--accentlt);border-bottom:1px solid var(--line);font-size:12.5px;font-weight:500;color:var(--accent);flex-shrink:0}
+.spin{width:14px;height:14px;border:2px solid var(--line2);border-top-color:var(--accent);border-radius:50%;animation:rot .7s linear infinite;flex-shrink:0}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="loginPage">
   <div class="login-card">
     <img src="https://spyne-prod-ai.s3.us-east-1.amazonaws.com/ai-dataset/2025/download.jpeg" style="height:38px; width:auto; margin-bottom:28px; display:block;" alt="Spyne Logo">
@@ -165,77 +169,94 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
   </div>
 </div>
 
-<!-- APP -->
 <div id="app">
   <div class="topbar">
     <img src="https://spyne-prod-ai.s3.us-east-1.amazonaws.com/ai-dataset/2025/download.jpeg" class="t-logo-img" alt="Spyne">
-    <div class="t-space"></div>
     <div class="mode-group">
       <button class="mode-pill on" id="tabQC" onclick="setMode('qc')">QC Pass</button>
       <button class="mode-pill" id="tabEdit" onclick="setMode('edited')">Re-Edit</button>
       <button class="mode-pill" id="tabTool" onclick="setMode('qc_tool')">QC Tool</button>
+      <button class="mode-pill" id="tab360" onclick="setMode('360')">360</button>
     </div>
     <div class="t-space"></div>
-    <!-- Done Chip -->
     <div class="t-chip done-count" id="doneCounter" style="margin-right:6px">Done: 0</div>
-    <!-- Top Review Link Button -->
     <a href="https://nandmodi.github.io/spot-qc-images/meet-review.html" target="_blank" class="btn-sm btn-top-link" style="margin-right:12px">Review</a>
     
     <div class="t-avatar" id="tAvatar">–</div>
     <div class="t-uname" id="tUser" style="margin-right:12px">–</div>
+    
     <button class="btn-sm" onclick="doLogout()">Logout</button>
   </div>
 
   <div id="setupPage">
     <div class="filter-bar">
-      <select id="entFilter" class="fi-sel"><option value="">All Enterprises</option></select>
-      <div id="contQcOnly" style="display:contents">
+      <!-- 360 Filter Bar -->
+      <div id="cont360Filters" class="hidden" style="display:contents">
+        <label style="font-weight: 700; font-size: 13px;">Date Range</label>
+        <div class="range-box-container">
+          <input type="text" id="dateRange360" placeholder="Select Range">
+        </div>
+        <label style="font-weight: 700; font-size: 13px; margin-left: 8px;">User</label>
+        <select id="userFilter360" class="fi-sel"><option value="">All Users</option></select>
+        <label style="font-weight: 700; font-size: 13px; margin-left: 8px;">Enterprise</label>
+        <select id="entFilter360" class="fi-sel"><option value="">All Enterprises</option></select>
+        <label style="font-weight: 700; font-size: 13px; margin-left: 8px;">Issue Level</label>
+        <select id="issueFilter360" class="fi-sel">
+          <option value="">All Issues</option>
+          <option value="nullblank">None / Blank</option>
+          <option value="blocker">Blocker</option>
+          <option value="high">High</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+
+      <!-- Standard Filter Bar -->
+      <div id="contStdFilters" style="display:contents">
+        <select id="entFilter" class="fi-sel"><option value="">All Enterprises</option></select>
         <select id="qcUFilter" class="fi-sel"><option value="">All QC Users</option></select>
       </div>
-      <div id="contEditOnly" class="hidden" style="display:contents">
-        <select id="fqcFilter" class="fi-sel"><option value="">All First QC</option></select>
-        <select id="lqcFilter" class="fi-sel"><option value="">All Last QC</option></select>
-        <select id="editorFilter" class="fi-sel"><option value="">All Editors</option></select>
-        <select id="issueFilter" class="fi-sel"><option value="">All Issues</option></select>
-      </div>
+
       <div class="t-space"></div>
       <span id="fcount" class="t-chip"></span>
       <button class="btn-start" id="startBtn">▶ Start Review</button>
     </div>
+    
     <div class="load-strip" id="loadStrip"><div class="spin"></div><span id="loadTxt">Fetching data…</span></div>
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--t4)">Select filters and click Start Review.</div>
+    
+    <div id="tableContainer" class="table-wrap hidden"></div>
+    <div id="emptySetupMsg" style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--t4)">Select filters and click Start Review.</div>
   </div>
 
   <div id="reviewPage">
     <div class="rev-top">
       <div class="rmc"><div class="rmc-l">Enterprise</div><div class="rmc-v" id="mEnt">-</div></div>
-      <div class="rmc"><div class="rmc-l">SKU</div><div class="rmc-v" id="mSku">-</div></div>
-      <div class="rmc"><div class="rmc-l">Image ID</div><div class="rmc-v" id="mImg">-</div></div>
-      <div class="rmc"><div class="rmc-l">QC Users</div><div class="rmc-v" id="mQcUsers">-</div></div>
+      <div class="rmc"><div class="rmc-l">SKU ID</div><div class="rmc-v" id="mSku">-</div></div>
+      <div class="rmc"><div class="rmc-l" id="labelImg">Image ID</div><div class="rmc-v" id="mImg">-</div></div>
+      <div class="rmc"><div class="rmc-l" id="labelUser">QC Users</div><div class="rmc-v" id="mQcUsers">-</div></div>
       <div class="rmc hidden" id="mEditorWrap"><div class="rmc-l">Editor</div><div class="rmc-v" id="mEditor">-</div></div>
       <div class="rmc hidden" id="mIssueWrap" style="color:var(--warn)"><div class="rmc-l">Previous Issue</div><div class="rmc-v" id="mIssue">-</div></div>
     </div>
+    
     <div class="prog-row">
       <div id="progLbl" style="font-size:11px;font-weight:700">Record 1 of 0</div>
       <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
     </div>
+
+    <!-- Media Area -->
     <div class="img-area" id="imgArea">
-      <div class="img-panel">
-        <div class="img-label">Input</div>
-        <img id="imgL" src="" alt="Input" loading="eager" decoding="async"/>
-      </div>
-      <div class="img-panel">
-        <div class="img-label">AI Output</div>
-        <img id="imgM" src="" alt="Output" loading="eager" decoding="async"/>
-      </div>
-      <div class="img-panel" id="panelR">
-        <div class="img-label">Final Output</div>
-        <img id="imgR" src="" alt="Final" loading="eager" decoding="async"/>
-      </div>
+      <div class="img-panel"><div class="img-label">Input</div><img id="imgL" src="" alt="Input" decoding="async" loading="eager"/></div>
+      <div class="img-panel"><div class="img-label">AI Output</div><img id="imgM" src="" alt="Output" decoding="async" loading="eager"/></div>
+      <div class="img-panel" id="panelR"><div class="img-label">Final Output</div><img id="imgR" src="" alt="Final" decoding="async" loading="eager"/></div>
     </div>
+
+    <div id="spinArea" class="hidden" style="flex:1; display:flex">
+      <iframe id="spinIframe" class="spin-frame"></iframe>
+    </div>
+
     <div class="rev-footer">
       <div style="flex:1">
-        <div class="issue-checkboxes">
+        <!-- Standard Issue Panel -->
+        <div id="standardIssues" class="issue-checkboxes">
           <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb1" value="RBG issue"><span class="issue-cb-num">1</span>RBG issue</label>
           <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb2" value="See-through int"><span class="issue-cb-num">2</span>See-through int</label>
           <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb3" value="See-through ext"><span class="issue-cb-num">3</span>See-through ext</label>
@@ -244,379 +265,545 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
           <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb6" value="Number Plate"><span class="issue-cb-num">6</span>Number Plate</label>
           <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb7" value="Shadow"><span class="issue-cb-num">7</span>Shadow</label>
           <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb8" value="Open-door RBG"><span class="issue-cb-num">8</span>Open-door RBG</label>
-          <!-- Shortcut 9: Wrong Marking -->
           <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb9" value="Wrong Marking"><span class="issue-cb-num">9</span>Wrong Marking</label>
-          <!-- Done: No Shortcut -->
-          <label class="issue-cb-row done-row"><input type="checkbox" class="issue-cb" id="cbDone" value="Done">Done</label>
+        </div>
+        <!-- 360 Specific Issue Panel -->
+        <div id="three60Issues" class="issue-checkboxes hidden">
+          <label class="issue-cb-row done-row"><input type="checkbox" class="issue-cb" id="qc360_done" name="qcReason" value="Done">Done</label>
+          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="qc360_1" name="qcReason" value="Wrong QC"><span class="issue-cb-num">1</span>Wrong QC</label>
+          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="qc360_2" name="qcReason" value="To Be Edited"><span class="issue-cb-num">2</span>To Be Edited</label>
+          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="qc360_3" name="qcReason" value="Missing Issue Marking"><span class="issue-cb-num">3</span>Missing Issue Marking</label>
+          <input type="text" id="modalComment360" class="comment-in" placeholder="Add comments here (Submits as Other option)...">
         </div>
       </div>
+      
+      <label class="issue-cb-row done-row" id="doneLabel"><input type="checkbox" class="issue-cb" id="cbDone" value="Done">Done</label>
+      
       <div style="display:flex;gap:8px">
         <button class="btn-prev" id="prevBtn" disabled>← Prev</button>
-        <button class="btn-sub" id="nextBtn" onclick="doSubmit()">Submit & Next →</button>
+        <button class="btn-sub" id="nextBtn" onclick="handleFinalSubmit()">Submit & Next →</button>
         <button class="btn-prev" onclick="exitToSetup()">Exit</button>
       </div>
     </div>
   </div>
 </div>
 
-<div class="bottom-ribbon">
-  Managed by <a href="mailto:kishor@spyne.ai">kishor@spyne.ai</a>
-</div>
-
+<div class="bottom-ribbon">Managed by <a href="mailto:kishor@spyne.ai">kishor@spyne.ai</a></div>
 <div class="toast-shelf" id="toastShelf"></div>
+<!-- HIDDEN IFRAME FOR GOOGLE FORM SUBMISSION -->
+<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
 
 <script>
 const QC_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=1717039169&single=true&output=csv";
 const EDIT_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=320301246&single=true&output=csv";
+const THREE60_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThoeXNovzUYQaHoFqHYY8p4hxrGTJWUPF8dQs0cinxvypfUVwAzFu74l06jhqXm0x611kRke13fa2t/pub?gid=0&single=true&output=csv';
 const DONE_COUNT_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=2128295653&single=true&output=csv";
-const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdrjhynjWITfOqHpkgKX8enCmDKg1b3s0Ij05Cux36kPmZEUA/formResponse";
+const DONE_COUNT_360_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vThoeXNovzUYQaHoFqHYY8p4hxrGTJWUPF8dQs0cinxvypfUVwAzFu74l06jhqXm0x611kRke13fa2t/pub?gid=1009592102&single=true&output=csv";
 
-const PROXY = "https://media.spyneai.com/unsafe/0x0/filters:format(webp)/";
+const FORM_STD = "https://docs.google.com/forms/d/e/1FAIpQLSdrjhynjWITfOqHpkgKX8enCmDKg1b3s0Ij05Cux36kPmZEUA/formResponse";
+const FORM_360 = 'https://docs.google.com/forms/d/e/1FAIpQLSeQH6R9-rYr1Kh2rwUBKu7uGvJAkRrvx8fnxF6jfkac7sNL2A/formResponse';
+
+const PROXY = "https://media.spyneai.com/unsafe/1280x0/filters:format(webp):quality(85)/";
 
 const FMAP = {
-  qc: { enterprise:'enterprise_name', image_id:'ai.image_id', sku_id:'sku_id', left:'input_image_hres_url', mid:'output_image_hres_url', right:'manual_image_hres_url', user:'qc_user_name', editor:'', fqc:'', lqc:'', issue:'', status:'status' },
-  edited: { enterprise:'enterprise_name', image_id:'ai.image_id', sku_id:'sku_id', left:'input_image_hres_url', mid:'ai_output', right:'final_output', user:'last_qc_user', editor:'last_editor_user', fqc:'first_qc_user', lqc:'last_qc_user', issue:'rejected_comments', status:'status', action:'latest_image_action' }
+  qc: { ent:'enterprise_name', img:'ai.image_id', sku:'sku_id', l:'input_image_hres_url', m:'output_image_hres_url', r:'manual_image_hres_url', u:'qc_user_name' },
+  edited: { ent:'enterprise_name', img:'ai.image_id', sku:'sku_id', l:'input_image_hres_url', m:'ai_output', r:'final_output', u:'last_qc_user' }
 };
 
-let raw=[], group=[], idx=0, mode='qc', user='';
-let imagesLoaded = false, loadedCount = 0, imgsToLoadTotal = 0;
-let safetyTimer = null; 
-let currentDoneCount = 0; 
+let raw=[], group=[], idx=0, mode='qc', user='', fp360=null;
+let imagesLoaded = false, loadedCount = 0, currentDoneCount = 0;
+let safetyTimer = null;
 const preloadedIndices = new Set();
+const prefetchCache = new Set();
+
+function prefetch(src) {
+  if (!src || prefetchCache.has(src)) return;
+  prefetchCache.add(src);
+  const i = new Image(); i.src = src;
+}
 
 const PWDS = {"Nand Kishor":"spyne@123","Ranbir Manoranjan":"spyne@123","Nitin Kumar":"spyne@123","Praveen Agarwal":"spyne@123","Raj Tripathi":"spyne@123","Rohit Chauhan":"spyne@123","Ajay Devrani":"spyne@123"};
 
 function _id(id){ return document.getElementById(id); }
 
-function setLoading(show, txt = 'Fetching data…') {
-  const strip = _id('loadStrip');
-  if (strip) {
-    strip.style.display = show ? 'flex' : 'none';
-    _id('loadTxt').textContent = txt;
-  }
-  const startBtn = _id('startBtn');
-  if (startBtn) startBtn.disabled = show;
-}
-
 function toast(msg, type='ok') {
   const shelf = _id('toastShelf');
   const t = document.createElement('div');
   t.className = `toast ${type}`;
-  const ic = (type === 'ok') ? '✓' : '⚠';
-  t.innerHTML = `<span>${ic}</span><span>${msg}</span>`;
+  t.innerHTML = `<span>${type==='ok'?'✓':'⚠'}</span><span>${msg}</span>`;
   shelf.appendChild(t);
-  setTimeout(() => {
-    t.style.animation = 'tOut .2s ease both';
-    setTimeout(() => t.remove(), 200);
-  }, 2500);
+  setTimeout(() => { t.style.animation = 'tOut .2s ease both'; setTimeout(() => t.remove(), 200); }, 2500);
+}
+
+function getRowVal(row, keysArray) {
+    if (!row) return '';
+    const keys = Object.keys(row);
+    if (!Array.isArray(keysArray)) keysArray = [keysArray];
+    for(let key of keysArray) {
+        const foundKey = keys.find(k => k.trim().toLowerCase() === key.toLowerCase());
+        if(foundKey && row[foundKey] !== undefined && row[foundKey] !== null) return row[foundKey].toString().trim();
+    }
+    return '';
 }
 
 function getShiftBoundaries() {
   const now = new Date();
   const start = new Date(now);
-  start.setMinutes(0, 0, 0);
-  start.setSeconds(0, 0);
-  if (now.getHours() < 7) { start.setDate(now.getDate() - 1); start.setHours(7); } 
-  else { start.setHours(7); }
+  start.setHours(7, 0, 0, 0);
+  if (now.getHours() < 7) { start.setDate(start.getDate() - 1); }
   const end = new Date(start);
   end.setDate(start.getDate() + 1);
   return { start, end };
 }
 
+function parseGSheetTimestamp(str) {
+    if (!str) return null;
+    str = str.trim();
+    const parts = str.split(' ');
+    if (parts.length < 1) return null;
+    const dateParts = parts[0].split('/');
+    if (dateParts.length !== 3) return null;
+    const month = parseInt(dateParts[0]) - 1;
+    const day = parseInt(dateParts[1]);
+    const year = parseInt(dateParts[2]);
+    let h=0, m=0, s=0;
+    if (parts.length > 1) {
+        const timeParts = parts[1].split(':');
+        h = parseInt(timeParts[0]) || 0;
+        m = parseInt(timeParts[1]) || 0;
+        s = parseInt(timeParts[2]) || 0;
+    }
+    return new Date(year, month, day, h, m, s);
+}
+
 async function fetchProductionCount() {
   if (!user) return;
+  const is360 = mode === '360';
   try {
-    const response = await fetch(DONE_COUNT_URL + '&cb=' + Date.now());
+    const countUrl = is360 ? DONE_COUNT_360_URL : DONE_COUNT_URL;
+    const response = await fetch(countUrl + (countUrl.includes('?') ? '&' : '?') + 'cb=' + Date.now());
     if (!response.ok) return;
     const csvData = await response.text();
     const boundaries = getShiftBoundaries();
     
     Papa.parse(csvData, {
-      header: true,
-      skipEmptyLines: true,
+      header: true, skipEmptyLines: true,
       complete: res => {
-        const keys = res.meta.fields;
-        const tsKey = keys.find(k => k.trim().toLowerCase() === 'timestamp');
-        const userKey = keys.find(k => k.trim().toLowerCase() === 'login user');
-        if (!tsKey || !userKey) return;
-        const userProduction = res.data.filter(row => {
-          if (row[userKey] !== user) return false;
-          const timestampStr = row[tsKey]; 
-          if (!timestampStr) return false;
-          const entryDate = new Date(timestampStr);
-          if (isNaN(entryDate.getTime())) return false;
-          return entryDate >= boundaries.start && entryDate < boundaries.end;
+        const fields = res.meta.fields || [];
+        const findFlexKey = (name) => {
+            const needle = name.trim().toLowerCase().replace(/\s+/g, ' ');
+            return fields.find(k => k.trim().toLowerCase().replace(/\s+/g, ' ') === needle);
+        };
+        const userKey = is360
+          ? (findFlexKey('QC By') || findFlexKey('QC  By') || findFlexKey('Login User'))
+          : (findFlexKey('Login User'));
+        const tsKey = findFlexKey('Timestamp');
+
+        if (!userKey || !tsKey) return;
+        
+        const filteredEntries = res.data.filter(row => {
+          const rowUser = (row[userKey] || '').trim();
+          if (rowUser !== user) return false;
+          const rawTs = (row[tsKey] || '').trim();
+          const entryDate = parseGSheetTimestamp(rawTs);
+          return entryDate && entryDate >= boundaries.start && entryDate < boundaries.end;
         });
-        currentDoneCount = userProduction.length;
-        _id('doneCounter').textContent = `Done: ${currentDoneCount}`;
+        
+        if (is360 === (mode === '360')) {
+          currentDoneCount = filteredEntries.length;
+          _id('doneCounter').textContent = `Done: ${currentDoneCount}`;
+        }
       }
     });
-  } catch (err) { console.error("Count fetch failed:", err); }
+  } catch (err) {}
 }
-
-function doLogin(){
-  const name = _id('loginName').value, pw = _id('loginPw').value;
-  if(PWDS[name] === pw){
-    user = name;
-    _id('tAvatar').textContent = name.split(' ').map(n => n[0]).join('').toUpperCase();
-    _id('tUser').textContent = name;
-    _id('loginPage').style.display = 'none';
-    _id('app').style.display = 'flex';
-    setMode('qc');
-    fetchProductionCount();
-  } else { _id('loginErr').style.display = 'block'; }
-}
-
-function doLogout(){ location.reload(); }
 
 function setMode(m){
   mode = m;
-  ['tabQC','tabEdit','tabTool'].forEach(id => _id(id).classList.remove('on'));
-  _id(m === 'qc' ? 'tabQC' : m === 'edited' ? 'tabEdit' : 'tabTool').classList.add('on');
+  ['tabQC','tabEdit','tabTool','tab360'].forEach(id => _id(id).classList.remove('on'));
+  const activeTabId = m==='qc'?'tabQC':m==='edited'?'tabEdit':m==='qc_tool'?'tabTool':'tab360';
+  _id(activeTabId).classList.add('on');
+  
+  _id('contStdFilters').classList.toggle('hidden', m === '360');
+  _id('cont360Filters').classList.toggle('hidden', m !== '360');
+  _id('emptySetupMsg').classList.toggle('hidden', m === '360');
+  _id('tableContainer').classList.toggle('hidden', m !== '360');
+  _id('startBtn').classList.remove('hidden');
+
+  currentDoneCount = 0;
+  _id('doneCounter').textContent = 'Done: …';
+
   exitToSetup();
-  const isQc = m === 'qc';
-  const qcOnly = _id('contQcOnly');
-  const editOnly = _id('contEditOnly');
-  if (qcOnly) qcOnly.classList.toggle('hidden', !isQc);
-  if (editOnly) editOnly.classList.toggle('hidden', isQc);
-  raw = [];
-  preloadedIndices.clear();
-  updateCount();
+  raw = []; preloadedIndices.clear();
   loadData();
 }
 
 async function loadData() {
   setLoading(true);
-  const url = mode === 'qc' ? QC_URL : EDIT_URL;
+  const url = mode==='qc'?QC_URL:(mode==='360'?THREE60_URL:EDIT_URL);
   try {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const response = await fetch(url + (url.includes('?')?'&':'?') + 'cb=' + Date.now());
     const csvData = await response.text();
     Papa.parse(csvData, {
       header: true, skipEmptyLines: true,
       complete: res => {
-        const m = mode === 'qc' ? FMAP.qc : FMAP.edited;
-        raw = res.data.map(r => ({
-          enterprise: r[m.enterprise] || '',
-          image_id: r[m.image_id] || '',
-          sku_id: r[m.sku_id] || '',
-          left: r[m.left] || '',
-          mid: r[m.mid] || '',
-          right: r[m.right] || '',
-          user: r[m.user] || 'N/A',
-          editor: r[m.editor] || 'N/A',
-          fqc: r[m.fqc] || 'N/A',
-          lqc: r[m.lqc] || 'N/A',
-          issue: r[m.issue] || '',
-          status: r[m.status] || '',
-          action: r['latest_image_action'] || ''
-        }));
-        fillFilters();
-        updateCount();
-        setLoading(false);
-      },
-      error: err => { toast('Error parsing data', 'err'); setLoading(false); }
+        raw = res.data.map(r => {
+          if (mode === '360') {
+            const issueField = getRowVal(r, ['Issues', 'validation_failure_reason', 'vdp_validation_failure_reason']);
+            return { 
+                ...r, ent: getRowVal(r, 'Enterprise'), sku: getRowVal(r, 'SKU_ID'), img: getRowVal(r, 'Spin_ID'), 
+                issue: issueField, u: getRowVal(r, 'User'), spin_url: getRowVal(r, 'spin_url'), 
+                status: getRowVal(r, ['status', 'Status']), date: getRowVal(r, 'Date')
+            };
+          }
+          const isQc = mode === 'qc';
+          const map = isQc ? FMAP.qc : FMAP.edited;
+          return {
+            ent: getRowVal(r, map.ent), img: getRowVal(r, map.img), sku: getRowVal(r, map.sku),
+            l: getRowVal(r, map.l), m: getRowVal(r, map.m), r: getRowVal(r, map.r),
+            u: getRowVal(r, map.u) || 'N/A', editor: getRowVal(r, ['last_editor_user', 'editor']) || 'N/A',
+            fqc: getRowVal(r, 'first_qc_user') || 'N/A', lqc: getRowVal(r, 'last_qc_user') || 'N/A',
+            issue: isQc ? '' : getRowVal(r, 'rejected_comments'), 
+            status: getRowVal(r, ['status', 'Status']), action: getRowVal(r, 'latest_image_action')
+          };
+        });
+        fillFilters(); updateCount(); setLoading(false);
+        fetchProductionCount();
+      }
     });
-  } catch (err) { toast('Network error - Check Sheet permissions', 'err'); setLoading(false); }
+  } catch (err) { toast('Error loading data', 'err'); setLoading(false); }
 }
 
 function fillFilters(){
   const populate = (id, list) => {
-    const sel = _id(id);
-    if (!sel) return;
-    const first = sel.options[0].text;
-    sel.innerHTML = `<option value="">${first}</option>`;
-    list.forEach(v => { if(v && v!=='N/A') sel.innerHTML += `<option value="${v}">${v}</option>`; });
+    const sel = _id(id); if (!sel) return;
+    sel.innerHTML = `<option value="">${sel.options[0].text}</option>` + [...new Set(list.filter(Boolean).map(s=>s.trim()))].sort().map(v => `<option value="${v}">${v}</option>`).join('');
   };
-  populate('entFilter', [...new Set(raw.map(r=>r.enterprise))].sort());
-  populate('qcUFilter', [...new Set(raw.map(r=>r.user))].sort());
-  populate('fqcFilter', [...new Set(raw.map(r=>r.fqc))].sort());
-  populate('lqcFilter', [...new Set(raw.map(r=>r.lqc))].sort());
-  populate('editorFilter', [...new Set(raw.map(r=>r.editor))].sort());
-  populate('issueFilter', [...new Set(raw.flatMap(r=>r.issue?r.issue.split(','):[]))].map(i=>i.trim()).filter(Boolean).sort());
+  if (mode === '360') {
+    populate('userFilter360', raw.map(r=>r.u));
+    populate('entFilter360', raw.map(r=>r.ent));
+  } else {
+    populate('entFilter', raw.map(r=>r.ent));
+    populate('qcUFilter', raw.map(r=>r.u));
+  }
 }
 
 function getFiltered(){
-  const ent = _id('entFilter').value, qcu = _id('qcUFilter').value, fqc = _id('fqcFilter').value, lqc = _id('lqcFilter').value, ed = _id('editorFilter').value, is = _id('issueFilter').value;
-  return raw.filter(r => {
-    const statusVal = (r.status || '').toString().trim().toLowerCase();
-    let ok = statusVal === '' || statusVal === 'null';
-    if(ent) ok = ok && r.enterprise === ent;
-    if(mode === 'qc'){ if(qcu) ok = ok && r.user === qcu; } 
-    else { if(fqc) ok = ok && r.fqc === fqc; if(lqc) ok = ok && r.lqc === lqc; if(ed) ok = ok && r.editor === ed; if(is) ok = ok && r.issue.includes(is); }
-    if(mode === 'qc_tool') ok = ok && r.action === 'qc_editingtool';
-    else if(mode === 'edited') ok = ok && r.action !== 'qc_editingtool';
-    return ok;
-  });
+  if (mode === '360') {
+    const dates = fp360 ? fp360.selectedDates : [];
+    const startStr = dates[0] ? dates[0].toISOString().split('T')[0] : null;
+    const endStr = dates[1] ? dates[1].toISOString().split('T')[0] : null;
+    const userF = _id('userFilter360').value;
+    const entF = _id('entFilter360').value;
+    const issueType = _id('issueFilter360').value.toLowerCase();
+    return raw.filter(row => {
+      if (row.status !== '' && row.status.toLowerCase() !== 'null') return false;
+      const rowDate = row.date;
+      if (startStr && rowDate < startStr) return false;
+      if (endStr && rowDate > endStr) return false;
+      if (userF && row.u !== userF) return false;
+      if (entF && row.ent !== entF) return false;
+      if (issueType) {
+        const rowIssues = (row.issue || '').toLowerCase();
+        if (issueType === 'nullblank') { if (rowIssues.length > 0) return false; }
+        else if (!rowIssues.includes(issueType)) return false;
+      }
+      return true;
+    });
+  } else {
+    const ent = _id('entFilter').value, qcu = _id('qcUFilter').value;
+    return raw.filter(r => {
+      if (r.status !== '' && r.status.toLowerCase() !== 'null') return false;
+      if (ent && r.ent !== ent) return false;
+      if (qcu && r.u !== qcu) return false;
+      if (mode === 'qc_tool') { if (r.action !== 'qc_editingtool') return false; }
+      else if (mode === 'edited') { if (r.action === 'qc_editingtool') return false; }
+      return true;
+    });
+  }
 }
 
 function updateCount(){
   const filtered = getFiltered();
-  const fcount = _id('fcount');
-  if (fcount) fcount.textContent = filtered.length.toLocaleString() + ' records';
+  _id('fcount').textContent = filtered.length.toLocaleString() + ' records';
+  if (mode === '360') renderTable(filtered);
 }
 
+function renderTable(data) {
+  let html = `<table><thead><tr><th>Date</th><th>Spin ID</th><th>SKU</th><th>Issues</th><th>Enterprise</th><th>User</th></tr></thead><tbody>`;
+  data.slice(0, 500).forEach((row) => {
+    html += `<tr><td>${row.date}</td><td><code>${row.img}</code></td><td>${row.sku}</td><td>${row.issue}</td><td>${row.ent}</td><td>${row.u}</td></tr>`;
+  });
+  _id('tableContainer').innerHTML = html + '</tbody></table>';
+}
+
+/**
+ * UPDATED: Claude logic - Eager preload first 5 immediately
+ */
 function startReview(){
   group = getFiltered().sort(() => Math.random() - 0.5);
-  if(!group.length) return alert('No records to review');
-  idx = 0;
-  _id('setupPage').style.display = 'none';
-  _id('reviewPage').style.display = 'flex';
+  if(!group.length) return alert('No records');
+  idx = 0; 
+  preloadedIndices.clear();
+
+  // Claude: Preload first 5 records immediately before switching view
+  if (mode !== '360') {
+    for (let i = 0; i < Math.min(5, group.length); i++) {
+        const item = group[i];
+        prefetch(PROXY + item.l);
+        prefetch(PROXY + item.m);
+        if (mode !== 'qc') prefetch(PROXY + (item.r || item.m));
+        preloadedIndices.add(i);
+    }
+  }
+
+  _id('setupPage').style.display = 'none'; _id('reviewPage').style.display = 'flex';
   showRecord();
 }
 
-function resetImage(imgId) {
-    const img = _id(imgId);
-    if (img) { img.classList.remove('loaded'); img.src = ""; }
-}
-
-function checkAllLoaded() {
-  if(loadedCount >= imgsToLoadTotal && !imagesLoaded) {
-    if (safetyTimer) clearTimeout(safetyTimer);
-    safetyTimer = setTimeout(() => {
-        imagesLoaded = true;
-        _id('nextBtn').disabled = false;
-        _id('nextBtn').textContent = "Submit & Next →";
-        setTimeout(() => preloadFuture(15), 500);
-    }, 1000); 
-  }
-}
-
-function preloadFuture(count = 15) {
+/**
+ * UPDATED: Claude logic - Preload next 20 immediately
+ */
+function preloadFuture(count = 20) {
+  if (mode === '360') return;
   for (let i = 1; i <= count; i++) {
     const targetIdx = idx + i;
-    if (targetIdx < group.length && !preloadedIndices.has(targetIdx)) {
+    if (targetIdx >= group.length) break;
+    if (!preloadedIndices.has(targetIdx)) {
       const item = group[targetIdx];
-      const urls = [item.left, item.mid];
-      if (mode !== 'qc') urls.push(item.right || item.mid);
-      urls.forEach(url => { if (!url) return; const img = new Image(); img.src = PROXY + url; });
+      prefetch(PROXY + item.l);
+      prefetch(PROXY + item.m);
+      if (mode !== 'qc') prefetch(PROXY + (item.r || item.m));
       preloadedIndices.add(targetIdx);
     }
   }
 }
 
+function enableSubmit() {
+    if (imagesLoaded) return;
+    imagesLoaded = true;
+    if (safetyTimer) clearTimeout(safetyTimer);
+    _id('nextBtn').disabled = false;
+    _id('nextBtn').textContent = "Submit & Next →";
+}
+
+function checkAllLoaded() {
+    if (safetyTimer) clearTimeout(safetyTimer);
+    // Claude: More aggressive 100ms safety timer
+    safetyTimer = setTimeout(enableSubmit, 100);
+}
+
+/**
+ * UPDATED: Claude logic - Efficient src assignment
+ */
 function showRecord(){
   const r = group[idx];
-  imagesLoaded = false;
-  loadedCount = 0;
+  imagesLoaded = false; loadedCount = 0;
   if (safetyTimer) clearTimeout(safetyTimer);
-  imgsToLoadTotal = mode === 'qc' ? 2 : 3;
-  _id('nextBtn').disabled = true;
-  _id('nextBtn').textContent = "⌛ Loading Images...";
+  
+  _id('nextBtn').disabled = true; 
+  _id('nextBtn').textContent = "⌛ Loading...";
 
-  const handleFinish = (e) => {
-    if (e.target.src && !e.target.src.endsWith('blob:') && e.target.src !== window.location.href) {
-        e.target.classList.add('loaded');
-        loadedCount++;
-        checkAllLoaded();
-    }
-  };
+  const is360 = mode === '360';
+  _id('imgArea').classList.toggle('hidden', is360);
+  _id('spinArea').classList.toggle('hidden', !is360);
+  _id('three60Issues').classList.toggle('hidden', !is360);
+  _id('standardIssues').classList.toggle('hidden', is360);
+  _id('doneLabel').classList.toggle('hidden', is360);
 
-  _id('mEnt').textContent = r.enterprise;
-  _id('mSku').textContent = r.sku_id;
-  _id('mImg').textContent = r.image_id;
-  _id('mQcUsers').textContent = [r.fqc, r.lqc, r.user].filter(u => u && u!=='N/A').join(', ');
+  _id('mEnt').textContent = r.ent;
+  _id('mSku').textContent = r.sku;
+  _id('mImg').textContent = r.img;
+  _id('mQcUsers').textContent = [r.fqc, r.lqc, r.u].filter(u=>u&&u!=='N/A').join(', ');
   _id('mEditor').textContent = r.editor;
-  _id('mEditorWrap').classList.toggle('hidden', mode === 'qc');
+  _id('mEditorWrap').classList.toggle('hidden', !r.editor || mode === 'qc');
   _id('mIssue').textContent = r.issue;
   _id('mIssueWrap').classList.toggle('hidden', !r.issue);
   _id('progLbl').textContent = `Record ${idx+1} of ${group.length}`;
   _id('progFill').style.width = ((idx+1)/group.length*100) + '%';
-  
-  resetImage('imgL'); resetImage('imgM'); resetImage('imgR');
 
-  ['imgL','imgM','imgR'].forEach(id => {
-    const el = _id(id);
-    el.onload = handleFinish;
-    el.onerror = handleFinish; 
-  });
-
-  _id('imgL').src = PROXY + r.left;
-  _id('imgM').src = PROXY + r.mid;
-  if(mode === 'qc'){
-    _id('panelR').style.display = 'none';
-    _id('imgArea').className = 'img-area two-col';
+  if (is360) {
+    _id('spinIframe').src = r.spin_url;
+    _id('modalComment360').value = '';
+    checkAllLoaded();
   } else {
-    _id('panelR').style.display = 'flex';
-    _id('imgArea').className = 'img-area';
-    _id('imgR').src = PROXY + (r.right || r.mid);
-  }
+    const required = mode === 'qc' ? 2 : 3;
+    const imgs = [
+      { el: _id('imgL'), src: PROXY + r.l },
+      { el: _id('imgM'), src: PROXY + r.m },
+      ...(mode !== 'qc' ? [{ el: _id('imgR'), src: PROXY + (r.r || r.m) }] : [])
+    ];
+    
+    // Claude: Parallel assignment and no el.src = "" resets
+    imgs.forEach(({ el, src }) => {
+      // Re-use handlers if possible, but keep simple for this structure
+      el.onload = () => { el.classList.add('loaded'); loadedCount++; if (loadedCount >= required) enableSubmit(); };
+      el.onerror = () => { loadedCount++; if (loadedCount >= required) enableSubmit(); };
+      
+      // Only assign if src changed to avoid network cancel
+      if (el.src !== src) {
+          el.classList.remove('loaded');
+          el.src = src;
+      } else if (el.complete) {
+          el.classList.add('loaded');
+          loadedCount++;
+          if (loadedCount >= required) enableSubmit();
+      }
+    });
 
+    checkAllLoaded();
+    
+    if(mode === 'qc'){ _id('panelR').style.display = 'none'; _id('imgArea').className = 'img-area two-col'; }
+    else { _id('panelR').style.display = 'flex'; _id('imgArea').className = 'img-area'; }
+  }
+  
   _id('prevBtn').disabled = idx === 0;
   document.querySelectorAll('.issue-cb').forEach(cb => cb.checked = false);
-  _id('cbDone').checked = true;
+  _id(is360?'qc360_done':'cbDone').checked = true;
+
+  // Claude: Preload future records immediately upon showing current
+  preloadFuture(20);
 }
 
-function doSubmit(){
-  if (!imagesLoaded) {
-    toast('Wait to load images then enter', 'warn');
-    return;
-  }
-  const r = group[idx];
-  const checkedBoxes = Array.from(document.querySelectorAll('.issue-cb:checked'));
-  if (checkedBoxes.length === 0) { toast('Please select an issue or Done', 'warn'); return; }
+function handleFinalSubmit() {
+    if (!imagesLoaded) return;
+    const r = group[idx];
+    const is360 = mode === '360';
+    const btn = _id('nextBtn');
+    
+    btn.disabled = true; 
+    btn.textContent = 'Submitting...';
 
-  _id('nextBtn').disabled = true;
-  const body = new URLSearchParams();
-  body.append("entry.890284089", r.enterprise);
-  body.append("entry.5932044", [r.fqc, r.lqc, r.user].filter(u => u && u!=='N/A').join(', '));
-  body.append("entry.1880389842", r.editor);
-  body.append("entry.1139236247", r.sku_id);
-  body.append("entry.661750446", r.image_id);
-  body.append("entry.1317530325", r.issue);
-  body.append("entry.1455673211", r.left);
-  body.append("entry.772576827", r.mid);
-  body.append("entry.780536997", r.right || r.mid);
-  body.append("entry.865196657", user);
-  checkedBoxes.forEach(cb => { body.append("entry.778698303", cb.value); });
+    const formUrl = is360 ? FORM_360 : FORM_STD;
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = formUrl;
+    form.target = 'hidden_iframe';
 
-  fetch(FORM_URL, { 
-    method: 'POST', mode: 'no-cors', 
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: body.toString() 
-  }).then(() => {
-    _id('nextBtn').disabled = false;
-    toast('Submitted successfully');
+    const data = {};
+    if (is360) {
+        data['entry.703277665'] = r.sku || '';
+        data['entry.179295275'] = r.date || '';
+        data['entry.1125049159'] = r.img || '';
+        data['entry.575622617'] = r.issue || '';
+        data['entry.1815472287'] = r.ent || '';
+        data['entry.582537694'] = r.u || '';
+        data['entry.1372347436'] = r.spin_url || '';
+        data['entry.1243416507'] = user || '';
+        
+        const checkedBoxes = Array.from(document.querySelectorAll('#three60Issues .issue-cb:checked')).map(cb => cb.value);
+        checkedBoxes.forEach(val => {
+            const input = document.createElement('input');
+            input.type = 'hidden'; input.name = 'entry.1751143375'; input.value = val;
+            form.appendChild(input);
+        });
+        
+        const comment = _id('modalComment360').value.trim();
+        if (comment) {
+            const other = document.createElement('input');
+            other.type = 'hidden'; other.name = 'entry.1751143375'; other.value = '__other_option__';
+            form.appendChild(other);
+            const otherVal = document.createElement('input');
+            otherVal.type = 'hidden'; otherVal.name = 'entry.1751143375.other_option_response'; otherVal.value = comment;
+            form.appendChild(otherVal);
+        }
+    } else {
+        data['entry.890284089'] = r.ent || '';
+        data['entry.5932044'] = [r.fqc, r.lqc, r.u].filter(x => x && x !== 'N/A').join(', ');
+        data['entry.1880389842'] = r.editor || '';
+        data['entry.1139236247'] = r.sku || '';
+        data['entry.661750446'] = r.img || '';
+        data['entry.1317530325'] = r.issue || '';
+        data['entry.1455673211'] = r.l || '';
+        data['entry.772576827'] = r.m || '';
+        data['entry.780536997'] = r.r || r.m;
+        data['entry.865196657'] = user || '';
+        
+        const checkedBoxes = Array.from(document.querySelectorAll('#standardIssues .issue-cb:checked, #doneLabel .issue-cb:checked')).map(cb => cb.value);
+        checkedBoxes.forEach(val => {
+            const input = document.createElement('input');
+            input.type = 'hidden'; input.name = 'entry.778698303'; input.value = val;
+            form.appendChild(input);
+        });
+    }
+
+    for (const key in data) {
+        const input = document.createElement('input');
+        input.type = 'hidden'; input.name = key; input.value = data[key];
+        form.appendChild(input);
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+    
+    // Claude: Minimal delay to move on almost instantly
+    setTimeout(() => {
+        if (form.parentNode) document.body.removeChild(form);
+        afterSubmitActions();
+    }, 100);
+}
+
+function afterSubmitActions() {
+    toast('Submitted!'); 
     currentDoneCount++;
     _id('doneCounter').textContent = `Done: ${currentDoneCount}`;
-    setTimeout(fetchProductionCount, 5000);
-    if(idx < group.length - 1){ idx++; showRecord(); }
-    else { alert('Review Finished.'); exitToSetup(); }
-  }).catch(() => { _id('nextBtn').disabled = false; toast('Error submitting', 'err'); });
+    if (idx < group.length - 1) { idx++; showRecord(); } 
+    else { alert('Review Finished.'); exitToSetup(); loadData(); }
 }
 
+function setLoading(s) { _id('loadStrip').style.display = s ? 'flex' : 'none'; }
 function exitToSetup(){ _id('reviewPage').style.display = 'none'; _id('setupPage').style.display = 'flex'; }
+function doLogout(){ location.reload(); }
 
-function handleLoginEnter(e) { if (e.key === 'Enter') { e.preventDefault(); doLogin(); } }
+const doLogin = () => {
+    const name = _id('loginName').value, pw = _id('loginPw').value;
+    if(PWDS[name] === pw){
+        user = name; _id('tUser').textContent = name;
+        _id('tAvatar').textContent = name.split(' ').map(n=>n[0]).join('').toUpperCase();
+        _id('loginPage').style.display = 'none'; _id('app').style.display = 'flex';
+        setMode('qc');
+    } else _id('loginErr').style.display='block';
+};
+
+_id('loginBtn').onclick = doLogin;
+_id('loginPw').onkeydown = e => { if(e.key==='Enter') doLogin(); };
 
 document.querySelectorAll('.issue-cb').forEach(cb => {
-  cb.addEventListener('change', (e) => {
-    if (e.target.id === 'cbDone') {
-      if (e.target.checked) document.querySelectorAll('.issue-cb:not(#cbDone)').forEach(o => o.checked = false);
-    } else {
-      if (e.target.checked) _id('cbDone').checked = false;
-      else if (!Array.from(document.querySelectorAll('.issue-cb:not(#cbDone)')).some(c => c.checked)) _id('cbDone').checked = true;
+  cb.addEventListener('change', e => {
+    const is360 = mode === '360';
+    const doneId = is360 ? 'qc360_done' : 'cbDone';
+    if(e.target.id === doneId && e.target.checked) {
+        const q = is360 ? '#three60Issues .issue-cb:not(#qc360_done)' : '#standardIssues .issue-cb';
+        document.querySelectorAll(q).forEach(o => o.checked = false);
+        if(is360) _id('modalComment360').value = '';
+    } else if(e.target.checked) { _id(doneId).checked = false; }
+    else {
+        const others = is360 ? '#three60Issues .issue-cb:not(#qc360_done)' : '#standardIssues .issue-cb';
+        const checked = Array.from(document.querySelectorAll(others)).some(o=>o.checked);
+        if(!checked && (mode !== '360' || !_id('modalComment360').value)) _id(doneId).checked = true;
     }
   });
 });
 
 document.addEventListener('keydown', e => {
   if (_id('reviewPage').style.display === 'flex') {
-    // Keys 1 through 9 toggle cb1 through cb9 (Wrong Marking is key 9)
-    if (e.key >= '1' && e.key <= '9') {
-      const cb = _id('cb' + e.key);
-      if (cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); e.preventDefault(); }
+    if (mode === '360') { if (e.key >= '1' && e.key <= '3') { const cb = _id('qc360_' + e.key); if (cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); e.preventDefault(); } } }
+    else { if (e.key >= '1' && e.key <= '9') { const cb = _id('cb' + e.key); if (cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); e.preventDefault(); } } }
+    if (e.key === 'Enter') { handleFinalSubmit(); e.preventDefault(); }
+    if (e.key === 'Backspace' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+      if (idx > 0) { idx--; showRecord(); } e.preventDefault();
     }
-    if (e.key === 'Enter') { doSubmit(); e.preventDefault(); }
   }
 });
 
-_id('loginBtn').onclick = doLogin;
-_id('loginName').addEventListener('keydown', handleLoginEnter);
-_id('loginPw').addEventListener('keydown', handleLoginEnter);
 _id('startBtn').onclick = startReview;
 _id('prevBtn').onclick = () => { if(idx > 0) { idx--; showRecord(); } };
-['entFilter','qcUFilter','fqcFilter','lqcFilter','editorFilter','issueFilter'].forEach(id => {
+
+window.onload = () => {
+    fp360 = flatpickr("#dateRange360", { mode: "range", dateFormat: "Y-m-d", defaultDate: null, onClose: () => updateCount() });
+};
+
+['userFilter360','entFilter360', 'issueFilter360', 'entFilter', 'qcUFilter'].forEach(id => {
   const el = _id(id); if (el) el.addEventListener('change', updateCount);
 });
 </script>
