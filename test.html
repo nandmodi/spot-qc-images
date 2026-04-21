@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-<title>Spyne · Quality Review</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Spyne · Meet Review</title>
 <link rel="icon" href="https://spyne-prod-ai.s3.us-east-1.amazonaws.com/ai-dataset/2025/logo/unnamed.png"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -20,7 +20,10 @@
   --line2:#CDD1DA;
   --accent:#2563EB;
   --accent2:#1D4ED8;
-  --accentlt:#DBEAFE; 
+  --accentg:rgba(37,99,235,.1);
+  --accentlt:#EFF6FF;
+  --ok:#16A34A;
+  --oklt:#F0FDF4;
   --warn:#D97706;
   --danger:#DC2626;
   --dangerlt:#FEF2F2;
@@ -28,307 +31,583 @@
   --t2:#374151;
   --t3:#6B7280;
   --t4:#9CA3AF;
+  --r:8px;
+  --rlg:12px;
   --mono:'IBM Plex Mono',monospace;
-  --shadow:0 1px 3px rgba(0,0,0,.08);
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.05);
+  --shadow-md:0 4px 12px rgba(0,0,0,.08),0 1px 4px rgba(0,0,0,.04);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%; overflow: hidden;}
-body{font-family:'Inter',sans-serif; background:var(--bg0); color:var(--t1); display: flex; flex-direction: column;}
+html,body{height:100%;min-height:100%}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--t1);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--line2);border-radius:3px}
 
-/* TOPBAR */
+/* ── TOPBAR ── */
 .topbar{
-  height:48px; background:var(--bg1); border-bottom:1px solid var(--line);
-  display:flex; align-items:center; padding:0 16px; gap:10px; flex-shrink:0; z-index:30;
+  height:52px;background:var(--bg1);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;padding:0 18px;gap:10px;
+  position:sticky;top:0;z-index:30;box-shadow:var(--shadow);
 }
-.t-logo{display:flex;align-items:center;}
-.t-sep{width:1px;height:16px;background:var(--line);margin:0 4px;}
-.t-title{font-size:13px;font-weight:700;color:#000;}
+.t-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+.t-back{
+  font-family:'Inter',sans-serif;font-size:12px;font-weight:500;
+  color:var(--t3);background:var(--bg2);border:1px solid var(--line2);
+  border-radius:6px;padding:0 12px;height:28px;cursor:pointer;
+  display:flex;align-items:center;gap:5px;text-decoration:none;
+  transition:all .14s;
+}
+.t-back:hover{color:var(--t1);border-color:#9CA3AF;background:var(--bg0)}
+.t-sep{width:1px;height:20px;background:var(--line);margin:0 4px;flex-shrink:0}
+.t-title{font-size:14px;font-weight:700;color:#000;letter-spacing:-.01em}
+.t-space{flex:1}
+.t-count{font-family:var(--mono);font-size:11px;color:var(--t3);background:var(--bg2);border:1px solid var(--line);border-radius:5px;padding:3px 9px;white-space:nowrap}
 
-/* TAB SECTION */
-.tab-section {
-    background: var(--bg1); padding: 6px 16px; border-bottom: 1px solid var(--line); flex-shrink:0;
+/* ── MODE TABS ── */
+.mode-tabs{
+  background:var(--bg1);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;padding:0 18px;gap:0;
+  position:sticky;top:52px;z-index:29;
 }
-.tab-container {
-    background: var(--accentlt); display: inline-flex; padding: 3px; border-radius: 8px; gap: 4px;
+.mode-tab{
+  font-size:13px;font-weight:600;color:var(--t3);
+  padding:12px 18px;border-bottom:2px solid transparent;
+  cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:7px;
+  user-select:none;
 }
-.mode-tab {
-    padding: 5px 18px; font-size: 12px; font-weight: 600; color: var(--t3); cursor: pointer; border-radius: 6px; transition: 0.2s;
+.mode-tab:hover{color:var(--t1)}
+.mode-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.mode-tab .tab-pill{
+  font-size:10px;font-family:var(--mono);font-weight:500;
+  background:var(--bg3);color:var(--t3);border-radius:4px;padding:1px 6px;
+  transition:all .15s;
 }
-.mode-tab.active { background: var(--bg1); color: var(--accent); box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+.mode-tab.active .tab-pill{background:var(--accentlt);color:var(--accent)}
 
-/* FILTER BAR */
+/* ── FILTER BAR ── */
 .filter-bar{
-  background:var(--bg1); border-bottom:1px solid var(--line);
-  padding:6px 16px; display:flex; align-items:center; gap:10px; flex-shrink:0;
+  background:var(--bg1);border-bottom:1px solid var(--line);
+  padding:10px 18px;display:flex;align-items:center;flex-wrap:wrap;gap:8px;
+  position:sticky;top:96px;z-index:20;
 }
-.fi{display:flex;align-items:center;gap:4px}
-.fi-lbl{font-size:11px;font-weight:700;text-transform:uppercase;color:var(--t3);}
-.fi-sel, .fi-date-range{
-  font-size:12px; background:var(--bg2); border:1px solid var(--line); border-radius:4px; padding:4px 8px; outline:none;
+.fi{display:flex;align-items:center;gap:5px}
+.fi-lbl{font-size:11.5px;font-weight:700;color:#000;white-space:nowrap}
+.fi-sel,.fi-date-range{
+  font-family:'Inter',sans-serif;font-size:12.5px;color:var(--t1);
+  background:var(--bg2);border:1px solid var(--line);border-radius:6px;
+  padding:5px 10px;outline:none;cursor:pointer;transition:border-color .14s;
 }
-.fi-date-range { width: 180px; }
+.fi-sel{
+  -webkit-appearance:none;padding-right:26px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5'%3E%3Cpath d='M1 1l3.5 3.5L8 1' stroke='%239CA3AF' stroke-width='1.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 8px center;max-width:170px;
+}
+.fi-date-range{min-width:210px;border-color:var(--accent)}
+.fi-sel:focus,.fi-date-range:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accentg)}
+.btn-reset{
+  font-family:'Inter',sans-serif;font-size:12px;font-weight:500;
+  background:var(--dangerlt);border:1px solid #FCA5A5;color:var(--danger);
+  border-radius:6px;padding:0 12px;height:32px;cursor:pointer;transition:all .14s;
+}
+.btn-reset:hover{background:#FEE2E2}
+.fi-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.rec-count{font-family:var(--mono);font-size:11px;color:var(--t3)}
 
-/* MAIN CONTENT AREA - NO SCROLL */
-.main-wrapper {
-    flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 12px;
-}
+/* ── CONTENT ── */
+.content{padding:18px;flex:1}
+
+/* empty state */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;text-align:center;color:var(--t3)}
+.empty-t{font-size:15px;font-weight:600;color:var(--t2);margin-bottom:6px}
+.empty-b{font-size:13px;color:var(--t3)}
+
+/* ── RECORD CARD ── */
 .record-card{
-  flex: 1; background:var(--bg1); border:1px solid var(--line); border-radius:10px;
-  overflow:hidden; display: flex; flex-direction: column; box-shadow: var(--shadow);
+  background:var(--bg1);border:1px solid var(--line);border-radius:var(--rlg);
+  overflow:hidden;box-shadow:var(--shadow-md);margin-bottom:20px;
 }
 
-/* Metadata Bar */
-.meta-strip {
-    display: flex; border-bottom: 1px solid var(--line); background: var(--bg2); flex-shrink: 0;
+/* meta rows */
+.meta-strip{
+  display:grid;grid-template-columns:repeat(2,1fr);
+  border-bottom:1px solid var(--line);
 }
-.meta-item { padding: 8px 12px; border-right: 1px solid var(--line); flex: 1; min-width: 0;}
-.meta-label { font-size: 9px; font-weight: 800; text-transform: uppercase; color: var(--t3); margin-bottom: 2px; white-space: nowrap;}
-.meta-value { font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--t1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;}
+@media(min-width:640px){.meta-strip{grid-template-columns:repeat(4,1fr)}}
 
-/* ISSUE INFO Bar */
-.issue-strip {
-    padding: 6px 12px; border-bottom: 1px solid var(--line); background: #fff; display: flex; gap: 16px; flex-shrink: 0; align-items: center;
+.meta-cell{padding:10px 16px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+@media(min-width:640px){.meta-cell{border-bottom:none}}
+.meta-cell:last-child{border-right:none}
+.meta-cell-l{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#000;margin-bottom:2px}
+.meta-cell-v{font-family:var(--mono);font-size:11.5px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* combined SKU+SPIN cell */
+.meta-cell-double{padding:10px 16px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+@media(min-width:640px){.meta-cell-double{border-bottom:none}}
+.meta-cell-double:last-child{border-right:none}
+.meta-cell-double-inner{display:flex;flex-direction:column;gap:4px}
+.meta-sub{display:flex;align-items:center;gap:6px}
+.meta-sub-l{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);min-width:44px}
+.meta-sub-v{font-family:var(--mono);font-size:11.5px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.meta-strip2{
+  display:grid;grid-template-columns:1fr;
+  border-bottom:1px solid var(--line);
 }
+@media(min-width:640px){.meta-strip2{grid-template-columns:1fr 1fr}}
+.meta-cell2{padding:8px 16px;border-right:none;border-bottom:1px solid var(--line)}
+@media(min-width:640px){.meta-cell2{border-right:1px solid var(--line);border-bottom:none}}
+.meta-cell2:last-child{border-right:none;border-bottom:none}
+.issue-val{color:var(--warn);font-weight:600;font-size:12px}
+.comment-val{color:var(--t2);font-size:12px}
 
-/* VIEWER AREA */
-.viewer-area { flex: 1; position: relative; overflow: hidden; background: #000; }
-
-/* 360 Iframe */
-.spin-frame { width: 100%; height: 100%; border: none; }
-
-/* Images Layout */
-.images-layout { height: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #2A2D38; }
-.img-pane { position: relative; background: #1A1C23; display: flex; align-items: center; justify-content: center; overflow: hidden;}
-.img-pane-label {
-  position:absolute; top:8px; left:8px; z-index:5; font-size:9px; font-weight:700;
-  background:rgba(255,255,255,0.85); padding:2px 6px; border-radius:3px;
+/* images */
+.images-row{display:grid;grid-template-columns:1fr}
+@media(min-width:768px){.images-row{grid-template-columns:repeat(3,1fr)}}
+.img-pane{
+  position:relative;background:#1A1C23;overflow:hidden;
+  border-bottom:1px solid #2A2D38;
 }
-.img-pane img { max-width: 100%; max-height: 100%; object-fit: contain; }
+@media(min-width:768px){
+  .img-pane{border-bottom:none;border-right:1px solid #2A2D38;min-height:420px}
+  .img-pane:last-child{border-right:none}
+}
+.img-pane-label{
+  position:absolute;top:10px;left:10px;z-index:5;
+  font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+  background:rgba(255,255,255,.88);border:1px solid rgba(0,0,0,.08);color:#374151;
+  padding:3px 9px;border-radius:5px;backdrop-filter:blur(6px);
+}
+.img-pane img{width:100%;height:auto;max-height:80vh;object-fit:contain;display:block}
+@media(min-width:768px){.img-pane img{height:100%;max-height:none}}
+.img-err{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;gap:8px;color:#555}
+@media(min-width:768px){.img-err{height:100%;min-height:420px}}
+.img-err span{font-size:12px;opacity:.4;color:#aaa}
 
-/* BOTTOM NAV */
-.bottom-stick { height: 56px; background: var(--bg1); border-top: 1px solid var(--line); flex-shrink: 0; display: flex; align-items: center; padding: 0 16px; }
-.btn-nav { font-weight: 600; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-size: 13px;}
-.btn-prev { background: var(--bg2); border: 1px solid var(--line2); color: var(--t2); margin-right: 8px;}
-.btn-next { background: var(--accent); color: #fff; border: none; }
-.btn-next:disabled, .btn-prev:disabled { opacity: 0.3; }
+/* 360 iframe */
+.spin-pane{
+  position:relative;background:#0F1115;overflow:hidden;
+  min-height:500px;display:flex;align-items:stretch;
+}
+.spin-pane iframe{
+  width:100%;height:100%;min-height:500px;border:none;display:block;
+  flex:1;
+}
+.spin-err{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  width:100%;gap:10px;color:#555;min-height:500px;
+}
+.spin-err span{font-size:13px;opacity:.5;color:#aaa}
 
-.empty { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--t3); font-weight: 500;}
+/* ── STICKY BOTTOM ── */
+.bottom-stick{
+  position:sticky;bottom:0;z-index:40;
+  background:var(--bg1);box-shadow:0 -4px 12px rgba(0,0,0,.05);
+}
+.nav-bar{
+  border-top:1px solid var(--line);
+  padding:10px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+}
+.prog-lbl{font-family:var(--mono);font-size:11px;color:#000;font-weight:700;min-width:110px}
+.prog-track{flex:1;min-width:150px;max-width:280px;height:4px;background:var(--line);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s ease}
+.prog-pct{font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:500;min-width:34px}
+.nav-space{flex:1}
+.btn-prev,.btn-next{
+  font-family:'Inter',sans-serif;font-size:13px;font-weight:600;
+  border:none;border-radius:var(--r);padding:0 20px;height:38px;cursor:pointer;transition:all .14s;
+}
+.btn-prev{background:var(--bg2);border:1px solid var(--line2);color:var(--t2)}
+.btn-prev:hover{background:var(--bg3);color:var(--t1)}
+.btn-prev:disabled{opacity:.35;cursor:not-allowed}
+.btn-next{background:var(--accent);color:#fff}
+.btn-next:hover{background:var(--accent2);box-shadow:0 3px 12px rgba(37,99,235,.3)}
+.btn-next:disabled{opacity:.35;cursor:not-allowed}
+.kbd-hint{font-size:11px;color:var(--t4);display:flex;align-items:center;gap:5px}
+@media(max-width:600px){.kbd-hint{display:none}}
+.kbd{font-family:var(--mono);font-size:9.5px;background:var(--bg3);border:1px solid var(--line2);border-radius:3px;padding:1px 5px;color:var(--t3)}
+.managed-ribbon{
+  background:var(--bg2);border-top:1px solid var(--line);
+  color:var(--t3);font-size:10.5px;text-align:center;padding:5px 18px;
+}
+.managed-ribbon span{color:var(--accent);font-weight:600}
+
+/* loading strip */
+.load-strip{display:none;align-items:center;gap:10px;padding:10px 18px;background:var(--accentlt);border-bottom:1px solid var(--line);font-size:12.5px;font-weight:500;color:var(--accent)}
+.load-spin{width:14px;height:14px;border:2px solid var(--line2);border-top-color:var(--accent);border-radius:50%;animation:rot .7s linear infinite;flex-shrink:0}
+@keyframes rot{to{transform:rotate(360deg)}}
+.hidden{display:none!important}
 </style>
 </head>
 <body>
 
+<!-- TOPBAR -->
 <div class="topbar">
-  <div class="t-logo"><img src="https://spyne-prod-ai.s3.us-east-1.amazonaws.com/ai-dataset/2025/logo/unnamed.png" height="24"/></div>
+  <a class="t-logo" href="#">
+    <img src="https://spyne-prod-ai.s3.us-east-1.amazonaws.com/ai-dataset/2025/logo/unnamed.png" style="height:28px;width:auto;display:block;" alt="Spyne"/>
+  </a>
   <div class="t-sep"></div>
-  <span class="t-title">Quality Review</span>
-  <div style="flex:1"></div>
-  <div id="statusBadge" style="font-size:10px; color:var(--t3); background:var(--bg2); padding:3px 8px; border-radius:4px;">Loading...</div>
+  <span class="t-title">Meet Review</span>
+  <div class="t-space"></div>
+  <div class="t-count hidden" id="tCount"></div>
+  <a class="t-back" href="https://nandmodi.github.io/spot-qc-images/" target="_self">← Back to QC</a>
 </div>
 
-<div class="tab-section">
-    <div class="tab-container">
-        <div id="tab-images" class="mode-tab active" onclick="setMode('images')">Images</div>
-        <div id="tab-360" class="mode-tab" onclick="setMode('360')">360</div>
-    </div>
+<!-- MODE TABS -->
+<div class="mode-tabs">
+  <div class="mode-tab active" id="tabImages" onclick="switchMode('images')">
+    🖼 Images <span class="tab-pill" id="pillImages">–</span>
+  </div>
+  <div class="mode-tab" id="tab360" onclick="switchMode('360')">
+    360° Spin <span class="tab-pill" id="pill360">–</span>
+  </div>
 </div>
 
-<div class="filter-bar">
-  <div class="fi"><input type="text" id="dateFilter" class="fi-date-range" placeholder="Filter Date Range"/></div>
-  <div class="fi"><select id="entFilter" class="fi-sel"><option value="">All Enterprises</option></select></div>
-  <div class="fi"><select id="userFilter" class="fi-sel"><option value="">All Users</option></select></div>
-  <div class="fi" id="qcGroup" style="display:none"><select id="qcFilter" class="fi-sel"><option value="">All Reviewers</option></select></div>
-  <div style="flex:1"></div>
-  <button style="border:none; background:none; color:var(--danger); font-size:11px; font-weight:700; cursor:pointer;" onclick="resetFilters()">RESET</button>
+<!-- LOADING STRIP -->
+<div class="load-strip" id="loadStrip">
+  <div class="load-spin"></div>
+  <span id="loadMsg">Loading records…</span>
 </div>
 
-<div class="main-wrapper" id="mainWrapper">
-    <div class="empty">Loading...</div>
+<!-- FILTER BAR -->
+<div class="filter-bar" id="filterBar">
+  <div class="fi"><span class="fi-lbl">Date Range</span><input type="text" id="dateRangeFilter" class="fi-date-range" placeholder="Select Range"/></div>
+  <div class="fi"><span class="fi-lbl">Enterprise</span><select id="enterpriseFilter" class="fi-sel"><option value="">All</option></select></div>
+  <!-- Images filters -->
+  <div class="fi" id="fi-qcuser"><span class="fi-lbl">QC User</span><select id="qcUserFilter" class="fi-sel"><option value="">All</option></select></div>
+  <div class="fi" id="fi-editor"><span class="fi-lbl">Editor</span><select id="editingUserFilter" class="fi-sel"><option value="">All</option></select></div>
+  <!-- 360 filters -->
+  <div class="fi hidden" id="fi-user360"><span class="fi-lbl">User</span><select id="user360Filter" class="fi-sel"><option value="">All</option></select></div>
+  <div class="fi hidden" id="fi-qcby"><span class="fi-lbl">QC By</span><select id="qcByFilter" class="fi-sel"><option value="">All</option></select></div>
+  <div class="fi-right">
+    <span class="rec-count" id="recCount"></span>
+    <button class="btn-reset" id="resetBtn">✕ Reset</button>
+  </div>
 </div>
 
-<div class="bottom-stick" id="navFooter" style="display:none">
-  <div id="progText" style="font-size:12px; font-weight:700; color:var(--t3)">RECORD 0 / 0</div>
-  <div style="flex:1"></div>
-  <button class="btn-nav btn-prev" id="prevBtn" onclick="move(-1)">PREVIOUS</button>
-  <button class="btn-nav btn-next" id="nextBtn" onclick="move(1)">NEXT RECORD</button>
+<!-- CONTENT -->
+<div class="content" id="content">
+  <div class="empty">
+    <div class="empty-t">Loading records…</div>
+    <div class="empty-b">Fetching review data from sheet.</div>
+  </div>
+</div>
+
+<!-- STICKY BOTTOM -->
+<div class="bottom-stick" id="bottomStick" style="display:none">
+  <div class="nav-bar">
+    <div class="prog-lbl" id="progLbl">Record 1 of 0</div>
+    <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    <div class="prog-pct" id="progPct">0%</div>
+    <div class="nav-space"></div>
+    <div class="kbd-hint"><span class="kbd">←</span>Prev</div>
+    <button class="btn-prev" id="prevBtn" disabled>← Prev</button>
+    <button class="btn-next" id="nextBtn">Next →</button>
+    <div class="kbd-hint"><span class="kbd">→</span>Next</div>
+    <div class="kbd-hint"><span class="kbd">Enter</span>Next</div>
+  </div>
+  <div class="managed-ribbon">Managed by <span>kishor@spyne.ai</span></div>
 </div>
 
 <script>
-const URL_IMAGES = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=2128295653&single=true&output=csv';
-const URL_360 = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThoeXNovzUYQaHoFqHYY8p4hxrGTJWUPF8dQs0cinxvypfUVwAzFu74l06jhqXm0x611kRke13fa2t/pub?gid=1009592102&single=true&output=csv';
-const PROXY = 'https://media.spyneai.com/unsafe/0x0/filters:format(webp)/';
+const CSV_IMAGES = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=2128295653&single=true&output=csv';
+const CSV_360   = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThoeXNovzUYQaHoFqHYY8p4hxrGTJWUPF8dQs0cinxvypfUVwAzFu74l06jhqXm0x611kRke13fa2t/pub?gid=1009592102&single=true&output=csv';
+const PROXY     = 'https://media.spyneai.com/unsafe/0x0/filters:format(webp)/';
 
-let currentMode = 'images'; 
-let dataStore = { images: [], '360': [] };
-let filtered = [];
-let cursor = 0;
+let mode = 'images'; // 'images' | '360'
+let imagesData = [], data360 = [];
+let imagesFiltered = [], filtered360 = [];
+let imagesIdx = 0, idx360 = 0;
 let fp = null;
+let filtersReady = { images: false, '360': false };
 
-async function init() {
-    try {
-        const [imgRes, spinRes] = await Promise.all([
-            fetch(URL_IMAGES).then(r => r.text()),
-            fetch(URL_360).then(r => r.text())
-        ]);
-
-        dataStore.images = Papa.parse(imgRes, {header:true, skipEmptyLines:true}).data.filter(r => r['Submit Issue'] !== 'Done');
-        dataStore['360'] = Papa.parse(spinRes, {header:true, skipEmptyLines:true}).data.filter(r => 
-            ["To Be Edited", "Wrong QC", "Wrong Marking"].includes(r.Reason)
-        );
-
-        fp = flatpickr("#dateFilter", { mode: "range", dateFormat: "Y-m-d", onChange: applyFilters });
-        setMode('images');
-    } catch (e) {
-        document.getElementById('mainWrapper').innerHTML = `<div class="empty">Error loading data.</div>`;
-    }
+function normalizeDate(s) {
+  if (!s) return null;
+  const p = s.trim().split(' ')[0];
+  if (/^\d{4}-\d{2}-\d{2}$/.test(p)) return p;
+  const d = new Date(p);
+  return isNaN(d) ? p : d.toISOString().split('T')[0];
 }
 
-function setMode(mode) {
-    currentMode = mode;
-    cursor = 0;
-    document.querySelectorAll('.mode-tab').forEach(t => t.classList.toggle('active', t.id === `tab-${mode}`));
-    document.getElementById('qcGroup').style.display = (mode === '360') ? 'block' : 'none';
-    populateDropdowns();
-    applyFilters();
+// ── INIT
+function initFlatpickr() {
+  fp = flatpickr('#dateRangeFilter', { mode:'range', dateFormat:'Y-m-d', onChange: applyFilters });
 }
 
-function populateDropdowns() {
-    const data = dataStore[currentMode];
-    const userKey = currentMode === 'images' ? 'User ID' : 'User';
-    const entSel = document.getElementById('entFilter');
-    const userSel = document.getElementById('userFilter');
-    
-    const ents = [...new Set(data.map(r => r.Enterprise).filter(Boolean))].sort();
-    const users = [...new Set(data.map(r => r[userKey]).filter(Boolean))].sort();
+function showLoad(msg) {
+  const s = document.getElementById('loadStrip');
+  s.style.display = 'flex';
+  document.getElementById('loadMsg').textContent = msg;
+}
+function hideLoad() { document.getElementById('loadStrip').style.display = 'none'; }
 
-    entSel.innerHTML = '<option value="">All Enterprises</option>';
-    userSel.innerHTML = '<option value="">All Users</option>';
-    ents.forEach(v => entSel.add(new Option(v, v)));
-    users.forEach(v => userSel.add(new Option(v, v)));
+// Load both CSVs
+showLoad('Loading Images records…');
+fetch(CSV_IMAGES)
+  .then(r => r.text())
+  .then(csv => {
+    imagesData = Papa.parse(csv, {header:true, skipEmptyLines:true}).data
+                     .filter(r => r['Submit Issue'] !== 'Done');
+    document.getElementById('pillImages').textContent = imagesData.length.toLocaleString();
+    populateImagesFilters(imagesData);
+    filtersReady.images = true;
+    if (mode === 'images') applyFilters();
+    loadData360();
+  })
+  .catch(() => { hideLoad(); showError(); });
 
-    if (currentMode === '360') {
-        const qcSel = document.getElementById('qcFilter');
-        const qcs = [...new Set(data.map(r => r['QC By']).filter(Boolean))].sort();
-        qcSel.innerHTML = '<option value="">All Reviewers</option>';
-        qcs.forEach(v => qcSel.add(new Option(v, v)));
-        qcSel.onchange = applyFilters;
-    }
-    entSel.onchange = applyFilters;
-    userSel.onchange = applyFilters;
+function loadData360() {
+  showLoad('Loading 360 records…');
+  fetch(CSV_360)
+    .then(r => r.text())
+    .then(csv => {
+      data360 = Papa.parse(csv, {header:true, skipEmptyLines:true}).data;
+      document.getElementById('pill360').textContent = data360.length.toLocaleString();
+      populate360Filters(data360);
+      filtersReady['360'] = true;
+      if (mode === '360') applyFilters();
+      hideLoad();
+      updateTCount();
+    })
+    .catch(() => { hideLoad(); });
 }
 
-function parseDate(r) {
-    if (!r.Timestamp) return new Date(0);
-    if (currentMode === '360' && r.Timestamp.includes('/')) {
-        const p = r.Timestamp.split(' ')[0].split('/');
-        return new Date(p[2], p[0] - 1, p[1]);
-    }
-    return new Date(r.Timestamp.split(' ')[0]);
+function updateTCount() {
+  const chip = document.getElementById('tCount');
+  chip.textContent = (imagesData.length + data360.length).toLocaleString() + ' total records';
+  chip.classList.remove('hidden');
+}
+
+// ── FILTERS
+function populateImagesFilters(data) {
+  const enterprises = [...new Set(data.map(r => r['Enterprise']).filter(Boolean))].sort();
+  const qcUsers     = [...new Set(data.flatMap(r => (r['qc-user']||'').split(',')).map(s=>s.trim()).filter(Boolean))].sort();
+  const editors     = [...new Set(data.map(r => r['editing user']).filter(Boolean))].sort();
+  fill('enterpriseFilter', enterprises, true);
+  fill('qcUserFilter', qcUsers);
+  fill('editingUserFilter', editors);
+  ['enterpriseFilter','qcUserFilter','editingUserFilter'].forEach(id =>
+    document.getElementById(id).addEventListener('change', applyFilters));
+}
+
+function populate360Filters(data) {
+  const users  = [...new Set(data.map(r => r['User']).filter(Boolean))].sort();
+  const qcBys  = [...new Set(data.map(r => r['QC By']).filter(Boolean))].sort();
+  fill('user360Filter', users);
+  fill('qcByFilter', qcBys);
+  ['user360Filter','qcByFilter'].forEach(id =>
+    document.getElementById(id).addEventListener('change', applyFilters));
+}
+
+function fill(id, vals, append=false) {
+  const sel = document.getElementById(id);
+  if (!append) { while(sel.options.length > 1) sel.remove(1); }
+  vals.forEach(v => { const o = document.createElement('option'); o.value=v; o.text=v; sel.appendChild(o); });
+}
+
+// ── MODE SWITCH
+function switchMode(m) {
+  mode = m;
+  document.getElementById('tabImages').classList.toggle('active', m === 'images');
+  document.getElementById('tab360').classList.toggle('active', m === '360');
+
+  // show/hide filter groups
+  ['fi-qcuser','fi-editor'].forEach(id => document.getElementById(id).classList.toggle('hidden', m !== 'images'));
+  ['fi-user360','fi-qcby'].forEach(id => document.getElementById(id).classList.toggle('hidden', m !== '360'));
+
+  // reset date picker
+  if (fp) fp.clear();
+
+  if (filtersReady[m]) applyFilters();
 }
 
 function applyFilters() {
-    const data = dataStore[currentMode];
-    const ent = document.getElementById('entFilter').value;
-    const user = document.getElementById('userFilter').value;
-    const qc = currentMode === '360' ? document.getElementById('qcFilter').value : '';
-    const dates = fp ? fp.selectedDates : [];
-    const userKey = currentMode === 'images' ? 'User ID' : 'User';
+  const selectedDates = fp ? fp.selectedDates : [];
+  const start = selectedDates[0] ? selectedDates[0].toISOString().split('T')[0] : null;
+  const end   = selectedDates[1] ? selectedDates[1].toISOString().split('T')[0] : start;
+  const ent   = document.getElementById('enterpriseFilter').value;
 
-    const isFiltered = ent || user || qc || dates.length > 0;
-
-    filtered = data.filter(r => {
-        if (ent && r.Enterprise !== ent) return false;
-        if (user && r[userKey] !== user) return false;
-        if (qc && r['QC By'] !== qc) return false;
-        
-        if (dates.length === 2 && r.Timestamp) {
-            let rowDate = parseDate(r);
-            rowDate.setHours(0,0,0,0);
-            if (rowDate < dates[0] || rowDate > dates[1]) return false;
-        }
-        return true;
+  if (mode === 'images') {
+    const qcu = document.getElementById('qcUserFilter').value;
+    const ed  = document.getElementById('editingUserFilter').value;
+    imagesFiltered = imagesData.filter(r => {
+      const rd = normalizeDate(r['Timestamp']);
+      if (start && rd < start) return false;
+      if (end   && rd > end)   return false;
+      if (ent && r['Enterprise'] !== ent) return false;
+      if (qcu && !(r['qc-user']||'').includes(qcu)) return false;
+      if (ed  && r['editing user'] !== ed) return false;
+      return true;
     });
-
-    // Sorting Logic: Descending by default, Ascending if filtered
-    filtered.sort((a, b) => {
-        const dateA = parseDate(a);
-        const dateB = parseDate(b);
-        return isFiltered ? dateA - dateB : dateB - dateA;
+    imagesIdx = 0;
+    document.getElementById('recCount').textContent = imagesFiltered.length > 0 ? imagesFiltered.length.toLocaleString() + ' records' : '';
+  } else {
+    const user  = document.getElementById('user360Filter').value;
+    const qcby  = document.getElementById('qcByFilter').value;
+    filtered360 = data360.filter(r => {
+      const rd = normalizeDate(r['Timestamp']);
+      if (start && rd < start) return false;
+      if (end   && rd > end)   return false;
+      if (ent && r['Enterprise'] !== ent) return false;
+      if (user  && r['User'] !== user)   return false;
+      if (qcby  && r['QC By'] !== qcby)  return false;
+      return true;
     });
-
-    cursor = 0;
-    render();
+    idx360 = 0;
+    document.getElementById('recCount').textContent = filtered360.length > 0 ? filtered360.length.toLocaleString() + ' records' : '';
+  }
+  render();
 }
 
+// ── RENDER
 function render() {
-    const wrap = document.getElementById('mainWrapper');
-    const footer = document.getElementById('navFooter');
-    const badge = document.getElementById('statusBadge');
+  if (mode === 'images') renderImages();
+  else render360();
+}
 
-    if (!filtered.length) {
-        wrap.innerHTML = `<div class="empty">No matching records found.</div>`;
-        footer.style.display = 'none';
-        badge.innerText = '0 RECORDS';
-        return;
-    }
+function renderImages() {
+  const content    = document.getElementById('content');
+  const bottomStick = document.getElementById('bottomStick');
+  if (!imagesFiltered.length) {
+    content.innerHTML = emptyHTML();
+    bottomStick.style.display = 'none';
+    return;
+  }
+  bottomStick.style.display = 'block';
+  const r     = imagesFiltered[imagesIdx];
+  const total = imagesFiltered.length;
+  updateProgress(imagesIdx, total);
 
-    footer.style.display = 'flex';
-    badge.innerText = `${filtered.length} RECORDS`;
-    document.getElementById('progText').innerText = `RECORD ${cursor + 1} / ${filtered.length}`;
-    document.getElementById('prevBtn').disabled = cursor === 0;
-    document.getElementById('nextBtn').disabled = cursor === filtered.length - 1;
+  const imgEl = (src, label) => {
+    const has = src && src.startsWith('http');
+    return `<div class="img-pane">
+      <div class="img-pane-label">${label}</div>
+      ${has
+        ? `<img src="${PROXY+src}" alt="${label}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+           <div class="img-err" style="display:none"><span>No image</span></div>`
+        : `<div class="img-err"><span>No image</span></div>`}
+    </div>`;
+  };
 
-    const r = filtered[cursor];
-    const is360 = currentMode === '360';
-
-    wrap.innerHTML = `
-        <div class="record-card">
-            <div class="meta-strip">
-                <div class="meta-item"><div class="meta-label">ID</div><div class="meta-value">${is360 ? r.SKU_ID : r.sku_id}</div></div>
-                <div class="meta-item"><div class="meta-label">Enterprise</div><div class="meta-value">${r.Enterprise}</div></div>
-                <div class="meta-item"><div class="meta-label">User</div><div class="meta-value">${is360 ? r.User : r['User ID']}</div></div>
-                <div class="meta-item"><div class="meta-label">Reviewer</div><div class="meta-value">${is360 ? r['QC By'] : r['qc-user']}</div></div>
-                <div class="meta-item"><div class="meta-label">Date</div><div class="meta-value">${r.Timestamp || '–'}</div></div>
-            </div>
-            <div class="issue-strip">
-                <span class="meta-label" style="color:var(--danger)">Issue:</span>
-                <span class="meta-value" style="color:var(--danger)">${(is360 ? r.Issues : r.Issue) || 'No label'}</span>
-                <span class="meta-label" style="margin-left:auto">Reason:</span>
-                <span class="meta-value">${(is360 ? r.Reason : r['Submit Issue']) || '–'}</span>
-            </div>
-            <div class="viewer-area">
-                ${is360 
-                    ? `<iframe class="spin-frame" src="${r.spin_url}"></iframe>`
-                    : `<div class="images-layout">
-                        <div class="img-pane"><div class="img-pane-label">INPUT</div><img src="${PROXY + r['input image']}"/></div>
-                        <div class="img-pane"><div class="img-pane-label">AI</div><img src="${PROXY + r['Ai image']}"/></div>
-                        <div class="img-pane"><div class="img-pane-label">FINAL</div><img src="${PROXY + r['Final Image']}"/></div>
-                       </div>`
-                }
-            </div>
+  content.innerHTML = `
+    <div class="record-card">
+      <div class="meta-strip">
+        <div class="meta-cell"><div class="meta-cell-l">Date</div><div class="meta-cell-v">${(r['Timestamp']||'').split(' ')[0]}</div></div>
+        <div class="meta-cell"><div class="meta-cell-l">Enterprise</div><div class="meta-cell-v">${r['Enterprise']||'–'}</div></div>
+        <div class="meta-cell-double">
+          <div class="meta-cell-double-inner">
+            <div class="meta-sub"><span class="meta-sub-l">SKU ID</span><span class="meta-sub-v">${r['sku_id']||'–'}</span></div>
+            <div class="meta-sub"><span class="meta-sub-l">Image ID</span><span class="meta-sub-v">${r['image_id']||'–'}</span></div>
+          </div>
         </div>
-    `;
+        <div class="meta-cell"><div class="meta-cell-l">QC User</div><div class="meta-cell-v">${r['qc-user']||'–'}</div></div>
+      </div>
+      <div class="meta-strip2">
+        <div class="meta-cell2"><span style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#000">Editor</span><div class="meta-cell-v" style="margin-top:2px">${r['editing user']||'–'}</div></div>
+        <div class="meta-cell2"><span style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#B45309">⚠ Issue</span><div class="issue-val" style="margin-top:2px">${r['Issue']||'–'}</div></div>
+      </div>
+      <div class="meta-strip2" style="border-bottom:1px solid var(--line)">
+        <div class="meta-cell2" style="grid-column:1/-1"><span style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#000">Comment (Submit Issue)</span><div class="comment-val" style="margin-top:2px">${r['Submit Issue']||'–'}</div></div>
+      </div>
+      <div class="images-row">
+        ${imgEl(r['input image'], 'Input Image')}
+        ${imgEl(r['Ai image'],    'AI Output')}
+        ${imgEl(r['Final Image'], 'Final Output')}
+      </div>
+    </div>`;
+  window.scrollTo({top:0, behavior:'smooth'});
 }
 
-function move(dir) {
-    cursor += dir;
-    render();
+function render360() {
+  const content     = document.getElementById('content');
+  const bottomStick = document.getElementById('bottomStick');
+  if (!filtered360.length) {
+    content.innerHTML = emptyHTML();
+    bottomStick.style.display = 'none';
+    return;
+  }
+  bottomStick.style.display = 'block';
+  const r     = filtered360[idx360];
+  const total = filtered360.length;
+  updateProgress(idx360, total);
+
+  const spinUrl = r['spin_url'] || '';
+  const spinBlock = spinUrl
+    ? `<div class="spin-pane"><iframe src="${spinUrl}" allowfullscreen allow="accelerometer; gyroscope"></iframe></div>`
+    : `<div class="spin-pane"><div class="spin-err"><span>No 360 spin URL</span></div></div>`;
+
+  content.innerHTML = `
+    <div class="record-card">
+      <div class="meta-strip">
+        <div class="meta-cell"><div class="meta-cell-l">Date</div><div class="meta-cell-v">${(r['Timestamp']||'').split(' ')[0]}</div></div>
+        <div class="meta-cell"><div class="meta-cell-l">Enterprise</div><div class="meta-cell-v">${r['Enterprise']||'–'}</div></div>
+        <div class="meta-cell-double">
+          <div class="meta-cell-double-inner">
+            <div class="meta-sub"><span class="meta-sub-l">SKU ID</span><span class="meta-sub-v">${r['SKU_ID']||'–'}</span></div>
+            <div class="meta-sub"><span class="meta-sub-l">Spin ID</span><span class="meta-sub-v">${r['Spin_ID']||'–'}</span></div>
+          </div>
+        </div>
+        <div class="meta-cell"><div class="meta-cell-l">User</div><div class="meta-cell-v">${r['User']||'–'}</div></div>
+      </div>
+      <div class="meta-strip2">
+        <div class="meta-cell2"><span style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#B45309">⚠ Issues</span><div class="issue-val" style="margin-top:2px">${r['Issues']||'–'}</div></div>
+        <div class="meta-cell2"><span style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#000">Reason</span><div class="comment-val" style="margin-top:2px">${r['Reason']||'–'}</div></div>
+      </div>
+      <div class="meta-strip2" style="border-bottom:1px solid var(--line)">
+        <div class="meta-cell2" style="grid-column:1/-1"><span style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#000">Reviewer (QC By)</span><div class="meta-cell-v" style="margin-top:2px">${r['QC By']||'–'}</div></div>
+      </div>
+      ${spinBlock}
+    </div>`;
+  window.scrollTo({top:0, behavior:'smooth'});
 }
 
-function resetFilters() {
-    if(fp) fp.clear();
-    document.getElementById('entFilter').value = '';
-    document.getElementById('userFilter').value = '';
-    const qcf = document.getElementById('qcFilter');
-    if(qcf) qcf.value = '';
-    applyFilters();
+function updateProgress(i, total) {
+  const pct = Math.round(((i+1)/total)*100);
+  document.getElementById('progLbl').textContent  = `Record ${i+1} of ${total}`;
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('progPct').textContent  = pct + '%';
+  document.getElementById('prevBtn').disabled = i === 0;
+  document.getElementById('nextBtn').disabled = i === total - 1;
 }
 
+function emptyHTML() {
+  return `<div class="empty"><div class="empty-t">No records found</div><div class="empty-b">Try adjusting the filters above.</div></div>`;
+}
+
+function showError() {
+  document.getElementById('content').innerHTML = `<div class="empty"><div class="empty-t">Failed to load</div><div class="empty-b">Check your connection and reload.</div></div>`;
+}
+
+// ── NAV
+document.getElementById('prevBtn').addEventListener('click', () => {
+  if (mode === 'images' && imagesIdx > 0) { imagesIdx--; render(); }
+  else if (mode === '360' && idx360 > 0)  { idx360--;    render(); }
+});
+document.getElementById('nextBtn').addEventListener('click', () => {
+  if (mode === 'images' && imagesIdx < imagesFiltered.length - 1) { imagesIdx++; render(); }
+  else if (mode === '360' && idx360 < filtered360.length - 1)     { idx360++;    render(); }
+});
+document.getElementById('resetBtn').addEventListener('click', () => {
+  if (fp) fp.clear();
+  ['enterpriseFilter','qcUserFilter','editingUserFilter','user360Filter','qcByFilter']
+    .forEach(id => { document.getElementById(id).value = ''; });
+  applyFilters();
+});
 document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowRight') move(1);
-    if (e.key === 'ArrowLeft') move(-1);
+  const filtered = mode === 'images' ? imagesFiltered : filtered360;
+  const idx      = mode === 'images' ? imagesIdx : idx360;
+  if ((e.key === 'ArrowRight' || e.key === 'Enter') && idx < filtered.length - 1) {
+    if (mode === 'images') imagesIdx++; else idx360++;
+    render();
+  }
+  if (e.key === 'ArrowLeft' && idx > 0) {
+    if (mode === 'images') imagesIdx--; else idx360--;
+    render();
+  }
 });
 
-init();
+// init flatpickr after DOM ready
+initFlatpickr();
 </script>
 </body>
 </html>
