@@ -216,6 +216,15 @@ function populateDropdowns() {
     userSel.onchange = applyFilters;
 }
 
+function parseDate(r) {
+    if (!r.Timestamp) return new Date(0);
+    if (currentMode === '360' && r.Timestamp.includes('/')) {
+        const p = r.Timestamp.split(' ')[0].split('/');
+        return new Date(p[2], p[0] - 1, p[1]);
+    }
+    return new Date(r.Timestamp.split(' ')[0]);
+}
+
 function applyFilters() {
     const data = dataStore[currentMode];
     const ent = document.getElementById('entFilter').value;
@@ -224,21 +233,26 @@ function applyFilters() {
     const dates = fp ? fp.selectedDates : [];
     const userKey = currentMode === 'images' ? 'User ID' : 'User';
 
+    const isFiltered = ent || user || qc || dates.length > 0;
+
     filtered = data.filter(r => {
         if (ent && r.Enterprise !== ent) return false;
         if (user && r[userKey] !== user) return false;
         if (qc && r['QC By'] !== qc) return false;
         
         if (dates.length === 2 && r.Timestamp) {
-            let rowDate = new Date(r.Timestamp.split(' ')[0]);
-            if (currentMode === '360' && r.Timestamp.includes('/')) {
-                const p = r.Timestamp.split(' ')[0].split('/');
-                rowDate = new Date(p[2], p[0]-1, p[1]);
-            }
+            let rowDate = parseDate(r);
             rowDate.setHours(0,0,0,0);
             if (rowDate < dates[0] || rowDate > dates[1]) return false;
         }
         return true;
+    });
+
+    // Sorting Logic: Descending by default, Ascending if filtered
+    filtered.sort((a, b) => {
+        const dateA = parseDate(a);
+        const dateB = parseDate(b);
+        return isFiltered ? dateA - dateB : dateB - dateA;
     });
 
     cursor = 0;
@@ -273,6 +287,7 @@ function render() {
                 <div class="meta-item"><div class="meta-label">Enterprise</div><div class="meta-value">${r.Enterprise}</div></div>
                 <div class="meta-item"><div class="meta-label">User</div><div class="meta-value">${is360 ? r.User : r['User ID']}</div></div>
                 <div class="meta-item"><div class="meta-label">Reviewer</div><div class="meta-value">${is360 ? r['QC By'] : r['qc-user']}</div></div>
+                <div class="meta-item"><div class="meta-label">Date</div><div class="meta-value">${r.Timestamp || '–'}</div></div>
             </div>
             <div class="issue-strip">
                 <span class="meta-label" style="color:var(--danger)">Issue:</span>
