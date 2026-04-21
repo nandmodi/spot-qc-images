@@ -2,14 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <title>Spyne · Quality Review</title>
 <link rel="icon" href="https://spyne-prod-ai.s3.us-east-1.amazonaws.com/ai-dataset/2025/logo/unnamed.png"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-<!-- Flatpickr for Date Range -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -23,8 +21,6 @@
   --accent:#2563EB;
   --accent2:#1D4ED8;
   --accentlt:#DBEAFE; 
-  --ok:#16A34A;
-  --oklt:#F0FDF4;
   --warn:#D97706;
   --danger:#DC2626;
   --dangerlt:#FEF2F2;
@@ -32,191 +28,134 @@
   --t2:#374151;
   --t3:#6B7280;
   --t4:#9CA3AF;
-  --r:8px;
-  --rlg:12px;
   --mono:'IBM Plex Mono',monospace;
-  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.05);
-  --shadow-md:0 4px 12px rgba(0,0,0,.08),0 1px 4px rgba(0,0,0,.04);
+  --shadow:0 1px 3px rgba(0,0,0,.08);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;min-height:100%}
-body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--t1);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased; display: flex; flex-direction: column;}
+html,body{height:100%; overflow: hidden;}
+body{font-family:'Inter',sans-serif; background:var(--bg0); color:var(--t1); display: flex; flex-direction: column;}
 
-/* ── TOPBAR ── */
+/* TOPBAR */
 .topbar{
-  height:52px;background:var(--bg1);border-bottom:1px solid var(--line);
-  display:flex;align-items:center;padding:0 18px;gap:10px;
-  position:sticky;top:0;z-index:30;box-shadow:var(--shadow);
+  height:48px; background:var(--bg1); border-bottom:1px solid var(--line);
+  display:flex; align-items:center; padding:0 16px; gap:10px; flex-shrink:0; z-index:30;
 }
-.t-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
-.t-sep{width:1px;height:20px;background:var(--line);margin:0 4px;flex-shrink:0}
-.t-title{font-size:14px;font-weight:700;color:#000;letter-spacing:-.01em}
-.t-space{flex:1}
+.t-logo{display:flex;align-items:center;}
+.t-sep{width:1px;height:16px;background:var(--line);margin:0 4px;}
+.t-title{font-size:13px;font-weight:700;color:#000;}
 
-/* ── TAB UI (PILL STYLE) ── */
+/* TAB SECTION */
 .tab-section {
-    background: var(--bg1);
-    padding: 8px 18px;
-    border-bottom: 1px solid var(--line);
+    background: var(--bg1); padding: 6px 16px; border-bottom: 1px solid var(--line); flex-shrink:0;
 }
 .tab-container {
-    background: var(--accentlt);
-    display: inline-flex;
-    padding: 4px;
-    border-radius: 10px;
-    gap: 4px;
+    background: var(--accentlt); display: inline-flex; padding: 3px; border-radius: 8px; gap: 4px;
 }
 .mode-tab {
-    padding: 6px 20px;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--t3);
-    cursor: pointer;
-    border-radius: 7px;
-    transition: all 0.2s ease;
-    white-space: nowrap;
+    padding: 5px 18px; font-size: 12px; font-weight: 600; color: var(--t3); cursor: pointer; border-radius: 6px; transition: 0.2s;
 }
-.mode-tab:hover { color: var(--t2); }
-.mode-tab.active {
-    background: var(--bg1);
-    color: var(--accent);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-}
+.mode-tab.active { background: var(--bg1); color: var(--accent); box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
 
-/* ── FILTER BAR ── */
+/* FILTER BAR */
 .filter-bar{
-  background:var(--bg1);border-bottom:1px solid var(--line);
-  padding:10px 18px;display:flex;align-items:center;flex-wrap:wrap;gap:12px;
-  position:sticky;top:52px;z-index:20;
+  background:var(--bg1); border-bottom:1px solid var(--line);
+  padding:6px 16px; display:flex; align-items:center; gap:10px; flex-shrink:0;
 }
-.fi{display:flex;align-items:center;gap:5px}
-.fi-lbl{font-size:11.5px;font-weight:700;color:#000;white-space:nowrap}
+.fi{display:flex;align-items:center;gap:4px}
+.fi-lbl{font-size:11px;font-weight:700;text-transform:uppercase;color:var(--t3);}
 .fi-sel, .fi-date-range{
-  font-family:'Inter',sans-serif;font-size:12.5px;color:var(--t1);
-  background:var(--bg2);border:1px solid var(--line);border-radius:6px;
-  padding:5px 10px;outline:none;cursor:pointer;
+  font-size:12px; background:var(--bg2); border:1px solid var(--line); border-radius:4px; padding:4px 8px; outline:none;
 }
-.fi-date-range { border-color: var(--accent); min-width: 200px; }
+.fi-date-range { width: 180px; }
 
-.btn-reset{
-  font-family:'Inter',sans-serif;font-size:12px;font-weight:500;
-  background:var(--dangerlt);border:1px solid #FCA5A5;color:var(--danger);
-  border-radius:6px;padding:0 12px;height:32px;cursor:pointer;
+/* MAIN CONTENT AREA - NO SCROLL */
+.main-wrapper {
+    flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 12px;
 }
-
-/* ── CONTENT ── */
-.content{padding:18px; flex: 1;}
 .record-card{
-  background:var(--bg1);border:1px solid var(--line);border-radius:var(--rlg);
-  overflow:hidden;box-shadow:var(--shadow-md); margin-bottom: 20px;
+  flex: 1; background:var(--bg1); border:1px solid var(--line); border-radius:10px;
+  overflow:hidden; display: flex; flex-direction: column; box-shadow: var(--shadow);
 }
 
-/* Meta Grid */
-.meta-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    border-bottom: 1px solid var(--line);
+/* Metadata Bar */
+.meta-strip {
+    display: flex; border-bottom: 1px solid var(--line); background: var(--bg2); flex-shrink: 0;
 }
-.meta-item { padding: 12px 16px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.meta-item:last-child { border-right: none; }
-.meta-label { font-size: 9px; font-weight: 800; text-transform: uppercase; color: var(--t3); margin-bottom: 2px; }
-.meta-value { font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--t1); }
+.meta-item { padding: 8px 12px; border-right: 1px solid var(--line); flex: 1; min-width: 0;}
+.meta-label { font-size: 9px; font-weight: 800; text-transform: uppercase; color: var(--t3); margin-bottom: 2px; white-space: nowrap;}
+.meta-value { font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--t1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;}
 
-/* 360 Frame */
-.spin-frame-container {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    min-height: 500px;
-    background: #000;
-}
-.spin-frame-container iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
+/* ISSUE INFO Bar */
+.issue-strip {
+    padding: 6px 12px; border-bottom: 1px solid var(--line); background: #fff; display: flex; gap: 16px; flex-shrink: 0; align-items: center;
 }
 
-/* Images View */
-.images-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
-.img-pane { position: relative; background: #1A1C23; border-right: 1px solid #2A2D38; }
+/* VIEWER AREA */
+.viewer-area { flex: 1; position: relative; overflow: hidden; background: #000; }
+
+/* 360 Iframe */
+.spin-frame { width: 100%; height: 100%; border: none; }
+
+/* Images Layout */
+.images-layout { height: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #2A2D38; }
+.img-pane { position: relative; background: #1A1C23; display: flex; align-items: center; justify-content: center; overflow: hidden;}
 .img-pane-label {
-  position:absolute;top:10px;left:10px;z-index:5;
-  font-size:10px;font-weight:600;text-transform:uppercase;
-  background:rgba(255,255,255,.9); padding:3px 8px;border-radius:4px;
+  position:absolute; top:8px; left:8px; z-index:5; font-size:9px; font-weight:700;
+  background:rgba(255,255,255,0.85); padding:2px 6px; border-radius:3px;
 }
-.img-pane img { width: 100%; height: auto; display: block; }
+.img-pane img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
-/* Bottom Nav */
-.bottom-stick {
-  position: sticky; bottom: 0; z-index: 40; background: var(--bg1);
-  border-top: 1px solid var(--line); box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
-}
-.nav-bar{ padding:12px 18px; display:flex; align-items:center; gap:16px; }
-.btn-prev, .btn-next {
-  font-family: inherit; font-weight: 600; padding: 10px 24px; border-radius: 6px; cursor: pointer; transition: 0.2s;
-}
-.btn-prev { background: var(--bg2); border: 1px solid var(--line2); color: var(--t2); }
+/* BOTTOM NAV */
+.bottom-stick { height: 56px; background: var(--bg1); border-top: 1px solid var(--line); flex-shrink: 0; display: flex; align-items: center; padding: 0 16px; }
+.btn-nav { font-weight: 600; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-size: 13px;}
+.btn-prev { background: var(--bg2); border: 1px solid var(--line2); color: var(--t2); margin-right: 8px;}
 .btn-next { background: var(--accent); color: #fff; border: none; }
-.btn-next:hover { background: var(--accent2); }
-.btn-next:disabled, .btn-prev:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-next:disabled, .btn-prev:disabled { opacity: 0.3; }
 
-.empty { padding: 100px; text-align: center; color: var(--t3); }
-
-@media (max-width: 768px) {
-    .spin-frame-container { min-height: 350px; }
-}
+.empty { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--t3); font-weight: 500;}
 </style>
 </head>
 <body>
 
 <div class="topbar">
-  <div class="t-logo">
-    <img src="https://spyne-prod-ai.s3.us-east-1.amazonaws.com/ai-dataset/2025/logo/unnamed.png" style="height:28px;"/>
-  </div>
+  <div class="t-logo"><img src="https://spyne-prod-ai.s3.us-east-1.amazonaws.com/ai-dataset/2025/logo/unnamed.png" height="24"/></div>
   <div class="t-sep"></div>
   <span class="t-title">Quality Review</span>
-  <div class="t-space"></div>
-  <div id="statusBadge" style="font-size:11px; color:var(--t3); background:var(--bg2); padding:4px 10px; border-radius:100px;">Loading...</div>
+  <div style="flex:1"></div>
+  <div id="statusBadge" style="font-size:10px; color:var(--t3); background:var(--bg2); padding:3px 8px; border-radius:4px;">Loading...</div>
 </div>
 
 <div class="tab-section">
     <div class="tab-container">
-        <!-- Simplified to only two tabs -->
         <div id="tab-images" class="mode-tab active" onclick="setMode('images')">Images</div>
         <div id="tab-360" class="mode-tab" onclick="setMode('360')">360</div>
     </div>
 </div>
 
 <div class="filter-bar">
-  <div class="fi"><span class="fi-lbl">Date Range</span><input type="text" id="dateFilter" class="fi-date-range" placeholder="Select Range"/></div>
-  <div class="fi"><span class="fi-lbl">Enterprise</span><select id="entFilter" class="fi-sel"><option value="">All</option></select></div>
-  <div class="fi"><span class="fi-lbl">User</span><select id="userFilter" class="fi-sel"><option value="">All</option></select></div>
-  
-  <div class="fi" id="qcFilterGroup" style="display:none"><span class="fi-lbl">Reviewed By</span><select id="qcFilter" class="fi-sel"><option value="">All</option></select></div>
-  <div class="fi" id="reasonFilterGroup" style="display:none"><span class="fi-lbl">Reason</span><select id="reasonFilter" class="fi-sel"><option value="">All</option></select></div>
-  
+  <div class="fi"><input type="text" id="dateFilter" class="fi-date-range" placeholder="Filter Date Range"/></div>
+  <div class="fi"><select id="entFilter" class="fi-sel"><option value="">All Enterprises</option></select></div>
+  <div class="fi"><select id="userFilter" class="fi-sel"><option value="">All Users</option></select></div>
+  <div class="fi" id="qcGroup" style="display:none"><select id="qcFilter" class="fi-sel"><option value="">All Reviewers</option></select></div>
   <div style="flex:1"></div>
-  <button class="btn-reset" onclick="resetFilters()">✕ Reset</button>
+  <button style="border:none; background:none; color:var(--danger); font-size:11px; font-weight:700; cursor:pointer;" onclick="resetFilters()">RESET</button>
 </div>
 
-<div class="content" id="mainContent">
-    <div class="empty">Initializing application...</div>
+<div class="main-wrapper" id="mainWrapper">
+    <div class="empty">Loading...</div>
 </div>
 
 <div class="bottom-stick" id="navFooter" style="display:none">
-  <div class="nav-bar">
-    <div id="progText" style="font-size:13px; font-weight:600; color:var(--t2)">Record 0 of 0</div>
-    <div style="flex:1"></div>
-    <button class="btn-prev" id="prevBtn" onclick="move(-1)">← Prev</button>
-    <button class="btn-next" id="nextBtn" onclick="move(1)">Next →</button>
-  </div>
+  <div id="progText" style="font-size:12px; font-weight:700; color:var(--t3)">RECORD 0 / 0</div>
+  <div style="flex:1"></div>
+  <button class="btn-nav btn-prev" id="prevBtn" onclick="move(-1)">PREVIOUS</button>
+  <button class="btn-nav btn-next" id="nextBtn" onclick="move(1)">NEXT RECORD</button>
 </div>
 
 <script>
 const URL_IMAGES = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=2128295653&single=true&output=csv';
 const URL_360 = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThoeXNovzUYQaHoFqHYY8p4hxrGTJWUPF8dQs0cinxvypfUVwAzFu74l06jhqXm0x611kRke13fa2t/pub?gid=1009592102&single=true&output=csv';
 const PROXY = 'https://media.spyneai.com/unsafe/0x0/filters:format(webp)/';
-
-const ALLOWED_360_REASONS = ["To Be Edited", "Wrong QC", "Wrong Marking"];
 
 let currentMode = 'images'; 
 let dataStore = { images: [], '360': [] };
@@ -233,124 +172,71 @@ async function init() {
 
         dataStore.images = Papa.parse(imgRes, {header:true, skipEmptyLines:true}).data.filter(r => r['Submit Issue'] !== 'Done');
         dataStore['360'] = Papa.parse(spinRes, {header:true, skipEmptyLines:true}).data.filter(r => 
-            ALLOWED_360_REASONS.includes(r.Reason)
+            ["To Be Edited", "Wrong QC", "Wrong Marking"].includes(r.Reason)
         );
 
-        initFlatpickr();
+        fp = flatpickr("#dateFilter", { mode: "range", dateFormat: "Y-m-d", onChange: applyFilters });
         setMode('images');
     } catch (e) {
-        document.getElementById('mainContent').innerHTML = `<div class="empty">Failed to load data. Please check connection.</div>`;
+        document.getElementById('mainWrapper').innerHTML = `<div class="empty">Error loading data.</div>`;
     }
-}
-
-function initFlatpickr() {
-    fp = flatpickr("#dateFilter", {
-        mode: "range",
-        dateFormat: "Y-m-d",
-        onChange: applyFilters
-    });
 }
 
 function setMode(mode) {
     currentMode = mode;
     cursor = 0;
-    
-    document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
-    document.getElementById(`tab-${mode}`).classList.add('active');
-
-    const is360 = (mode === '360');
-    document.getElementById('reasonFilterGroup').style.display = is360 ? 'flex' : 'none';
-    document.getElementById('qcFilterGroup').style.display = is360 ? 'flex' : 'none';
-
-    populateFilterDropdowns();
+    document.querySelectorAll('.mode-tab').forEach(t => t.classList.toggle('active', t.id === `tab-${mode}`));
+    document.getElementById('qcGroup').style.display = (mode === '360') ? 'block' : 'none';
+    populateDropdowns();
     applyFilters();
 }
 
-function populateFilterDropdowns() {
+function populateDropdowns() {
     const data = dataStore[currentMode];
     const userKey = currentMode === 'images' ? 'User ID' : 'User';
+    const entSel = document.getElementById('entFilter');
+    const userSel = document.getElementById('userFilter');
     
     const ents = [...new Set(data.map(r => r.Enterprise).filter(Boolean))].sort();
     const users = [...new Set(data.map(r => r[userKey]).filter(Boolean))].sort();
 
-    const entSel = document.getElementById('entFilter');
-    const userSel = document.getElementById('userFilter');
-
     entSel.innerHTML = '<option value="">All Enterprises</option>';
     userSel.innerHTML = '<option value="">All Users</option>';
-
     ents.forEach(v => entSel.add(new Option(v, v)));
     users.forEach(v => userSel.add(new Option(v, v)));
 
     if (currentMode === '360') {
         const qcSel = document.getElementById('qcFilter');
-        const reasonSel = document.getElementById('reasonFilter');
         const qcs = [...new Set(data.map(r => r['QC By']).filter(Boolean))].sort();
-        
         qcSel.innerHTML = '<option value="">All Reviewers</option>';
         qcs.forEach(v => qcSel.add(new Option(v, v)));
-        
-        reasonSel.innerHTML = '<option value="">All Reasons</option>';
-        ALLOWED_360_REASONS.forEach(v => reasonSel.add(new Option(v, v)));
-        
         qcSel.onchange = applyFilters;
-        reasonSel.onchange = applyFilters;
     }
-
     entSel.onchange = applyFilters;
     userSel.onchange = applyFilters;
 }
 
-function parse360DateOnly(dateStr) {
-    if (!dateStr) return null;
-    const parts = dateStr.split(' ')[0].split('/');
-    if (parts.length === 3) {
-        return new Date(parts[2], parseInt(parts[0]) - 1, parts[1], 0, 0, 0, 0);
-    }
-    const d = new Date(dateStr);
-    d.setHours(0,0,0,0);
-    return d;
-}
-
 function applyFilters() {
     const data = dataStore[currentMode];
-    const entVal = document.getElementById('entFilter').value;
-    const userVal = document.getElementById('userFilter').value;
-    
-    const userKey = currentMode === 'images' ? 'User ID' : 'User';
-    const dateKey = 'Timestamp'; 
-
+    const ent = document.getElementById('entFilter').value;
+    const user = document.getElementById('userFilter').value;
+    const qc = currentMode === '360' ? document.getElementById('qcFilter').value : '';
     const dates = fp ? fp.selectedDates : [];
-
-    const qcVal = currentMode === '360' ? document.getElementById('qcFilter').value : '';
-    const reasonVal = currentMode === '360' ? document.getElementById('reasonFilter').value : '';
+    const userKey = currentMode === 'images' ? 'User ID' : 'User';
 
     filtered = data.filter(r => {
-        if (entVal && r.Enterprise !== entVal) return false;
-        if (userVal && r[userKey] !== userVal) return false;
+        if (ent && r.Enterprise !== ent) return false;
+        if (user && r[userKey] !== user) return false;
+        if (qc && r['QC By'] !== qc) return false;
         
-        if (currentMode === '360') {
-            if (qcVal && r['QC By'] !== qcVal) return false;
-            if (reasonVal && r.Reason !== reasonVal) return false;
-        }
-        
-        if (dates.length === 2 && r[dateKey]) {
-            let rowDate;
-            if (currentMode === '360') {
-                rowDate = parse360DateOnly(r[dateKey]);
-            } else {
-                rowDate = new Date(r[dateKey].split(' ')[0]);
-                rowDate.setHours(0,0,0,0);
+        if (dates.length === 2 && r.Timestamp) {
+            let rowDate = new Date(r.Timestamp.split(' ')[0]);
+            if (currentMode === '360' && r.Timestamp.includes('/')) {
+                const p = r.Timestamp.split(' ')[0].split('/');
+                rowDate = new Date(p[2], p[0]-1, p[1]);
             }
-
-            if (!rowDate || isNaN(rowDate.getTime())) return false;
-            
-            const dStart = new Date(dates[0]);
-            dStart.setHours(0,0,0,0);
-            const dEnd = new Date(dates[1]);
-            dEnd.setHours(0,0,0,0);
-            
-            if (rowDate < dStart || rowDate > dEnd) return false;
+            rowDate.setHours(0,0,0,0);
+            if (rowDate < dates[0] || rowDate > dates[1]) return false;
         }
         return true;
     });
@@ -360,105 +246,70 @@ function applyFilters() {
 }
 
 function render() {
-    const content = document.getElementById('mainContent');
+    const wrap = document.getElementById('mainWrapper');
     const footer = document.getElementById('navFooter');
     const badge = document.getElementById('statusBadge');
 
-    if (filtered.length === 0) {
-        content.innerHTML = `<div class="empty">No records found matching criteria.</div>`;
+    if (!filtered.length) {
+        wrap.innerHTML = `<div class="empty">No matching records found.</div>`;
         footer.style.display = 'none';
-        badge.innerText = '0 records';
+        badge.innerText = '0 RECORDS';
         return;
     }
 
-    footer.style.display = 'block';
-    badge.innerText = `${filtered.length} records`;
-    document.getElementById('progText').innerText = `Record ${cursor + 1} of ${filtered.length}`;
+    footer.style.display = 'flex';
+    badge.innerText = `${filtered.length} RECORDS`;
+    document.getElementById('progText').innerText = `RECORD ${cursor + 1} / ${filtered.length}`;
     document.getElementById('prevBtn').disabled = cursor === 0;
     document.getElementById('nextBtn').disabled = cursor === filtered.length - 1;
 
     const r = filtered[cursor];
+    const is360 = currentMode === '360';
 
-    if (currentMode === 'images') {
-        renderImages(r, content);
-    } else {
-        render360(r, content);
-    }
-    
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function render360(r, container) {
-    container.innerHTML = `
+    wrap.innerHTML = `
         <div class="record-card">
-            <div class="meta-grid">
-                <div class="meta-item"><div class="meta-label">Date</div><div class="meta-value">${r.Timestamp || '–'}</div></div>
-                <div class="meta-item"><div class="meta-label">SKU ID</div><div class="meta-value">${r.SKU_ID || '–'}</div></div>
-                <div class="meta-item"><div class="meta-label">Spin ID</div><div class="meta-value">${r.Spin_ID || '–'}</div></div>
-                <div class="meta-item"><div class="meta-label">Enterprise</div><div class="meta-value">${r.Enterprise || '–'}</div></div>
-                <div class="meta-item"><div class="meta-label">User</div><div class="meta-value">${r.User || '–'}</div></div>
-                <div class="meta-item"><div class="meta-label">QC By</div><div class="meta-value">${r['QC By'] || '–'}</div></div>
+            <div class="meta-strip">
+                <div class="meta-item"><div class="meta-label">ID</div><div class="meta-value">${is360 ? r.SKU_ID : r.sku_id}</div></div>
+                <div class="meta-item"><div class="meta-label">Enterprise</div><div class="meta-value">${r.Enterprise}</div></div>
+                <div class="meta-item"><div class="meta-label">User</div><div class="meta-value">${is360 ? r.User : r['User ID']}</div></div>
+                <div class="meta-item"><div class="meta-label">Reviewer</div><div class="meta-value">${is360 ? r['QC By'] : r['qc-user']}</div></div>
             </div>
-            <div style="padding: 12px 16px; border-bottom: 1px solid var(--line); display: flex; gap: 20px;">
-                <div><span class="meta-label" style="color:var(--warn)">⚠ Issue:</span> <span class="meta-value" style="color:var(--warn)">${r.Issues || 'None'}</span></div>
-                <div><span class="meta-label">Reason:</span> <span class="meta-value">${r.Reason || '–'}</span></div>
+            <div class="issue-strip">
+                <span class="meta-label" style="color:var(--danger)">Issue:</span>
+                <span class="meta-value" style="color:var(--danger)">${(is360 ? r.Issues : r.Issue) || 'No label'}</span>
+                <span class="meta-label" style="margin-left:auto">Reason:</span>
+                <span class="meta-value">${(is360 ? r.Reason : r['Submit Issue']) || '–'}</span>
             </div>
-            <div class="spin-frame-container">
-                <iframe src="${r.spin_url}" title="360 Viewer"></iframe>
-            </div>
-        </div>
-    `;
-}
-
-function renderImages(r, container) {
-    const imgUrl = src => (src && src.startsWith('http')) ? PROXY + src : '';
-    
-    container.innerHTML = `
-        <div class="record-card">
-            <div class="meta-grid">
-                <div class="meta-item"><div class="meta-label">Date</div><div class="meta-value">${(r.Timestamp||'').split(' ')[0]}</div></div>
-                <div class="meta-item"><div class="meta-label">Enterprise</div><div class="meta-value">${r.Enterprise || '–'}</div></div>
-                <div class="meta-item"><div class="meta-label">SKU ID</div><div class="meta-value">${r.sku_id || '–'}</div></div>
-                <div class="meta-item"><div class="meta-label">User ID</div><div class="meta-value">${r['User ID'] || '–'}</div></div>
-                <div class="meta-item"><div class="meta-label">QC User</div><div class="meta-value">${r['qc-user'] || '–'}</div></div>
-                <div class="meta-item"><div class="meta-label">Editor</div><div class="meta-value">${r['editing user'] || '–'}</div></div>
-            </div>
-             <div style="padding: 12px 16px; border-bottom: 1px solid var(--line); display: flex; gap: 20px;">
-                <div><span class="meta-label" style="color:var(--warn)">⚠ Issue:</span> <span class="meta-value" style="color:var(--warn)">${r.Issue || 'None'}</span></div>
-                <div><span class="meta-label">Comment:</span> <span class="meta-value">${r['Submit Issue'] || '–'}</span></div>
-            </div>
-            <div class="images-row">
-                <div class="img-pane"><div class="img-pane-label">Input</div><img src="${imgUrl(r['input image'])}"/></div>
-                <div class="img-pane"><div class="img-pane-label">AI Output</div><img src="${imgUrl(r['Ai image'])}"/></div>
-                <div class="img-pane"><div class="img-pane-label">Final</div><img src="${imgUrl(r['Final Image'])}"/></div>
+            <div class="viewer-area">
+                ${is360 
+                    ? `<iframe class="spin-frame" src="${r.spin_url}"></iframe>`
+                    : `<div class="images-layout">
+                        <div class="img-pane"><div class="img-pane-label">INPUT</div><img src="${PROXY + r['input image']}"/></div>
+                        <div class="img-pane"><div class="img-pane-label">AI</div><img src="${PROXY + r['Ai image']}"/></div>
+                        <div class="img-pane"><div class="img-pane-label">FINAL</div><img src="${PROXY + r['Final Image']}"/></div>
+                       </div>`
+                }
             </div>
         </div>
     `;
 }
 
 function move(dir) {
-    const newIdx = cursor + dir;
-    if (newIdx >= 0 && newIdx < filtered.length) {
-        cursor = newIdx;
-        render();
-    }
+    cursor += dir;
+    render();
 }
 
 function resetFilters() {
     if(fp) fp.clear();
     document.getElementById('entFilter').value = '';
     document.getElementById('userFilter').value = '';
-    
     const qcf = document.getElementById('qcFilter');
-    const rf = document.getElementById('reasonFilter');
-    if (qcf) qcf.value = '';
-    if (rf) rf.value = '';
-    
+    if(qcf) qcf.value = '';
     applyFilters();
 }
 
 document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowRight' || e.key === 'Enter') move(1);
+    if (e.key === 'ArrowRight') move(1);
     if (e.key === 'ArrowLeft') move(-1);
 });
 
