@@ -65,24 +65,25 @@ body{
 .t-space{flex:1}
 .t-count{font-family:var(--mono);font-size:10.5px;color:var(--t3);background:var(--bg2);border:1px solid var(--line);border-radius:5px;padding:2px 8px;white-space:nowrap}
 
-/* ── MODE TABS 36px ── */
+/* ── MODE TABS 44px ── */
 .mode-tabs{
-  height:36px;flex-shrink:0;
+  height:44px;flex-shrink:0;
   background:var(--bg1);border-bottom:1px solid var(--line);
-  display:flex;align-items:stretch;padding:0 14px;
+  display:flex;align-items:center;padding:0 14px;gap:6px;
 }
 .mode-tab{
-  font-size:12.5px;font-weight:600;color:var(--t3);
-  padding:0 16px;border-bottom:2px solid transparent;
-  cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;user-select:none;
+  font-size:12.5px;font-weight:600;
+  padding:0 16px;height:28px;border-radius:20px;
+  border:1.5px solid var(--line2);
+  background:var(--bg2);color:var(--t3);
+  cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:6px;user-select:none;
 }
-.mode-tab:hover{color:var(--t1)}
-.mode-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
-.tab-pill{
-  font-size:9.5px;font-family:var(--mono);font-weight:500;
-  background:var(--bg3);color:var(--t3);border-radius:4px;padding:1px 5px;transition:all .15s;
+.mode-tab:hover{color:var(--t1);border-color:#9CA3AF;background:var(--bg3)}
+.mode-tab.active{
+  background:var(--accent);color:#fff;
+  border-color:var(--accent);
+  box-shadow:0 2px 8px rgba(37,99,235,.25);
 }
-.mode-tab.active .tab-pill{background:var(--accentlt);color:var(--accent)}
 
 /* ── FILTER BAR auto ── */
 .filter-bar{
@@ -261,12 +262,8 @@ body{
 
 <!-- MODE TABS -->
 <div class="mode-tabs">
-  <div class="mode-tab active" id="tabImages" onclick="switchMode('images')">
-    🖼 Images <span class="tab-pill" id="pillImages">–</span>
-  </div>
-  <div class="mode-tab" id="tab360" onclick="switchMode('360')">
-    360° Spin <span class="tab-pill" id="pill360">–</span>
-  </div>
+  <div class="mode-tab active" id="tabImages" onclick="switchMode('images')">🖼 Images</div>
+  <div class="mode-tab" id="tab360" onclick="switchMode('360')">360° Spin</div>
 </div>
 
 <!-- LOAD STRIP -->
@@ -347,7 +344,6 @@ fetch(CSV_IMAGES)
   .then(csv => {
     imagesData = Papa.parse(csv, {header:true, skipEmptyLines:true}).data
                      .filter(r => r['Submit Issue'] !== 'Done');
-    document.getElementById('pillImages').textContent = imagesData.length.toLocaleString();
     populateImagesFilters(imagesData);
     filtersReady.images = true;
     if (mode === 'images') applyFilters();
@@ -361,7 +357,6 @@ function loadData360() {
     .then(r => r.text())
     .then(csv => {
       data360 = Papa.parse(csv, {header:true, skipEmptyLines:true}).data;
-      document.getElementById('pill360').textContent = data360.length.toLocaleString();
       populate360Filters(data360);
       filtersReady['360'] = true;
       if (mode === '360') applyFilters();
@@ -411,6 +406,23 @@ function switchMode(m) {
   if (filtersReady[m]) applyFilters();
 }
 
+function isFiltered() {
+  const sel = fp ? fp.selectedDates : [];
+  const hasDate = sel.length > 0;
+  const hasEnt  = !!document.getElementById('enterpriseFilter').value;
+  const hasImg  = !!(document.getElementById('qcUserFilter').value || document.getElementById('editingUserFilter').value);
+  const has360  = !!(document.getElementById('user360Filter').value || document.getElementById('qcByFilter').value);
+  return hasDate || hasEnt || hasImg || has360;
+}
+
+function sortByDate(arr, ascending) {
+  return arr.slice().sort((a, b) => {
+    const da = normalizeDate(a['Timestamp']) || '';
+    const db = normalizeDate(b['Timestamp']) || '';
+    return ascending ? da.localeCompare(db) : db.localeCompare(da);
+  });
+}
+
 function applyFilters() {
   const sel   = fp ? fp.selectedDates : [];
   const start = sel[0] ? sel[0].toISOString().split('T')[0] : null;
@@ -420,7 +432,7 @@ function applyFilters() {
   if (mode === 'images') {
     const qcu = document.getElementById('qcUserFilter').value;
     const ed  = document.getElementById('editingUserFilter').value;
-    imagesFiltered = imagesData.filter(r => {
+    imagesFiltered = sortByDate(imagesData.filter(r => {
       const rd = normalizeDate(r['Timestamp']);
       if (start && rd < start) return false;
       if (end   && rd > end)   return false;
@@ -428,13 +440,13 @@ function applyFilters() {
       if (qcu && !(r['qc-user']||'').includes(qcu)) return false;
       if (ed  && r['editing user'] !== ed) return false;
       return true;
-    });
+    }), isFiltered());
     imagesIdx = 0;
     document.getElementById('recCount').textContent = imagesFiltered.length ? imagesFiltered.length.toLocaleString()+' records' : '';
   } else {
     const user = document.getElementById('user360Filter').value;
     const qcby = document.getElementById('qcByFilter').value;
-    filtered360 = data360.filter(r => {
+    filtered360 = sortByDate(data360.filter(r => {
       const rd = normalizeDate(r['Timestamp']);
       if (start && rd < start) return false;
       if (end   && rd > end)   return false;
@@ -442,7 +454,7 @@ function applyFilters() {
       if (user && r['User'] !== user)    return false;
       if (qcby && r['QC By'] !== qcby)  return false;
       return true;
-    });
+    }), isFiltered());
     idx360 = 0;
     document.getElementById('recCount').textContent = filtered360.length ? filtered360.length.toLocaleString()+' records' : '';
   }
