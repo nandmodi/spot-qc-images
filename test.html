@@ -3,809 +3,408 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Spyne QC</title>
+<title>Spyne · Quality Review</title>
 <link rel="icon" href="https://spyne-prod-ai.s3.us-east-1.amazonaws.com/ai-dataset/2025/logo/unnamed.png"/>
-<link rel="preconnect" href="https://media.spyneai.com" crossorigin>
-<link rel="dns-prefetch" href="https://media.spyneai.com">
-<link rel="preconnect" href="https://spyne-prod-ai.s3.us-east-1.amazonaws.com" crossorigin>
-<!-- Libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+<!-- Flatpickr for Date Range -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<!-- Fonts -->
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg0:#D6E8FA; --bg1:#FFFFFF; --bg2:#F7F8FA; --bg3:#EEF0F4; --bg4:#E5E7EC;
-  --line:#E2E5EB; --line2:#CDD1DA; --accent:#2563EB; --accent2:#1D4ED8;
-  --accentg:rgba(37,99,235,.1); --accentlt:#EFF6FF; --ok:#16A34A;
-  --okg:rgba(22,163,74,.1); --oklt:#F0FDF4; --warn:#D97706; --warnlt:#FFFBEB;
-  --danger:#DC2626; --dangerg:rgba(220,38,38,.08); --dangerlt:#FEF2F2;
-  --t1:#0F1523; --t2:#374151; --t3:#6B7280; --t4:#9CA3AF; --r:8px; --rlg:12px;
-  --mono:'IBM Plex Mono',monospace; --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.05);
+  --bg0:#D6E8FA;
+  --bg1:#FFFFFF;
+  --bg2:#F7F8FA;
+  --bg3:#EEF0F4;
+  --line:#E2E5EB;
+  --line2:#CDD1DA;
+  --accent:#2563EB;
+  --accent2:#1D4ED8;
+  --accentg:rgba(37,99,235,.1);
+  --accentlt:#EFF6FF;
+  --ok:#16A34A;
+  --oklt:#F0FDF4;
+  --warn:#D97706;
+  --danger:#DC2626;
+  --dangerlt:#FEF2F2;
+  --t1:#0F1523;
+  --t2:#374151;
+  --t3:#6B7280;
+  --t4:#9CA3AF;
+  --r:8px;
+  --rlg:12px;
+  --mono:'IBM Plex Mono',monospace;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.05);
   --shadow-md:0 4px 12px rgba(0,0,0,.08),0 1px 4px rgba(0,0,0,.04);
-  --shadow-lg:0 12px 40px rgba(0,0,0,.12),0 2px 8px rgba(0,0,0,.06);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%}
-body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--t1);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow:hidden}
-::-webkit-scrollbar{width:4px;height:4px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--line2);border-radius:2px}
-.hidden{display:none!important}
+html,body{height:100%;min-height:100%}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--t1);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased; display: flex; flex-direction: column;}
 
-/* ── ANIMATIONS ── */
-@keyframes tIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
-@keyframes tOut{to{opacity:0;transform:translateX(-12px)}}
-@keyframes slideUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
-@keyframes rot{to{transform:rotate(360deg)}}
-
-/* ── LOGIN ── */
-#loginPage{height:100%;display:flex;align-items:center;justify-content:center;background:var(--bg0);padding-bottom:30px}
-.login-card{width:390px;background:var(--bg1);border:1px solid var(--line);border-radius:var(--rlg);padding:44px 40px 38px;box-shadow:var(--shadow-lg);animation:slideUp .35s cubic-bezier(.22,.68,0,1.2) both}
-.login-h{font-size:20px;font-weight:800;letter-spacing:-.03em;margin-bottom:4px;color:#000}
-.login-sub{font-size:13px;color:var(--t3);margin-bottom:28px}
-.field+.field{margin-top:15px}
-.field-lbl{font-size:12px;font-weight:500;color:var(--t2);margin-bottom:5px;display:block}
-.field-in{width:100%;height:40px;padding:0 12px;background:var(--bg1);border:1px solid var(--line2);border-radius:var(--r);font-family:'Inter',sans-serif;font-size:14px;color:var(--t1);outline:none;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none}
-.field-in:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accentg)}
-.login-err{display:none;margin-top:14px;padding:10px 12px;background:var(--dangerlt);border:1px solid #FCA5A5;border-radius:var(--r);font-size:13px;color:var(--danger)}
-.btn-login{width:100%;height:42px;background:var(--accent);color:#fff;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;border:none;border-radius:var(--r);cursor:pointer;transition:background .15s,box-shadow .15s,transform .1s;letter-spacing:.01em}
-.btn-login:hover{background:var(--accent2);box-shadow:0 4px 16px rgba(37,99,235,.35)}
-
-/* ── APP SHELL ── */
-#app{display:none;flex-direction:column;height:100vh;padding-bottom:30px}
-.topbar{height:52px;background:var(--bg1);border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 18px;gap:8px;flex-shrink:0;z-index:30;box-shadow:var(--shadow)}
-.t-logo-img{height:28px; width:auto; display:block; margin-right:8px;}
-.mode-group{display:flex;background:var(--bg0);border:1px solid var(--line);border-radius:var(--r);padding:3px;gap:2px}
-.mode-pill{font-family:'Inter',sans-serif;font-size:12px;font-weight:500;padding:4px 13px;border:none;border-radius:6px;background:transparent;color:var(--t3);cursor:pointer;transition:all .14s;white-space:nowrap}
-.mode-pill.on{background:var(--bg1);color:var(--accent);font-weight:600;box-shadow:var(--shadow)}
+/* ── TOPBAR ── */
+.topbar{
+  height:52px;background:var(--bg1);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;padding:0 18px;gap:10px;
+  position:sticky;top:0;z-index:30;box-shadow:var(--shadow);
+}
+.t-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+.t-sep{width:1px;height:20px;background:var(--line);margin:0 4px;flex-shrink:0}
+.t-title{font-size:14px;font-weight:700;color:#000;letter-spacing:-.01em}
 .t-space{flex:1}
-.t-chip{font-family:var(--mono);font-size:11px;color:var(--t3);background:var(--bg2);border:1px solid var(--line);border-radius:5px;padding:3px 9px;white-space:nowrap;display:flex;align-items:center}
-.t-chip.done-count{background:var(--oklt);color:var(--ok);border-color:var(--ok);font-weight:700}
 
-.t-avatar{width:28px;height:28px;background:var(--accentlt);border:1.5px solid var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--accent);flex-shrink:0;margin-right:6px}
-.t-uname{font-size:13px;font-weight:500;color:var(--t1)}
-
-.btn-sm{font-family:'Inter',sans-serif;font-size:12px;font-weight:500;background:transparent;border:1px solid var(--line2);border-radius:6px;color:var(--t3);padding:0 11px;height:28px;cursor:pointer;transition:all .14s;display:flex;align-items:center;justify-content:center}
-.btn-top-link{text-decoration:none;background:var(--bg2);border-color:var(--line2);color:var(--t2); font-family:inherit;}
-.btn-top-link:hover{background:var(--accentlt);border-color:var(--accent);color:var(--accent)}
-
-/* ── SETUP PAGE ── */
-#setupPage{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.filter-bar{background:var(--bg1);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;align-items:center;flex-wrap:wrap;gap:12px;flex-shrink:0}
-.fi-sel, .fi-in{font-family:'Inter',sans-serif;font-size:12px;color:var(--t1);background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:4px 8px;outline:none;cursor:pointer; height: 32px;}
-
-.range-box-container {
-    display: flex; align-items: center; background: var(--bg1); border: 1.5px solid var(--accent); border-radius: 6px; padding: 0 10px; height: 32px; gap: 8px; cursor: pointer; transition: box-shadow 0.2s;
+/* ── TAB SWITCHER ── */
+.tab-container {
+    background: var(--bg1);
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    padding: 0 18px;
+    gap: 24px;
 }
-.range-box-container label { font-size: 13px; font-weight: 700; color: #000; white-space: nowrap; margin-right: 4px; }
-.range-box-container input { border: none; background: transparent; font-size: 13px; color: var(--t2); outline: none; width: 170px; cursor: pointer; }
-
-.btn-start{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;background:var(--accent);color:#fff;border:none;border-radius:6px;padding:0 18px;height:34px;cursor:pointer;transition:background .14s;display:flex;align-items:center;gap:6px}
-.btn-start:hover{background:var(--accent2)}
-
-/* ── DASHBOARD TABLE ── */
-.table-wrap{flex:1;overflow:auto;background:var(--bg1);margin:12px 18px;border-radius:var(--rlg);border:1px solid var(--line);box-shadow:var(--shadow)}
-table{width:100%;border-collapse:collapse;min-width:900px}
-th{position:sticky;top:0;background:#f8fafc;padding:12px 16px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--accent);border-bottom:2px solid #edf2f7;z-index:5}
-td{padding:12px 16px;border-bottom:1px solid #edf2f7;font-size:13px;color:var(--t2)}
-tr:hover td{background:var(--bg2)}
-
-/* ── REVIEW PAGE ── */
-#reviewPage{display:none;flex-direction:column;flex:1;overflow:hidden;min-height:0}
-.rev-top{background:var(--bg1);border-bottom:1px solid var(--line);padding:0 18px;display:flex;align-items:stretch;overflow-x:auto;flex-shrink:0}
-.rmc{padding:9px 18px 9px 0;border-right:1px solid var(--line);margin-right:18px;flex-shrink:0;min-width:0;max-width:260px}
-.rmc-l{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#000;margin-bottom:2px}
-.rmc-v{font-family:var(--mono);font-size:11.5px;color:var(--t2);font-weight:400;overflow:hidden;text-overflow:ellipsis}
-
-.prog-row{background:var(--bg2);border-bottom:1px solid var(--line);padding:6px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0}
-.prog-track{flex:1;max-width:280px;height:4px;background:var(--line);border-radius:2px;overflow:hidden}
-.prog-fill{height:100%;background:var(--accent);transition:width .4s ease}
-
-.img-area{flex:1;display:grid;grid-template-columns:repeat(3,1fr);overflow:hidden;min-height:0}
-.img-area.two-col{grid-template-columns:1fr 1fr}
-.img-panel{position:relative;display:flex;flex-direction:column;background:#1A1C23;overflow:hidden;border-right:1px solid #2A2D38}
-.img-panel img{width:100%;height:100%;object-fit:contain;display:block;opacity:0;transition:opacity .15s ease;position:absolute;inset:0;image-rendering:auto;will-change:opacity}
-.img-panel img.loaded{opacity:1}
-.img-label{position:absolute;top:10px;left:10px;z-index:5;font-size:10.5px;font-weight:600;text-transform:uppercase;background:rgba(255,255,255,0.88);padding:3px 9px;border-radius:5px}
-.spin-frame{flex:1;width:100%;height:100%;border:none;background:#000}
-
-.rev-footer{background:var(--bg1);border-top:1px solid var(--line);padding:10px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0; position:relative; z-index:50}
-.issue-checkboxes{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center}
-.issue-cb-row{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:var(--t2);cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid var(--line);background:var(--bg2);transition:background 0.2s}
-.issue-cb-row:has(.issue-cb:checked){background:var(--dangerlt);border-color:#FCA5A5;color:var(--danger);font-weight:600}
-.issue-cb-row.done-row:has(.issue-cb:checked){background:var(--oklt);border-color:var(--ok);color:var(--ok)}
-.issue-cb{display:none}
-.issue-cb-num{font-family:var(--mono);font-size:9.5px;font-weight:700;background:var(--bg4);border-radius:3px;padding:1px 4px;color:var(--t3);line-height:1}
-.issue-cb-row:has(.issue-cb:checked) .issue-cb-num{background:var(--danger);color:#fff}
-
-.btn-sub{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;background:var(--ok);color:#fff;border:none;border-radius:var(--r);padding:0 20px;height:38px;cursor:pointer}
-.btn-sub:disabled{background:var(--line2);cursor:not-allowed;color:var(--t3);opacity:0.8}
-.btn-prev{font-family:'Inter',sans-serif;font-size:13px;font-weight:500;background:var(--bg1);border:1px solid var(--line2);padding:0 16px;height:38px;border-radius:var(--r);cursor:pointer}
-
-.comment-in{flex:1;height:38px;border-radius:6px;border:1px solid var(--line);padding:0 12px;font-size:13px; font-family:inherit; outline:none}
-.comment-in:focus{border-color:var(--accent)}
-
-.toast-shelf{position:fixed;bottom:35px;left:18px;z-index:999;display:flex;flex-direction:column;gap:7px}
-.toast{background:var(--bg1);border:1px solid var(--line);border-radius:var(--r);padding:10px 14px;font-size:12.5px;box-shadow:var(--shadow-md);display:flex;align-items:center;gap:8px;animation:tIn .22s ease both}
-.toast.ok{border-left:3px solid var(--ok)}
-.toast.err{border-left:3px solid var(--danger)}
-
-.bottom-ribbon {
-  position: fixed;
-  bottom: 0; left: 0; right: 0; height: 24px; background: var(--bg1); border-top: 1px solid var(--line);
-  display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--t3); z-index: 1000;
+.mode-tab {
+    padding: 14px 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--t3);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
 }
-.bottom-ribbon a { color: var(--accent); text-decoration: none; font-weight: 600; margin-left: 4px; }
-.bottom-ribbon a:hover { text-decoration: underline; }
+.mode-tab:hover { color: var(--accent); }
+.mode-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+}
 
-.load-strip{display:none;align-items:center;gap:10px;padding:9px 18px;background:var(--accentlt);border-bottom:1px solid var(--line);font-size:12.5px;font-weight:500;color:var(--accent);flex-shrink:0}
-.spin{width:14px;height:14px;border:2px solid var(--line2);border-top-color:var(--accent);border-radius:50%;animation:rot .7s linear infinite;flex-shrink:0}
+/* ── FILTER BAR ── */
+.filter-bar{
+  background:var(--bg1);border-bottom:1px solid var(--line);
+  padding:10px 18px;display:flex;align-items:center;flex-wrap:wrap;gap:12px;
+  position:sticky;top:52px;z-index:20;
+}
+.fi{display:flex;align-items:center;gap:5px}
+.fi-lbl{font-size:11.5px;font-weight:700;color:#000;white-space:nowrap}
+.fi-sel, .fi-date-range{
+  font-family:'Inter',sans-serif;font-size:12.5px;color:var(--t1);
+  background:var(--bg2);border:1px solid var(--line);border-radius:6px;
+  padding:5px 10px;outline:none;cursor:pointer;
+}
+.fi-date-range { border-color: var(--accent); min-width: 200px; }
+
+.btn-reset{
+  font-family:'Inter',sans-serif;font-size:12px;font-weight:500;
+  background:var(--dangerlt);border:1px solid #FCA5A5;color:var(--danger);
+  border-radius:6px;padding:0 12px;height:32px;cursor:pointer;
+}
+
+/* ── CONTENT ── */
+.content{padding:18px; flex: 1;}
+.record-card{
+  background:var(--bg1);border:1px solid var(--line);border-radius:var(--rlg);
+  overflow:hidden;box-shadow:var(--shadow-md); margin-bottom: 20px;
+}
+
+/* Meta Grid */
+.meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    border-bottom: 1px solid var(--line);
+}
+.meta-item { padding: 12px 16px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.meta-item:last-child { border-right: none; }
+.meta-label { font-size: 9px; font-weight: 800; text-transform: uppercase; color: var(--t3); margin-bottom: 2px; }
+.meta-value { font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--t1); }
+
+/* 360 Frame */
+.spin-frame-container {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    min-height: 500px;
+    background: #000;
+}
+.spin-frame-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Images View */
+.images-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.img-pane { position: relative; background: #1A1C23; border-right: 1px solid #2A2D38; }
+.img-pane-label {
+  position:absolute;top:10px;left:10px;z-index:5;
+  font-size:10px;font-weight:600;text-transform:uppercase;
+  background:rgba(255,255,255,.9); padding:3px 8px;border-radius:4px;
+}
+.img-pane img { width: 100%; height: auto; display: block; }
+
+/* Bottom Nav */
+.bottom-stick {
+  position: sticky; bottom: 0; z-index: 40; background: var(--bg1);
+  border-top: 1px solid var(--line); box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+}
+.nav-bar{ padding:12px 18px; display:flex; align-items:center; gap:16px; }
+.btn-prev, .btn-next {
+  font-family: inherit; font-weight: 600; padding: 10px 24px; border-radius: 6px; cursor: pointer; transition: 0.2s;
+}
+.btn-prev { background: var(--bg2); border: 1px solid var(--line2); color: var(--t2); }
+.btn-next { background: var(--accent); color: #fff; border: none; }
+.btn-next:hover { background: var(--accent2); }
+.btn-next:disabled, .btn-prev:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.empty { padding: 100px; text-align: center; color: var(--t3); }
+
+@media (max-width: 768px) {
+    .spin-frame-container { min-height: 350px; }
+}
 </style>
 </head>
 <body>
 
-<div id="loginPage">
-  <div class="login-card">
-    <img src="https://spyne-prod-ai.s3.us-east-1.amazonaws.com/ai-dataset/2025/download.jpeg" style="height:38px; width:auto; margin-bottom:28px; display:block;" alt="Spyne Logo">
-    <div class="login-h">Welcome back</div>
-    <div class="login-sub">Sign in to QC Review</div>
-    <div class="login-err" id="loginErr">Incorrect name or password.</div>
-    <div class="field">
-      <label class="field-lbl">Your name</label>
-      <select id="loginName" class="field-in">
-        <option value="">— Select —</option>
-        <option>Nand Kishor</option><option>Ranbir Manoranjan</option><option>Nitin Kumar</option>
-        <option>Praveen Agarwal</option><option>Raj Tripathi</option><option>Rohit Chauhan</option><option>Ajay Devrani</option>
-      </select>
-    </div>
-    <div class="field">
-      <label class="field-lbl">Password</label>
-      <input type="password" id="loginPw" class="field-in" placeholder="Enter password"/>
-    </div>
-    <button class="btn-login" id="loginBtn" style="margin-top:20px">Sign in →</button>
+<div class="topbar">
+  <div class="t-logo">
+    <img src="https://spyne-prod-ai.s3.us-east-1.amazonaws.com/ai-dataset/2025/logo/unnamed.png" style="height:28px;"/>
   </div>
+  <div class="t-sep"></div>
+  <span class="t-title">Quality Review</span>
+  <div class="t-space"></div>
+  <div id="statusBadge" style="font-size:11px; color:var(--t3); background:var(--bg2); padding:4px 10px; border-radius:100px;">Loading...</div>
 </div>
 
-<div id="app">
-  <div class="topbar">
-    <img src="https://spyne-prod-ai.s3.us-east-1.amazonaws.com/ai-dataset/2025/download.jpeg" class="t-logo-img" alt="Spyne">
-    <div class="mode-group">
-      <button class="mode-pill on" id="tabQC" onclick="setMode('qc')">QC Pass</button>
-      <button class="mode-pill" id="tabEdit" onclick="setMode('edited')">Re-Edit</button>
-      <button class="mode-pill" id="tabTool" onclick="setMode('qc_tool')">QC Tool</button>
-      <button class="mode-pill" id="tab360" onclick="setMode('360')">360</button>
-    </div>
-    <div class="t-space"></div>
-    <div class="t-chip done-count" id="doneCounter" style="margin-right:6px">Done: 0</div>
-    <a href="https://nandmodi.github.io/spot-qc-images/meet-review.html" target="_blank" class="btn-sm btn-top-link" style="margin-right:12px">Review</a>
-    
-    <div class="t-avatar" id="tAvatar">–</div>
-    <div class="t-uname" id="tUser" style="margin-right:12px">–</div>
-    
-    <button class="btn-sm" onclick="doLogout()">Logout</button>
-  </div>
-
-  <div id="setupPage">
-    <div class="filter-bar">
-      <!-- 360 Filter Bar -->
-      <div id="cont360Filters" class="hidden" style="display:contents">
-        <label style="font-weight: 700; font-size: 13px;">Date Range</label>
-        <div class="range-box-container">
-          <input type="text" id="dateRange360" placeholder="Select Range">
-        </div>
-        <label style="font-weight: 700; font-size: 13px; margin-left: 8px;">User</label>
-        <select id="userFilter360" class="fi-sel"><option value="">All Users</option></select>
-        <label style="font-weight: 700; font-size: 13px; margin-left: 8px;">Enterprise</label>
-        <select id="entFilter360" class="fi-sel"><option value="">All Enterprises</option></select>
-        <label style="font-weight: 700; font-size: 13px; margin-left: 8px;">Issue Level</label>
-        <select id="issueFilter360" class="fi-sel">
-          <option value="">All Issues</option>
-          <option value="nullblank">None / Blank</option>
-          <option value="blocker">Blocker</option>
-          <option value="high">High</option>
-          <option value="low">Low</option>
-        </select>
-      </div>
-
-      <!-- Standard Filter Bar -->
-      <div id="contStdFilters" style="display:contents">
-        <select id="entFilter" class="fi-sel"><option value="">All Enterprises</option></select>
-        <select id="qcUFilter" class="fi-sel"><option value="">All QC Users</option></select>
-      </div>
-
-      <div class="t-space"></div>
-      <span id="fcount" class="t-chip"></span>
-      <button class="btn-start" id="startBtn">▶ Start Review</button>
-    </div>
-    
-    <div class="load-strip" id="loadStrip"><div class="spin"></div><span id="loadTxt">Fetching data…</span></div>
-    
-    <div id="tableContainer" class="table-wrap hidden"></div>
-    <div id="emptySetupMsg" style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--t4)">Select filters and click Start Review.</div>
-  </div>
-
-  <div id="reviewPage">
-    <div class="rev-top">
-      <div class="rmc"><div class="rmc-l">Enterprise</div><div class="rmc-v" id="mEnt">-</div></div>
-      <div class="rmc"><div class="rmc-l">SKU ID</div><div class="rmc-v" id="mSku">-</div></div>
-      <div class="rmc"><div class="rmc-l" id="labelImg">Image ID</div><div class="rmc-v" id="mImg">-</div></div>
-      <div class="rmc"><div class="rmc-l" id="labelUser">QC Users</div><div class="rmc-v" id="mQcUsers">-</div></div>
-      <div class="rmc hidden" id="mEditorWrap"><div class="rmc-l">Editor</div><div class="rmc-v" id="mEditor">-</div></div>
-      <div class="rmc hidden" id="mIssueWrap" style="color:var(--warn)"><div class="rmc-l">Previous Issue</div><div class="rmc-v" id="mIssue">-</div></div>
-    </div>
-    
-    <div class="prog-row">
-      <div id="progLbl" style="font-size:11px;font-weight:700">Record 1 of 0</div>
-      <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
-    </div>
-
-    <!-- Media Area -->
-    <div class="img-area" id="imgArea">
-      <div class="img-panel"><div class="img-label">Input</div><img id="imgL" src="" alt="Input" decoding="async" loading="eager"/></div>
-      <div class="img-panel"><div class="img-label">AI Output</div><img id="imgM" src="" alt="Output" decoding="async" loading="eager"/></div>
-      <div class="img-panel" id="panelR"><div class="img-label">Final Output</div><img id="imgR" src="" alt="Final" decoding="async" loading="eager"/></div>
-    </div>
-
-    <div id="spinArea" class="hidden" style="flex:1; display:flex">
-      <iframe id="spinIframe" class="spin-frame"></iframe>
-    </div>
-
-    <div class="rev-footer">
-      <div style="flex:1">
-        <!-- Standard Issue Panel -->
-        <div id="standardIssues" class="issue-checkboxes">
-          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb1" value="RBG issue"><span class="issue-cb-num">1</span>RBG issue</label>
-          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb2" value="See-through int"><span class="issue-cb-num">2</span>See-through int</label>
-          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb3" value="See-through ext"><span class="issue-cb-num">3</span>See-through ext</label>
-          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb4" value="Floor extension"><span class="issue-cb-num">4</span>Floor extension</label>
-          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb5" value="Tilt"><span class="issue-cb-num">5</span>Tilt</label>
-          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb6" value="Number Plate"><span class="issue-cb-num">6</span>Number Plate</label>
-          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb7" value="Shadow"><span class="issue-cb-num">7</span>Shadow</label>
-          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb8" value="Open-door RBG"><span class="issue-cb-num">8</span>Open-door RBG</label>
-          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb9" value="Wrong Marking"><span class="issue-cb-num">9</span>Wrong Marking</label>
-        </div>
-        <!-- 360 Specific Issue Panel -->
-        <div id="three60Issues" class="issue-checkboxes hidden">
-          <label class="issue-cb-row done-row"><input type="checkbox" class="issue-cb" id="qc360_done" name="qcReason" value="Done">Done</label>
-          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="qc360_1" name="qcReason" value="Wrong QC"><span class="issue-cb-num">1</span>Wrong QC</label>
-          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="qc360_2" name="qcReason" value="To Be Edited"><span class="issue-cb-num">2</span>To Be Edited</label>
-          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="qc360_3" name="qcReason" value="Missing Issue Marking"><span class="issue-cb-num">3</span>Missing Issue Marking</label>
-          <input type="text" id="modalComment360" class="comment-in" placeholder="Add comments here (Submits as Other option)...">
-        </div>
-      </div>
-      
-      <label class="issue-cb-row done-row" id="doneLabel"><input type="checkbox" class="issue-cb" id="cbDone" value="Done">Done</label>
-      
-      <div style="display:flex;gap:8px">
-        <button class="btn-prev" id="prevBtn" disabled>← Prev</button>
-        <button class="btn-sub" id="nextBtn" onclick="handleFinalSubmit()">Submit & Next →</button>
-        <button class="btn-prev" onclick="exitToSetup()">Exit</button>
-      </div>
-    </div>
-  </div>
+<div class="tab-container">
+    <div id="tab-images" class="mode-tab active" onclick="setMode('images')">Image Review</div>
+    <div id="tab-360" class="mode-tab" onclick="setMode('360')">360 Review</div>
 </div>
 
-<div class="bottom-ribbon">Managed by <a href="mailto:kishor@spyne.ai">kishor@spyne.ai</a></div>
-<div class="toast-shelf" id="toastShelf"></div>
-<!-- HIDDEN IFRAME FOR GOOGLE FORM SUBMISSION -->
-<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+<div class="filter-bar">
+  <div class="fi"><span class="fi-lbl">Date Range</span><input type="text" id="dateFilter" class="fi-date-range" placeholder="Select Range"/></div>
+  <div class="fi"><span class="fi-lbl">Enterprise</span><select id="entFilter" class="fi-sel"><option value="">All</option></select></div>
+  <div class="fi"><span class="fi-lbl">User</span><select id="userFilter" class="fi-sel"><option value="">All</option></select></div>
+  <div class="fi"><span class="fi-lbl">Reason</span><select id="reasonFilter" class="fi-sel"><option value="">All</option></select></div>
+  <div style="flex:1"></div>
+  <button class="btn-reset" onclick="resetFilters()">✕ Reset</button>
+</div>
+
+<div class="content" id="mainContent">
+    <div class="empty">Initializing application...</div>
+</div>
+
+<div class="bottom-stick" id="navFooter" style="display:none">
+  <div class="nav-bar">
+    <div id="progText" style="font-size:13px; font-weight:600; color:var(--t2)">Record 0 of 0</div>
+    <div style="flex:1"></div>
+    <button class="btn-prev" id="prevBtn" onclick="move(-1)">← Prev</button>
+    <button class="btn-next" id="nextBtn" onclick="move(1)">Next →</button>
+  </div>
+</div>
 
 <script>
-const QC_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=1717039169&single=true&output=csv";
-const EDIT_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=320301246&single=true&output=csv";
-const THREE60_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThoeXNovzUYQaHoFqHYY8p4hxrGTJWUPF8dQs0cinxvypfUVwAzFu74l06jhqXm0x611kRke13fa2t/pub?gid=0&single=true&output=csv';
-const DONE_COUNT_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=2128295653&single=true&output=csv";
-const DONE_COUNT_360_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vThoeXNovzUYQaHoFqHYY8p4hxrGTJWUPF8dQs0cinxvypfUVwAzFu74l06jhqXm0x611kRke13fa2t/pub?gid=1009592102&single=true&output=csv";
+const URL_IMAGES = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=2128295653&single=true&output=csv';
+const URL_360 = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThoeXNovzUYQaHoFqHYY8p4hxrGTJWUPF8dQs0cinxvypfUVwAzFu74l06jhqXm0x611kRke13fa2t/pub?gid=1009592102&single=true&output=csv';
+const PROXY = 'https://media.spyneai.com/unsafe/0x0/filters:format(webp)/';
 
-const FORM_STD = "https://docs.google.com/forms/d/e/1FAIpQLSdrjhynjWITfOqHpkgKX8enCmDKg1b3s0Ij05Cux36kPmZEUA/formResponse";
-const FORM_360 = 'https://docs.google.com/forms/d/e/1FAIpQLSeQH6R9-rYr1Kh2rwUBKu7uGvJAkRrvx8fnxF6jfkac7sNL2A/formResponse';
+let currentMode = 'images';
+let dataStore = { images: [], '360': [] };
+let filtered = [];
+let cursor = 0;
+let fp = null;
 
-const PROXY = "https://media.spyneai.com/unsafe/1280x0/filters:format(webp):quality(85)/";
+// Initialization
+async function init() {
+    try {
+        const [imgRes, spinRes] = await Promise.all([
+            fetch(URL_IMAGES).then(r => r.text()),
+            fetch(URL_360).then(r => r.text())
+        ]);
 
-const FMAP = {
-  qc: { ent:'enterprise_name', img:'ai.image_id', sku:'sku_id', l:'input_image_hres_url', m:'output_image_hres_url', r:'manual_image_hres_url', u:'qc_user_name' },
-  edited: { ent:'enterprise_name', img:'ai.image_id', sku:'sku_id', l:'input_image_hres_url', m:'ai_output', r:'final_output', u:'last_qc_user' }
-};
+        dataStore.images = Papa.parse(imgRes, {header:true, skipEmptyLines:true}).data.filter(r => r['Submit Issue'] !== 'Done');
+        dataStore['360'] = Papa.parse(spinRes, {header:true, skipEmptyLines:true}).data;
 
-let raw=[], group=[], idx=0, mode='qc', user='', fp360=null;
-let imagesLoaded = false, loadedCount = 0, currentDoneCount = 0;
-let safetyTimer = null;
-const preloadedIndices = new Set();
-const prefetchCache = new Set();
-
-function prefetch(src) {
-  if (!src || prefetchCache.has(src)) return;
-  prefetchCache.add(src);
-  const i = new Image(); i.src = src;
-}
-
-const PWDS = {"Nand Kishor":"spyne@123","Ranbir Manoranjan":"spyne@123","Nitin Kumar":"spyne@123","Praveen Agarwal":"spyne@123","Raj Tripathi":"spyne@123","Rohit Chauhan":"spyne@123","Ajay Devrani":"spyne@123"};
-
-function _id(id){ return document.getElementById(id); }
-
-function toast(msg, type='ok') {
-  const shelf = _id('toastShelf');
-  const t = document.createElement('div');
-  t.className = `toast ${type}`;
-  t.innerHTML = `<span>${type==='ok'?'✓':'⚠'}</span><span>${msg}</span>`;
-  shelf.appendChild(t);
-  setTimeout(() => { t.style.animation = 'tOut .2s ease both'; setTimeout(() => t.remove(), 200); }, 2500);
-}
-
-function getRowVal(row, keysArray) {
-    if (!row) return '';
-    const keys = Object.keys(row);
-    if (!Array.isArray(keysArray)) keysArray = [keysArray];
-    for(let key of keysArray) {
-        const foundKey = keys.find(k => k.trim().toLowerCase() === key.toLowerCase());
-        if(foundKey && row[foundKey] !== undefined && row[foundKey] !== null) return row[foundKey].toString().trim();
+        initFlatpickr();
+        setMode('images');
+    } catch (e) {
+        document.getElementById('mainContent').innerHTML = `<div class="empty">Failed to load data. Please check connection.</div>`;
     }
-    return '';
 }
 
-function getShiftBoundaries() {
-  const now = new Date();
-  const start = new Date(now);
-  start.setHours(7, 0, 0, 0);
-  if (now.getHours() < 7) { start.setDate(start.getDate() - 1); }
-  const end = new Date(start);
-  end.setDate(start.getDate() + 1);
-  return { start, end };
+function initFlatpickr() {
+    fp = flatpickr("#dateFilter", {
+        mode: "range",
+        dateFormat: "Y-m-d",
+        onChange: applyFilters
+    });
 }
 
-function parseGSheetTimestamp(str) {
-    if (!str) return null;
-    str = str.trim();
-    const parts = str.split(' ');
-    if (parts.length < 1) return null;
-    const dateParts = parts[0].split('/');
-    if (dateParts.length !== 3) return null;
-    const month = parseInt(dateParts[0]) - 1;
-    const day = parseInt(dateParts[1]);
-    const year = parseInt(dateParts[2]);
-    let h=0, m=0, s=0;
-    if (parts.length > 1) {
-        const timeParts = parts[1].split(':');
-        h = parseInt(timeParts[0]) || 0;
-        m = parseInt(timeParts[1]) || 0;
-        s = parseInt(timeParts[2]) || 0;
-    }
-    return new Date(year, month, day, h, m, s);
-}
-
-async function fetchProductionCount() {
-  if (!user) return;
-  const is360 = mode === '360';
-  try {
-    const countUrl = is360 ? DONE_COUNT_360_URL : DONE_COUNT_URL;
-    const response = await fetch(countUrl + (countUrl.includes('?') ? '&' : '?') + 'cb=' + Date.now());
-    if (!response.ok) return;
-    const csvData = await response.text();
-    const boundaries = getShiftBoundaries();
+function setMode(mode) {
+    currentMode = mode;
+    cursor = 0;
     
-    Papa.parse(csvData, {
-      header: true, skipEmptyLines: true,
-      complete: res => {
-        const fields = res.meta.fields || [];
-        const findFlexKey = (name) => {
-            const needle = name.trim().toLowerCase().replace(/\s+/g, ' ');
-            return fields.find(k => k.trim().toLowerCase().replace(/\s+/g, ' ') === needle);
-        };
-        const userKey = is360
-          ? (findFlexKey('QC By') || findFlexKey('QC  By') || findFlexKey('Login User'))
-          : (findFlexKey('Login User'));
-        const tsKey = findFlexKey('Timestamp');
+    // UI Update
+    document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(`tab-${mode}`).classList.add('active');
 
-        if (!userKey || !tsKey) return;
+    // Sync Filters
+    populateFilterDropdowns();
+    applyFilters();
+}
+
+function populateFilterDropdowns() {
+    const data = dataStore[currentMode];
+    const userKey = currentMode === 'images' ? 'qc-user' : 'User';
+    // For images mode, we'll map 'Submit Issue' or similar if needed, 
+    // but the request specifically mentioned Reason which exists in the 360 sheet.
+    const reasonKey = currentMode === 'images' ? 'Issue' : 'Reason'; 
+    
+    const ents = [...new Set(data.map(r => r.Enterprise).filter(Boolean))].sort();
+    const users = [...new Set(data.map(r => r[userKey]).filter(Boolean))].sort();
+    
+    // Get unique reasons from data
+    const reasons = [...new Set(data.map(r => r[reasonKey]).filter(Boolean))].sort();
+
+    const entSel = document.getElementById('entFilter');
+    const userSel = document.getElementById('userFilter');
+    const reasonSel = document.getElementById('reasonFilter');
+
+    entSel.innerHTML = '<option value="">All Enterprises</option>';
+    userSel.innerHTML = '<option value="">All Users</option>';
+    reasonSel.innerHTML = '<option value="">All Reasons</option>';
+
+    ents.forEach(v => entSel.add(new Option(v, v)));
+    users.forEach(v => userSel.add(new Option(v, v)));
+    reasons.forEach(v => reasonSel.add(new Option(v, v)));
+
+    entSel.onchange = applyFilters;
+    userSel.onchange = applyFilters;
+    reasonSel.onchange = applyFilters;
+}
+
+function applyFilters() {
+    const data = dataStore[currentMode];
+    const entVal = document.getElementById('entFilter').value;
+    const userVal = document.getElementById('userFilter').value;
+    const reasonVal = document.getElementById('reasonFilter').value;
+    
+    const userKey = currentMode === 'images' ? 'qc-user' : 'User';
+    const dateKey = currentMode === 'images' ? 'Timestamp' : 'Date';
+    const reasonKey = currentMode === 'images' ? 'Issue' : 'Reason';
+
+    const dates = fp ? fp.selectedDates : [];
+
+    filtered = data.filter(r => {
+        if (entVal && r.Enterprise !== entVal) return false;
+        if (userVal && r[userKey] !== userVal) return false;
+        if (reasonVal && r[reasonKey] !== reasonVal) return false;
         
-        const filteredEntries = res.data.filter(row => {
-          const rowUser = (row[userKey] || '').trim();
-          if (rowUser !== user) return false;
-          const rawTs = (row[tsKey] || '').trim();
-          const entryDate = parseGSheetTimestamp(rawTs);
-          return entryDate && entryDate >= boundaries.start && entryDate < boundaries.end;
-        });
-        
-        if (is360 === (mode === '360')) {
-          currentDoneCount = filteredEntries.length;
-          _id('doneCounter').textContent = `Done: ${currentDoneCount}`;
+        if (dates.length === 2 && r[dateKey]) {
+            const rowDate = new Date(r[dateKey].split(' ')[0]);
+            if (rowDate < dates[0] || rowDate > dates[1]) return false;
         }
-      }
+        return true;
     });
-  } catch (err) {}
+
+    cursor = 0;
+    render();
 }
 
-function setMode(m){
-  mode = m;
-  ['tabQC','tabEdit','tabTool','tab360'].forEach(id => _id(id).classList.remove('on'));
-  const activeTabId = m==='qc'?'tabQC':m==='edited'?'tabEdit':m==='qc_tool'?'tabTool':'tab360';
-  _id(activeTabId).classList.add('on');
-  
-  _id('contStdFilters').classList.toggle('hidden', m === '360');
-  _id('cont360Filters').classList.toggle('hidden', m !== '360');
-  _id('emptySetupMsg').classList.toggle('hidden', m === '360');
-  _id('tableContainer').classList.toggle('hidden', m !== '360');
-  _id('startBtn').classList.remove('hidden');
+function render() {
+    const content = document.getElementById('mainContent');
+    const footer = document.getElementById('navFooter');
+    const badge = document.getElementById('statusBadge');
 
-  currentDoneCount = 0;
-  _id('doneCounter').textContent = 'Done: …';
-
-  exitToSetup();
-  raw = []; preloadedIndices.clear();
-  loadData();
-}
-
-async function loadData() {
-  setLoading(true);
-  const url = mode==='qc'?QC_URL:(mode==='360'?THREE60_URL:EDIT_URL);
-  try {
-    const response = await fetch(url + (url.includes('?')?'&':'?') + 'cb=' + Date.now());
-    const csvData = await response.text();
-    Papa.parse(csvData, {
-      header: true, skipEmptyLines: true,
-      complete: res => {
-        raw = res.data.map(r => {
-          if (mode === '360') {
-            const issueField = getRowVal(r, ['Issues', 'validation_failure_reason', 'vdp_validation_failure_reason']);
-            return { 
-                ...r, ent: getRowVal(r, 'Enterprise'), sku: getRowVal(r, 'SKU_ID'), img: getRowVal(r, 'Spin_ID'), 
-                issue: issueField, u: getRowVal(r, 'User'), spin_url: getRowVal(r, 'spin_url'), 
-                status: getRowVal(r, ['status', 'Status']), date: getRowVal(r, 'Date')
-            };
-          }
-          const isQc = mode === 'qc';
-          const map = isQc ? FMAP.qc : FMAP.edited;
-          return {
-            ent: getRowVal(r, map.ent), img: getRowVal(r, map.img), sku: getRowVal(r, map.sku),
-            l: getRowVal(r, map.l), m: getRowVal(r, map.m), r: getRowVal(r, map.r),
-            u: getRowVal(r, map.u) || 'N/A', editor: getRowVal(r, ['last_editor_user', 'editor']) || 'N/A',
-            fqc: getRowVal(r, 'first_qc_user') || 'N/A', lqc: getRowVal(r, 'last_qc_user') || 'N/A',
-            issue: isQc ? '' : getRowVal(r, 'rejected_comments'), 
-            status: getRowVal(r, ['status', 'Status']), action: getRowVal(r, 'latest_image_action')
-          };
-        });
-        fillFilters(); updateCount(); setLoading(false);
-        fetchProductionCount();
-      }
-    });
-  } catch (err) { toast('Error loading data', 'err'); setLoading(false); }
-}
-
-function fillFilters(){
-  const populate = (id, list) => {
-    const sel = _id(id); if (!sel) return;
-    sel.innerHTML = `<option value="">${sel.options[0].text}</option>` + [...new Set(list.filter(Boolean).map(s=>s.trim()))].sort().map(v => `<option value="${v}">${v}</option>`).join('');
-  };
-  if (mode === '360') {
-    populate('userFilter360', raw.map(r=>r.u));
-    populate('entFilter360', raw.map(r=>r.ent));
-  } else {
-    populate('entFilter', raw.map(r=>r.ent));
-    populate('qcUFilter', raw.map(r=>r.u));
-  }
-}
-
-function getFiltered(){
-  if (mode === '360') {
-    const dates = fp360 ? fp360.selectedDates : [];
-    const startStr = dates[0] ? dates[0].toISOString().split('T')[0] : null;
-    const endStr = dates[1] ? dates[1].toISOString().split('T')[0] : null;
-    const userF = _id('userFilter360').value;
-    const entF = _id('entFilter360').value;
-    const issueType = _id('issueFilter360').value.toLowerCase();
-    return raw.filter(row => {
-      if (row.status !== '' && row.status.toLowerCase() !== 'null') return false;
-      const rowDate = row.date;
-      if (startStr && rowDate < startStr) return false;
-      if (endStr && rowDate > endStr) return false;
-      if (userF && row.u !== userF) return false;
-      if (entF && row.ent !== entF) return false;
-      if (issueType) {
-        const rowIssues = (row.issue || '').toLowerCase();
-        if (issueType === 'nullblank') { if (rowIssues.length > 0) return false; }
-        else if (!rowIssues.includes(issueType)) return false;
-      }
-      return true;
-    });
-  } else {
-    const ent = _id('entFilter').value, qcu = _id('qcUFilter').value;
-    return raw.filter(r => {
-      if (r.status !== '' && r.status.toLowerCase() !== 'null') return false;
-      if (ent && r.ent !== ent) return false;
-      if (qcu && r.u !== qcu) return false;
-      if (mode === 'qc_tool') { if (r.action !== 'qc_editingtool') return false; }
-      else if (mode === 'edited') { if (r.action === 'qc_editingtool') return false; }
-      return true;
-    });
-  }
-}
-
-function updateCount(){
-  const filtered = getFiltered();
-  _id('fcount').textContent = filtered.length.toLocaleString() + ' records';
-  if (mode === '360') renderTable(filtered);
-}
-
-function renderTable(data) {
-  let html = `<table><thead><tr><th>Date</th><th>Spin ID</th><th>SKU</th><th>Issues</th><th>Enterprise</th><th>User</th></tr></thead><tbody>`;
-  data.slice(0, 500).forEach((row) => {
-    html += `<tr><td>${row.date}</td><td><code>${row.img}</code></td><td>${row.sku}</td><td>${row.issue}</td><td>${row.ent}</td><td>${row.u}</td></tr>`;
-  });
-  _id('tableContainer').innerHTML = html + '</tbody></table>';
-}
-
-/**
- * UPDATED: Claude logic - Eager preload first 5 immediately
- */
-function startReview(){
-  group = getFiltered().sort(() => Math.random() - 0.5);
-  if(!group.length) return alert('No records');
-  idx = 0; 
-  preloadedIndices.clear();
-
-  // Claude: Preload first 5 records immediately before switching view
-  if (mode !== '360') {
-    for (let i = 0; i < Math.min(5, group.length); i++) {
-        const item = group[i];
-        prefetch(PROXY + item.l);
-        prefetch(PROXY + item.m);
-        if (mode !== 'qc') prefetch(PROXY + (item.r || item.m));
-        preloadedIndices.add(i);
+    if (filtered.length === 0) {
+        content.innerHTML = `<div class="empty">No records found for current filters.</div>`;
+        footer.style.display = 'none';
+        badge.innerText = '0 records';
+        return;
     }
-  }
 
-  _id('setupPage').style.display = 'none'; _id('reviewPage').style.display = 'flex';
-  showRecord();
-}
+    footer.style.display = 'block';
+    badge.innerText = `${filtered.length} records`;
+    document.getElementById('progText').innerText = `Record ${cursor + 1} of ${filtered.length}`;
+    document.getElementById('prevBtn').disabled = cursor === 0;
+    document.getElementById('nextBtn').disabled = cursor === filtered.length - 1;
 
-/**
- * UPDATED: Claude logic - Preload next 20 immediately
- */
-function preloadFuture(count = 20) {
-  if (mode === '360') return;
-  for (let i = 1; i <= count; i++) {
-    const targetIdx = idx + i;
-    if (targetIdx >= group.length) break;
-    if (!preloadedIndices.has(targetIdx)) {
-      const item = group[targetIdx];
-      prefetch(PROXY + item.l);
-      prefetch(PROXY + item.m);
-      if (mode !== 'qc') prefetch(PROXY + (item.r || item.m));
-      preloadedIndices.add(targetIdx);
-    }
-  }
-}
+    const r = filtered[cursor];
 
-function enableSubmit() {
-    if (imagesLoaded) return;
-    imagesLoaded = true;
-    if (safetyTimer) clearTimeout(safetyTimer);
-    _id('nextBtn').disabled = false;
-    _id('nextBtn').textContent = "Submit & Next →";
-}
-
-function checkAllLoaded() {
-    if (safetyTimer) clearTimeout(safetyTimer);
-    // Claude: More aggressive 100ms safety timer
-    safetyTimer = setTimeout(enableSubmit, 100);
-}
-
-/**
- * UPDATED: Claude logic - Efficient src assignment
- */
-function showRecord(){
-  const r = group[idx];
-  imagesLoaded = false; loadedCount = 0;
-  if (safetyTimer) clearTimeout(safetyTimer);
-  
-  _id('nextBtn').disabled = true; 
-  _id('nextBtn').textContent = "⌛ Loading...";
-
-  const is360 = mode === '360';
-  _id('imgArea').classList.toggle('hidden', is360);
-  _id('spinArea').classList.toggle('hidden', !is360);
-  _id('three60Issues').classList.toggle('hidden', !is360);
-  _id('standardIssues').classList.toggle('hidden', is360);
-  _id('doneLabel').classList.toggle('hidden', is360);
-
-  _id('mEnt').textContent = r.ent;
-  _id('mSku').textContent = r.sku;
-  _id('mImg').textContent = r.img;
-  _id('mQcUsers').textContent = [r.fqc, r.lqc, r.u].filter(u=>u&&u!=='N/A').join(', ');
-  _id('mEditor').textContent = r.editor;
-  _id('mEditorWrap').classList.toggle('hidden', !r.editor || mode === 'qc');
-  _id('mIssue').textContent = r.issue;
-  _id('mIssueWrap').classList.toggle('hidden', !r.issue);
-  _id('progLbl').textContent = `Record ${idx+1} of ${group.length}`;
-  _id('progFill').style.width = ((idx+1)/group.length*100) + '%';
-
-  if (is360) {
-    _id('spinIframe').src = r.spin_url;
-    _id('modalComment360').value = '';
-    checkAllLoaded();
-  } else {
-    const required = mode === 'qc' ? 2 : 3;
-    const imgs = [
-      { el: _id('imgL'), src: PROXY + r.l },
-      { el: _id('imgM'), src: PROXY + r.m },
-      ...(mode !== 'qc' ? [{ el: _id('imgR'), src: PROXY + (r.r || r.m) }] : [])
-    ];
-    
-    // Claude: Parallel assignment and no el.src = "" resets
-    imgs.forEach(({ el, src }) => {
-      // Re-use handlers if possible, but keep simple for this structure
-      el.onload = () => { el.classList.add('loaded'); loadedCount++; if (loadedCount >= required) enableSubmit(); };
-      el.onerror = () => { loadedCount++; if (loadedCount >= required) enableSubmit(); };
-      
-      // Only assign if src changed to avoid network cancel
-      if (el.src !== src) {
-          el.classList.remove('loaded');
-          el.src = src;
-      } else if (el.complete) {
-          el.classList.add('loaded');
-          loadedCount++;
-          if (loadedCount >= required) enableSubmit();
-      }
-    });
-
-    checkAllLoaded();
-    
-    if(mode === 'qc'){ _id('panelR').style.display = 'none'; _id('imgArea').className = 'img-area two-col'; }
-    else { _id('panelR').style.display = 'flex'; _id('imgArea').className = 'img-area'; }
-  }
-  
-  _id('prevBtn').disabled = idx === 0;
-  document.querySelectorAll('.issue-cb').forEach(cb => cb.checked = false);
-  _id(is360?'qc360_done':'cbDone').checked = true;
-
-  // Claude: Preload future records immediately upon showing current
-  preloadFuture(20);
-}
-
-function handleFinalSubmit() {
-    if (!imagesLoaded) return;
-    const r = group[idx];
-    const is360 = mode === '360';
-    const btn = _id('nextBtn');
-    
-    btn.disabled = true; 
-    btn.textContent = 'Submitting...';
-
-    const formUrl = is360 ? FORM_360 : FORM_STD;
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = formUrl;
-    form.target = 'hidden_iframe';
-
-    const data = {};
-    if (is360) {
-        data['entry.703277665'] = r.sku || '';
-        data['entry.179295275'] = r.date || '';
-        data['entry.1125049159'] = r.img || '';
-        data['entry.575622617'] = r.issue || '';
-        data['entry.1815472287'] = r.ent || '';
-        data['entry.582537694'] = r.u || '';
-        data['entry.1372347436'] = r.spin_url || '';
-        data['entry.1243416507'] = user || '';
-        
-        const checkedBoxes = Array.from(document.querySelectorAll('#three60Issues .issue-cb:checked')).map(cb => cb.value);
-        checkedBoxes.forEach(val => {
-            const input = document.createElement('input');
-            input.type = 'hidden'; input.name = 'entry.1751143375'; input.value = val;
-            form.appendChild(input);
-        });
-        
-        const comment = _id('modalComment360').value.trim();
-        if (comment) {
-            const other = document.createElement('input');
-            other.type = 'hidden'; other.name = 'entry.1751143375'; other.value = '__other_option__';
-            form.appendChild(other);
-            const otherVal = document.createElement('input');
-            otherVal.type = 'hidden'; otherVal.name = 'entry.1751143375.other_option_response'; otherVal.value = comment;
-            form.appendChild(otherVal);
-        }
+    if (currentMode === 'images') {
+        renderImages(r, content);
     } else {
-        data['entry.890284089'] = r.ent || '';
-        data['entry.5932044'] = [r.fqc, r.lqc, r.u].filter(x => x && x !== 'N/A').join(', ');
-        data['entry.1880389842'] = r.editor || '';
-        data['entry.1139236247'] = r.sku || '';
-        data['entry.661750446'] = r.img || '';
-        data['entry.1317530325'] = r.issue || '';
-        data['entry.1455673211'] = r.l || '';
-        data['entry.772576827'] = r.m || '';
-        data['entry.780536997'] = r.r || r.m;
-        data['entry.865196657'] = user || '';
-        
-        const checkedBoxes = Array.from(document.querySelectorAll('#standardIssues .issue-cb:checked, #doneLabel .issue-cb:checked')).map(cb => cb.value);
-        checkedBoxes.forEach(val => {
-            const input = document.createElement('input');
-            input.type = 'hidden'; input.name = 'entry.778698303'; input.value = val;
-            form.appendChild(input);
-        });
+        render360(r, content);
     }
-
-    for (const key in data) {
-        const input = document.createElement('input');
-        input.type = 'hidden'; input.name = key; input.value = data[key];
-        form.appendChild(input);
-    }
-
-    document.body.appendChild(form);
-    form.submit();
     
-    // Claude: Minimal delay to move on almost instantly
-    setTimeout(() => {
-        if (form.parentNode) document.body.removeChild(form);
-        afterSubmitActions();
-    }, 100);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function afterSubmitActions() {
-    toast('Submitted!'); 
-    currentDoneCount++;
-    _id('doneCounter').textContent = `Done: ${currentDoneCount}`;
-    if (idx < group.length - 1) { idx++; showRecord(); } 
-    else { alert('Review Finished.'); exitToSetup(); loadData(); }
+function render360(r, container) {
+    container.innerHTML = `
+        <div class="record-card">
+            <div class="meta-grid">
+                <div class="meta-item"><div class="meta-label">Date</div><div class="meta-value">${r.Date || '–'}</div></div>
+                <div class="meta-item"><div class="meta-label">SKU ID</div><div class="meta-value">${r.SKU_ID || '–'}</div></div>
+                <div class="meta-item"><div class="meta-label">Spin ID</div><div class="meta-value">${r.Spin_ID || '–'}</div></div>
+                <div class="meta-item"><div class="meta-label">Enterprise</div><div class="meta-value">${r.Enterprise || '–'}</div></div>
+                <div class="meta-item"><div class="meta-label">User</div><div class="meta-value">${r.User || '–'}</div></div>
+            </div>
+            <div style="padding: 12px 16px; border-bottom: 1px solid var(--line); display: flex; gap: 20px;">
+                <div><span class="meta-label" style="color:var(--warn)">⚠ Issue:</span> <span class="meta-value" style="color:var(--warn)">${r.Issues || 'None'}</span></div>
+                <div><span class="meta-label">Reason:</span> <span class="meta-value">${r.Reason || '–'}</span></div>
+            </div>
+            <div class="spin-frame-container">
+                <iframe src="${r.spin_url}" title="360 Viewer"></iframe>
+            </div>
+        </div>
+    `;
 }
 
-function setLoading(s) { _id('loadStrip').style.display = s ? 'flex' : 'none'; }
-function exitToSetup(){ _id('reviewPage').style.display = 'none'; _id('setupPage').style.display = 'flex'; }
-function doLogout(){ location.reload(); }
+function renderImages(r, container) {
+    const imgUrl = src => (src && src.startsWith('http')) ? PROXY + src : '';
+    
+    container.innerHTML = `
+        <div class="record-card">
+            <div class="meta-grid">
+                <div class="meta-item"><div class="meta-label">Date</div><div class="meta-value">${(r.Timestamp||'').split(' ')[0]}</div></div>
+                <div class="meta-item"><div class="meta-label">Enterprise</div><div class="meta-value">${r.Enterprise || '–'}</div></div>
+                <div class="meta-item"><div class="meta-label">SKU ID</div><div class="meta-value">${r.sku_id || '–'}</div></div>
+                <div class="meta-item"><div class="meta-label">QC User</div><div class="meta-value">${r['qc-user'] || '–'}</div></div>
+                <div class="meta-item"><div class="meta-label">Editor</div><div class="meta-value">${r['editing user'] || '–'}</div></div>
+            </div>
+             <div style="padding: 12px 16px; border-bottom: 1px solid var(--line); display: flex; gap: 20px;">
+                <div><span class="meta-label" style="color:var(--warn)">⚠ Issue:</span> <span class="meta-value" style="color:var(--warn)">${r.Issue || 'None'}</span></div>
+                <div><span class="meta-label">Comment:</span> <span class="meta-value">${r['Submit Issue'] || '–'}</span></div>
+            </div>
+            <div class="images-row">
+                <div class="img-pane"><div class="img-pane-label">Input</div><img src="${imgUrl(r['input image'])}"/></div>
+                <div class="img-pane"><div class="img-pane-label">AI Output</div><img src="${imgUrl(r['Ai image'])}"/></div>
+                <div class="img-pane"><div class="img-pane-label">Final</div><img src="${imgUrl(r['Final Image'])}"/></div>
+            </div>
+        </div>
+    `;
+}
 
-const doLogin = () => {
-    const name = _id('loginName').value, pw = _id('loginPw').value;
-    if(PWDS[name] === pw){
-        user = name; _id('tUser').textContent = name;
-        _id('tAvatar').textContent = name.split(' ').map(n=>n[0]).join('').toUpperCase();
-        _id('loginPage').style.display = 'none'; _id('app').style.display = 'flex';
-        setMode('qc');
-    } else _id('loginErr').style.display='block';
-};
-
-_id('loginBtn').onclick = doLogin;
-_id('loginPw').onkeydown = e => { if(e.key==='Enter') doLogin(); };
-
-document.querySelectorAll('.issue-cb').forEach(cb => {
-  cb.addEventListener('change', e => {
-    const is360 = mode === '360';
-    const doneId = is360 ? 'qc360_done' : 'cbDone';
-    if(e.target.id === doneId && e.target.checked) {
-        const q = is360 ? '#three60Issues .issue-cb:not(#qc360_done)' : '#standardIssues .issue-cb';
-        document.querySelectorAll(q).forEach(o => o.checked = false);
-        if(is360) _id('modalComment360').value = '';
-    } else if(e.target.checked) { _id(doneId).checked = false; }
-    else {
-        const others = is360 ? '#three60Issues .issue-cb:not(#qc360_done)' : '#standardIssues .issue-cb';
-        const checked = Array.from(document.querySelectorAll(others)).some(o=>o.checked);
-        if(!checked && (mode !== '360' || !_id('modalComment360').value)) _id(doneId).checked = true;
+function move(dir) {
+    const newIdx = cursor + dir;
+    if (newIdx >= 0 && newIdx < filtered.length) {
+        cursor = newIdx;
+        render();
     }
-  });
-});
+}
 
+function resetFilters() {
+    if(fp) fp.clear();
+    document.getElementById('entFilter').value = '';
+    document.getElementById('userFilter').value = '';
+    document.getElementById('reasonFilter').value = '';
+    applyFilters();
+}
+
+// Keyboard shortcuts
 document.addEventListener('keydown', e => {
-  if (_id('reviewPage').style.display === 'flex') {
-    if (mode === '360') { if (e.key >= '1' && e.key <= '3') { const cb = _id('qc360_' + e.key); if (cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); e.preventDefault(); } } }
-    else { if (e.key >= '1' && e.key <= '9') { const cb = _id('cb' + e.key); if (cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); e.preventDefault(); } } }
-    if (e.key === 'Enter') { handleFinalSubmit(); e.preventDefault(); }
-    if (e.key === 'Backspace' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-      if (idx > 0) { idx--; showRecord(); } e.preventDefault();
-    }
-  }
+    if (e.key === 'ArrowRight' || e.key === 'Enter') move(1);
+    if (e.key === 'ArrowLeft') move(-1);
 });
 
-_id('startBtn').onclick = startReview;
-_id('prevBtn').onclick = () => { if(idx > 0) { idx--; showRecord(); } };
-
-window.onload = () => {
-    fp360 = flatpickr("#dateRange360", { mode: "range", dateFormat: "Y-m-d", defaultDate: null, onClose: () => updateCount() });
-};
-
-['userFilter360','entFilter360', 'issueFilter360', 'entFilter', 'qcUFilter'].forEach(id => {
-  const el = _id(id); if (el) el.addEventListener('change', updateCount);
-});
+init();
 </script>
 </body>
 </html>
