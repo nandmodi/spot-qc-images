@@ -22,8 +22,7 @@
   --line2:#CDD1DA;
   --accent:#2563EB;
   --accent2:#1D4ED8;
-  --accentg:rgba(37,99,235,.1);
-  --accentlt:#EFF6FF;
+  --accentlt:#DBEAFE; 
   --ok:#16A34A;
   --oklt:#F0FDF4;
   --warn:#D97706;
@@ -54,27 +53,34 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 .t-title{font-size:14px;font-weight:700;color:#000;letter-spacing:-.01em}
 .t-space{flex:1}
 
-/* ── TAB SWITCHER ── */
-.tab-container {
+/* ── TAB UI (PILL STYLE) ── */
+.tab-section {
     background: var(--bg1);
+    padding: 8px 18px;
     border-bottom: 1px solid var(--line);
-    display: flex;
-    padding: 0 18px;
-    gap: 24px;
+}
+.tab-container {
+    background: var(--accentlt);
+    display: inline-flex;
+    padding: 4px;
+    border-radius: 10px;
+    gap: 4px;
 }
 .mode-tab {
-    padding: 14px 4px;
+    padding: 6px 20px;
     font-size: 13px;
     font-weight: 600;
     color: var(--t3);
     cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s;
+    border-radius: 7px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
 }
-.mode-tab:hover { color: var(--accent); }
+.mode-tab:hover { color: var(--t2); }
 .mode-tab.active {
+    background: var(--bg1);
     color: var(--accent);
-    border-bottom-color: var(--accent);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
 /* ── FILTER BAR ── */
@@ -172,16 +178,22 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
   <div id="statusBadge" style="font-size:11px; color:var(--t3); background:var(--bg2); padding:4px 10px; border-radius:100px;">Loading...</div>
 </div>
 
-<div class="tab-container">
-    <div id="tab-images" class="mode-tab active" onclick="setMode('images')">Image Review</div>
-    <div id="tab-360" class="mode-tab" onclick="setMode('360')">360 Review</div>
+<div class="tab-section">
+    <div class="tab-container">
+        <!-- Simplified to only two tabs -->
+        <div id="tab-images" class="mode-tab active" onclick="setMode('images')">Images</div>
+        <div id="tab-360" class="mode-tab" onclick="setMode('360')">360</div>
+    </div>
 </div>
 
 <div class="filter-bar">
   <div class="fi"><span class="fi-lbl">Date Range</span><input type="text" id="dateFilter" class="fi-date-range" placeholder="Select Range"/></div>
   <div class="fi"><span class="fi-lbl">Enterprise</span><select id="entFilter" class="fi-sel"><option value="">All</option></select></div>
   <div class="fi"><span class="fi-lbl">User</span><select id="userFilter" class="fi-sel"><option value="">All</option></select></div>
-  <div class="fi"><span class="fi-lbl">Reason</span><select id="reasonFilter" class="fi-sel"><option value="">All</option></select></div>
+  
+  <div class="fi" id="qcFilterGroup" style="display:none"><span class="fi-lbl">Reviewed By</span><select id="qcFilter" class="fi-sel"><option value="">All</option></select></div>
+  <div class="fi" id="reasonFilterGroup" style="display:none"><span class="fi-lbl">Reason</span><select id="reasonFilter" class="fi-sel"><option value="">All</option></select></div>
+  
   <div style="flex:1"></div>
   <button class="btn-reset" onclick="resetFilters()">✕ Reset</button>
 </div>
@@ -204,13 +216,14 @@ const URL_IMAGES = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY
 const URL_360 = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThoeXNovzUYQaHoFqHYY8p4hxrGTJWUPF8dQs0cinxvypfUVwAzFu74l06jhqXm0x611kRke13fa2t/pub?gid=1009592102&single=true&output=csv';
 const PROXY = 'https://media.spyneai.com/unsafe/0x0/filters:format(webp)/';
 
-let currentMode = 'images';
+const ALLOWED_360_REASONS = ["To Be Edited", "Wrong QC", "Wrong Marking"];
+
+let currentMode = 'images'; 
 let dataStore = { images: [], '360': [] };
 let filtered = [];
 let cursor = 0;
 let fp = null;
 
-// Initialization
 async function init() {
     try {
         const [imgRes, spinRes] = await Promise.all([
@@ -219,7 +232,9 @@ async function init() {
         ]);
 
         dataStore.images = Papa.parse(imgRes, {header:true, skipEmptyLines:true}).data.filter(r => r['Submit Issue'] !== 'Done');
-        dataStore['360'] = Papa.parse(spinRes, {header:true, skipEmptyLines:true}).data;
+        dataStore['360'] = Papa.parse(spinRes, {header:true, skipEmptyLines:true}).data.filter(r => 
+            ALLOWED_360_REASONS.includes(r.Reason)
+        );
 
         initFlatpickr();
         setMode('images');
@@ -240,65 +255,102 @@ function setMode(mode) {
     currentMode = mode;
     cursor = 0;
     
-    // UI Update
     document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
     document.getElementById(`tab-${mode}`).classList.add('active');
 
-    // Sync Filters
+    const is360 = (mode === '360');
+    document.getElementById('reasonFilterGroup').style.display = is360 ? 'flex' : 'none';
+    document.getElementById('qcFilterGroup').style.display = is360 ? 'flex' : 'none';
+
     populateFilterDropdowns();
     applyFilters();
 }
 
 function populateFilterDropdowns() {
     const data = dataStore[currentMode];
-    const userKey = currentMode === 'images' ? 'qc-user' : 'User';
-    // For images mode, we'll map 'Submit Issue' or similar if needed, 
-    // but the request specifically mentioned Reason which exists in the 360 sheet.
-    const reasonKey = currentMode === 'images' ? 'Issue' : 'Reason'; 
+    const userKey = currentMode === 'images' ? 'User ID' : 'User';
     
     const ents = [...new Set(data.map(r => r.Enterprise).filter(Boolean))].sort();
     const users = [...new Set(data.map(r => r[userKey]).filter(Boolean))].sort();
-    
-    // Get unique reasons from data
-    const reasons = [...new Set(data.map(r => r[reasonKey]).filter(Boolean))].sort();
 
     const entSel = document.getElementById('entFilter');
     const userSel = document.getElementById('userFilter');
-    const reasonSel = document.getElementById('reasonFilter');
 
     entSel.innerHTML = '<option value="">All Enterprises</option>';
     userSel.innerHTML = '<option value="">All Users</option>';
-    reasonSel.innerHTML = '<option value="">All Reasons</option>';
 
     ents.forEach(v => entSel.add(new Option(v, v)));
     users.forEach(v => userSel.add(new Option(v, v)));
-    reasons.forEach(v => reasonSel.add(new Option(v, v)));
+
+    if (currentMode === '360') {
+        const qcSel = document.getElementById('qcFilter');
+        const reasonSel = document.getElementById('reasonFilter');
+        const qcs = [...new Set(data.map(r => r['QC By']).filter(Boolean))].sort();
+        
+        qcSel.innerHTML = '<option value="">All Reviewers</option>';
+        qcs.forEach(v => qcSel.add(new Option(v, v)));
+        
+        reasonSel.innerHTML = '<option value="">All Reasons</option>';
+        ALLOWED_360_REASONS.forEach(v => reasonSel.add(new Option(v, v)));
+        
+        qcSel.onchange = applyFilters;
+        reasonSel.onchange = applyFilters;
+    }
 
     entSel.onchange = applyFilters;
     userSel.onchange = applyFilters;
-    reasonSel.onchange = applyFilters;
+}
+
+function parse360DateOnly(dateStr) {
+    if (!dateStr) return null;
+    const parts = dateStr.split(' ')[0].split('/');
+    if (parts.length === 3) {
+        return new Date(parts[2], parseInt(parts[0]) - 1, parts[1], 0, 0, 0, 0);
+    }
+    const d = new Date(dateStr);
+    d.setHours(0,0,0,0);
+    return d;
 }
 
 function applyFilters() {
     const data = dataStore[currentMode];
     const entVal = document.getElementById('entFilter').value;
     const userVal = document.getElementById('userFilter').value;
-    const reasonVal = document.getElementById('reasonFilter').value;
     
-    const userKey = currentMode === 'images' ? 'qc-user' : 'User';
-    const dateKey = currentMode === 'images' ? 'Timestamp' : 'Date';
-    const reasonKey = currentMode === 'images' ? 'Issue' : 'Reason';
+    const userKey = currentMode === 'images' ? 'User ID' : 'User';
+    const dateKey = 'Timestamp'; 
 
     const dates = fp ? fp.selectedDates : [];
+
+    const qcVal = currentMode === '360' ? document.getElementById('qcFilter').value : '';
+    const reasonVal = currentMode === '360' ? document.getElementById('reasonFilter').value : '';
 
     filtered = data.filter(r => {
         if (entVal && r.Enterprise !== entVal) return false;
         if (userVal && r[userKey] !== userVal) return false;
-        if (reasonVal && r[reasonKey] !== reasonVal) return false;
+        
+        if (currentMode === '360') {
+            if (qcVal && r['QC By'] !== qcVal) return false;
+            if (reasonVal && r.Reason !== reasonVal) return false;
+        }
         
         if (dates.length === 2 && r[dateKey]) {
-            const rowDate = new Date(r[dateKey].split(' ')[0]);
-            if (rowDate < dates[0] || rowDate > dates[1]) return false;
+            let rowDate;
+            if (currentMode === '360') {
+                rowDate = parse360DateOnly(r[dateKey]);
+            } else {
+                rowDate = new Date(r[dateKey].split(' ')[0]);
+                rowDate.setHours(0,0,0,0);
+            }
+
+            if (!rowDate || isNaN(rowDate.getTime())) return false;
+            
+            const dStart = new Date(dates[0]);
+            dStart.setHours(0,0,0,0);
+            const dEnd = new Date(dates[1]);
+            dEnd.setHours(0,0,0,0);
+            
+            if (rowDate < dStart || rowDate > dEnd) return false;
         }
         return true;
     });
@@ -313,7 +365,7 @@ function render() {
     const badge = document.getElementById('statusBadge');
 
     if (filtered.length === 0) {
-        content.innerHTML = `<div class="empty">No records found for current filters.</div>`;
+        content.innerHTML = `<div class="empty">No records found matching criteria.</div>`;
         footer.style.display = 'none';
         badge.innerText = '0 records';
         return;
@@ -340,11 +392,12 @@ function render360(r, container) {
     container.innerHTML = `
         <div class="record-card">
             <div class="meta-grid">
-                <div class="meta-item"><div class="meta-label">Date</div><div class="meta-value">${r.Date || '–'}</div></div>
+                <div class="meta-item"><div class="meta-label">Date</div><div class="meta-value">${r.Timestamp || '–'}</div></div>
                 <div class="meta-item"><div class="meta-label">SKU ID</div><div class="meta-value">${r.SKU_ID || '–'}</div></div>
                 <div class="meta-item"><div class="meta-label">Spin ID</div><div class="meta-value">${r.Spin_ID || '–'}</div></div>
                 <div class="meta-item"><div class="meta-label">Enterprise</div><div class="meta-value">${r.Enterprise || '–'}</div></div>
                 <div class="meta-item"><div class="meta-label">User</div><div class="meta-value">${r.User || '–'}</div></div>
+                <div class="meta-item"><div class="meta-label">QC By</div><div class="meta-value">${r['QC By'] || '–'}</div></div>
             </div>
             <div style="padding: 12px 16px; border-bottom: 1px solid var(--line); display: flex; gap: 20px;">
                 <div><span class="meta-label" style="color:var(--warn)">⚠ Issue:</span> <span class="meta-value" style="color:var(--warn)">${r.Issues || 'None'}</span></div>
@@ -366,6 +419,7 @@ function renderImages(r, container) {
                 <div class="meta-item"><div class="meta-label">Date</div><div class="meta-value">${(r.Timestamp||'').split(' ')[0]}</div></div>
                 <div class="meta-item"><div class="meta-label">Enterprise</div><div class="meta-value">${r.Enterprise || '–'}</div></div>
                 <div class="meta-item"><div class="meta-label">SKU ID</div><div class="meta-value">${r.sku_id || '–'}</div></div>
+                <div class="meta-item"><div class="meta-label">User ID</div><div class="meta-value">${r['User ID'] || '–'}</div></div>
                 <div class="meta-item"><div class="meta-label">QC User</div><div class="meta-value">${r['qc-user'] || '–'}</div></div>
                 <div class="meta-item"><div class="meta-label">Editor</div><div class="meta-value">${r['editing user'] || '–'}</div></div>
             </div>
@@ -394,11 +448,15 @@ function resetFilters() {
     if(fp) fp.clear();
     document.getElementById('entFilter').value = '';
     document.getElementById('userFilter').value = '';
-    document.getElementById('reasonFilter').value = '';
+    
+    const qcf = document.getElementById('qcFilter');
+    const rf = document.getElementById('reasonFilter');
+    if (qcf) qcf.value = '';
+    if (rf) rf.value = '';
+    
     applyFilters();
 }
 
-// Keyboard shortcuts
 document.addEventListener('keydown', e => {
     if (e.key === 'ArrowRight' || e.key === 'Enter') move(1);
     if (e.key === 'ArrowLeft') move(-1);
