@@ -343,7 +343,7 @@ fetch(CSV_IMAGES)
   .then(r => r.text())
   .then(csv => {
     imagesData = Papa.parse(csv, {header:true, skipEmptyLines:true}).data
-                     .filter(r => r['Submit Issue'] !== 'Done');
+                     .filter(r => (r['Submit Issue']||'').trim() !== 'Done');
     populateImagesFilters(imagesData);
     filtersReady.images = true;
     if (mode === 'images') applyFilters();
@@ -356,7 +356,8 @@ function loadData360() {
   fetch(CSV_360)
     .then(r => r.text())
     .then(csv => {
-      data360 = Papa.parse(csv, {header:true, skipEmptyLines:true}).data;
+      data360 = Papa.parse(csv, {header:true, skipEmptyLines:true}).data
+                    .filter(r => (r['Reason']||'').trim() !== 'Done');
       populate360Filters(data360);
       filtersReady['360'] = true;
       if (mode === '360') applyFilters();
