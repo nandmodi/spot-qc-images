@@ -378,9 +378,22 @@ function populateImagesFilters(data) {
   ['enterpriseFilter','qcUserFilter','editingUserFilter'].forEach(id =>
     document.getElementById(id).addEventListener('change', applyFilters));
 }
+// Find the actual column key by normalising (trim, lowercase, strip spaces/underscores)
+function findColKey(data, target) {
+  if (!data.length) return target;
+  const norm = s => s.trim().toLowerCase().replace(/[\s_]+/g,'');
+  const t = norm(target);
+  return Object.keys(data[0]).find(k => norm(k) === t) || target;
+}
+
+let qcByKey   = 'QC By';
+let user360Key = 'User';
+
 function populate360Filters(data) {
-  const users = [...new Set(data.map(r => r['User']).filter(Boolean))].sort();
-  const qcbys = [...new Set(data.map(r => r['QC By']).filter(Boolean))].sort();
+  qcByKey    = findColKey(data, 'QC By');
+  user360Key = findColKey(data, 'User');
+  const users = [...new Set(data.map(r => r[user360Key]).filter(Boolean))].sort();
+  const qcbys = [...new Set(data.map(r => r[qcByKey]).filter(Boolean))].sort();
   fill('user360Filter', users);
   fill('qcByFilter', qcbys);
   ['user360Filter','qcByFilter'].forEach(id =>
@@ -451,8 +464,8 @@ function applyFilters() {
       if (start && rd < start) return false;
       if (end   && rd > end)   return false;
       if (ent && r['Enterprise'] !== ent) return false;
-      if (user && r['User'] !== user)    return false;
-      if (qcby && r['QC By'] !== qcby)  return false;
+      if (user && r[user360Key] !== user) return false;
+      if (qcby && r[qcByKey] !== qcby)  return false;
       return true;
     }), isFiltered());
     idx360 = 0;
@@ -534,10 +547,10 @@ function render360() {
         <div class="mc-sub"><span class="mc-sub-l">SKU ID</span><span class="mc-sub-v">${r['SKU_ID']||'–'}</span></div>
         <div class="mc-sub"><span class="mc-sub-l">Spin ID</span><span class="mc-sub-v">${r['Spin_ID']||'–'}</span></div>
       </div>
-      <div class="mc"><span class="mc-l">User</span><span class="mc-v">${r['User']||'–'}</span></div>
+      <div class="mc"><span class="mc-l">User</span><span class="mc-v">${r[user360Key]||'–'}</span></div>
       <div class="mc mc-warn"><span class="mc-l">⚠ Issues</span><span class="mc-v">${r['Issues']||'–'}</span></div>
       <div class="mc"><span class="mc-l">Reason</span><span class="mc-v">${r['Reason']||'–'}</span></div>
-      <div class="mc"><span class="mc-l">Reviewer (QC By)</span><span class="mc-v">${r['QC By']||'–'}</span></div>
+      <div class="mc"><span class="mc-l">Reviewer (QC By)</span><span class="mc-v">${r[qcByKey]||'–'}</span></div>
     </div>
     <div class="media-area">
       ${spinBlock}
