@@ -3,8 +3,11 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Spyne · Meet Review</title>
+<title>Spyne QC</title>
 <link rel="icon" href="https://spyne-prod-ai.s3.us-east-1.amazonaws.com/ai-dataset/2025/logo/unnamed.png"/>
+<link rel="preconnect" href="https://media.spyneai.com" crossorigin>
+<link rel="dns-prefetch" href="https://media.spyneai.com">
+<link rel="preconnect" href="https://spyne-prod-ai.s3.us-east-1.amazonaws.com" crossorigin>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -12,592 +15,1205 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg0:#D6E8FA;
-  --bg1:#FFFFFF;
-  --bg2:#F7F8FA;
-  --bg3:#EEF0F4;
-  --line:#E2E5EB;
-  --line2:#CDD1DA;
-  --accent:#2563EB;
-  --accent2:#1D4ED8;
-  --accentg:rgba(37,99,235,.1);
-  --accentlt:#EFF6FF;
-  --warn:#D97706;
-  --danger:#DC2626;
-  --dangerlt:#FEF2F2;
-  --t1:#0F1523;
-  --t2:#374151;
-  --t3:#6B7280;
-  --t4:#9CA3AF;
-  --r:8px;
-  --mono:'IBM Plex Mono',monospace;
-  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.05);
+  --bg0:#D6E8FA; --bg1:#FFFFFF; --bg2:#F7F8FA; --bg3:#EEF0F4; --bg4:#E5E7EC;
+  --line:#E2E5EB; --line2:#CDD1DA; --accent:#2563EB; --accent2:#1D4ED8;
+  --accentg:rgba(37,99,235,.1); --accentlt:#EFF6FF; --ok:#16A34A;
+  --okg:rgba(22,163,74,.1); --oklt:#F0FDF4; --warn:#D97706; --warnlt:#FFFBEB;
+  --danger:#DC2626; --dangerg:rgba(220,38,38,.08); --dangerlt:#FEF2F2;
+  --t1:#0F1523; --t2:#374151; --t3:#6B7280; --t4:#9CA3AF; --r:8px; --rlg:12px;
+  --mono:'IBM Plex Mono',monospace; --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.05);
+  --shadow-md:0 4px 12px rgba(0,0,0,.08),0 1px 4px rgba(0,0,0,.04);
+  --shadow-lg:0 12px 40px rgba(0,0,0,.12),0 2px 8px rgba(0,0,0,.06);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;overflow:hidden}
-body{
-  font-family:'Inter',system-ui,sans-serif;
-  background:var(--bg0);color:var(--t1);
-  font-size:13px;line-height:1.4;
-  -webkit-font-smoothing:antialiased;
-  display:flex;flex-direction:column;
-}
+html,body{height:100%}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--t1);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow:hidden}
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--line2);border-radius:3px}
-
-/* ── TOPBAR 44px ── */
-.topbar{
-  height:44px;flex-shrink:0;
-  background:var(--bg1);border-bottom:1px solid var(--line);
-  display:flex;align-items:center;padding:0 14px;gap:10px;
-  z-index:30;box-shadow:var(--shadow);
-}
-.t-back{
-  font-size:11.5px;font-weight:500;color:var(--t3);
-  background:var(--bg2);border:1px solid var(--line2);
-  border-radius:6px;padding:0 10px;height:26px;cursor:pointer;
-  display:flex;align-items:center;gap:5px;text-decoration:none;transition:all .14s;
-}
-.t-back:hover{color:var(--t1);border-color:#9CA3AF;background:var(--bg0)}
-.t-sep{width:1px;height:18px;background:var(--line);margin:0 2px;flex-shrink:0}
-.t-title{font-size:13.5px;font-weight:700;color:#000;letter-spacing:-.01em}
-.t-space{flex:1}
-.t-count{font-family:var(--mono);font-size:10.5px;color:var(--t3);background:var(--bg2);border:1px solid var(--line);border-radius:5px;padding:2px 8px;white-space:nowrap}
-
-/* ── MODE TABS 44px ── */
-.mode-tabs{
-  height:44px;flex-shrink:0;
-  background:var(--bg1);border-bottom:1px solid var(--line);
-  display:flex;align-items:center;padding:0 14px;gap:6px;
-}
-.mode-tab{
-  font-size:12.5px;font-weight:600;
-  padding:0 16px;height:28px;border-radius:20px;
-  border:1.5px solid var(--line2);
-  background:var(--bg2);color:var(--t3);
-  cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:6px;user-select:none;
-}
-.mode-tab:hover{color:var(--t1);border-color:#9CA3AF;background:var(--bg3)}
-.mode-tab.active{
-  background:var(--accent);color:#fff;
-  border-color:var(--accent);
-  box-shadow:0 2px 8px rgba(37,99,235,.25);
-}
-
-/* ── FILTER BAR auto ── */
-.filter-bar{
-  flex-shrink:0;
-  background:var(--bg1);border-bottom:1px solid var(--line);
-  padding:5px 14px;display:flex;align-items:center;flex-wrap:wrap;gap:6px;
-}
-.fi{display:flex;align-items:center;gap:4px}
-.fi-lbl{font-size:10.5px;font-weight:700;color:#000;white-space:nowrap}
-.fi-sel,.fi-date-range{
-  font-family:'Inter',sans-serif;font-size:11.5px;color:var(--t1);
-  background:var(--bg2);border:1px solid var(--line);border-radius:5px;
-  padding:2px 8px;outline:none;cursor:pointer;transition:border-color .14s;height:24px;
-}
-.fi-sel{
-  -webkit-appearance:none;padding-right:22px;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5'%3E%3Cpath d='M1 1l3.5 3.5L8 1' stroke='%239CA3AF' stroke-width='1.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 6px center;max-width:150px;
-}
-.fi-date-range{min-width:190px;border-color:var(--accent)}
-.fi-sel:focus,.fi-date-range:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accentg)}
-.btn-reset{
-  font-size:11px;font-weight:500;
-  background:var(--dangerlt);border:1px solid #FCA5A5;color:var(--danger);
-  border-radius:5px;padding:0 10px;height:24px;cursor:pointer;transition:all .14s;
-}
-.btn-reset:hover{background:#FEE2E2}
-.fi-right{margin-left:auto;display:flex;align-items:center;gap:6px}
-.rec-count{font-family:var(--mono);font-size:10.5px;color:var(--t3)}
-
-/* ── LOAD STRIP ── */
-.load-strip{
-  display:none;flex-shrink:0;
-  align-items:center;gap:8px;padding:5px 14px;
-  background:var(--accentlt);border-bottom:1px solid var(--line);
-  font-size:11.5px;font-weight:500;color:var(--accent);
-}
-.load-spin{width:11px;height:11px;border:2px solid var(--line2);border-top-color:var(--accent);border-radius:50%;animation:rot .7s linear infinite;flex-shrink:0}
-@keyframes rot{to{transform:rotate(360deg)}}
-
-/* ── MAIN AREA fills all remaining height ── */
-.main-area{
-  flex:1;min-height:0;
-  display:flex;flex-direction:column;
-  overflow:hidden;
-}
-
-/* ── META PANEL (single compact row) ── */
-.meta-panel{
-  flex-shrink:0;
-  background:var(--bg1);
-  border-bottom:1px solid var(--line);
-  display:flex;align-items:stretch;
-  overflow-x:auto;
-}
-.mc{
-  padding:4px 12px;border-right:1px solid var(--line);
-  display:flex;flex-direction:column;justify-content:center;
-  min-width:0;flex:1;flex-shrink:0;
-}
-.mc:last-child{border-right:none}
-.mc-wide{flex:2}
-.mc-l{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--t4);white-space:nowrap;margin-bottom:1px}
-.mc-v{font-family:var(--mono);font-size:10.5px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mc-warn .mc-l{color:#B45309}
-.mc-warn .mc-v{color:var(--warn);font-weight:600;font-family:'Inter',sans-serif;font-size:10.5px}
-/* double cell */
-.mc-double{
-  padding:3px 12px;border-right:1px solid var(--line);
-  display:flex;flex-direction:column;justify-content:center;gap:2px;
-  min-width:120px;flex:1.3;flex-shrink:0;
-}
-.mc-double:last-child{border-right:none}
-.mc-sub{display:flex;align-items:baseline;gap:4px}
-.mc-sub-l{font-size:7.5px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--t4);min-width:38px;flex-shrink:0}
-.mc-sub-v{font-family:var(--mono);font-size:10.5px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-
-/* ── MEDIA AREA fills rest ── */
-.media-area{
-  flex:1;min-height:0;
-  display:flex;overflow:hidden;
-  background:#111318;
-}
-
-/* Images */
-.images-row{display:flex;flex:1;min-width:0;}
-.img-pane{
-  flex:1;min-width:0;position:relative;
-  background:#1A1C23;border-right:1px solid #2A2D38;
-  display:flex;align-items:center;justify-content:center;
-  overflow:hidden;
-}
-.img-pane:last-child{border-right:none}
-.img-pane-label{
-  position:absolute;top:8px;left:8px;z-index:5;
-  font-size:9px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
-  background:rgba(255,255,255,.85);border:1px solid rgba(0,0,0,.08);color:#374151;
-  padding:2px 7px;border-radius:4px;backdrop-filter:blur(6px);
-}
-.img-pane img{
-  max-width:100%;max-height:100%;
-  width:auto;height:auto;
-  object-fit:contain;display:block;
-}
-.img-err{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:6px;color:#555;width:100%;height:100%;
-}
-.img-err span{font-size:11px;opacity:.35;color:#aaa}
-
-/* 360 */
-.spin-pane{flex:1;display:flex;overflow:hidden;}
-.spin-pane iframe{flex:1;width:100%;height:100%;border:none;display:block;}
-.spin-err{
-  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:8px;color:#555;
-}
-.spin-err span{font-size:12px;opacity:.4;color:#aaa}
-
-/* ── BOTTOM BAR ── */
-.bottom-stick{
-  flex-shrink:0;background:var(--bg1);
-  box-shadow:0 -2px 8px rgba(0,0,0,.06);
-}
-.nav-bar{
-  height:40px;border-top:1px solid var(--line);
-  padding:0 14px;display:flex;align-items:center;gap:10px;
-}
-.prog-lbl{font-family:var(--mono);font-size:10px;color:#000;font-weight:700;min-width:96px}
-.prog-track{flex:1;max-width:220px;height:3px;background:var(--line);border-radius:2px;overflow:hidden}
-.prog-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s ease}
-.prog-pct{font-family:var(--mono);font-size:10px;color:var(--accent);font-weight:500;min-width:30px}
-.nav-space{flex:1}
-.btn-prev,.btn-next{
-  font-size:12px;font-weight:600;border:none;border-radius:6px;
-  padding:0 14px;height:28px;cursor:pointer;transition:all .14s;
-}
-.btn-prev{background:var(--bg2);border:1px solid var(--line2);color:var(--t2)}
-.btn-prev:hover{background:var(--bg3);color:var(--t1)}
-.btn-prev:disabled{opacity:.35;cursor:not-allowed}
-.btn-next{background:var(--accent);color:#fff}
-.btn-next:hover{background:var(--accent2);box-shadow:0 2px 10px rgba(37,99,235,.3)}
-.btn-next:disabled{opacity:.35;cursor:not-allowed}
-.kbd-hint{font-size:10px;color:var(--t4);display:flex;align-items:center;gap:4px}
-@media(max-width:600px){.kbd-hint{display:none}}
-.kbd{font-family:var(--mono);font-size:8.5px;background:var(--bg3);border:1px solid var(--line2);border-radius:3px;padding:1px 4px;color:var(--t3)}
-.managed-ribbon{
-  background:var(--bg2);border-top:1px solid var(--line);
-  color:var(--t3);font-size:9.5px;text-align:center;padding:2px 14px;
-}
-.managed-ribbon span{color:var(--accent);font-weight:600}
-
-/* empty */
-.empty-state{
-  flex:1;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:6px;color:var(--t3);
-}
-.empty-t{font-size:14px;font-weight:600;color:var(--t2)}
-.empty-b{font-size:12px}
+::-webkit-scrollbar-thumb{background:var(--line2);border-radius:2px}
 .hidden{display:none!important}
+
+@keyframes tIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
+@keyframes tOut{to{opacity:0;transform:translateX(-12px)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes rot{to{transform:rotate(360deg)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes popIn{from{opacity:0;transform:scale(.94) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+
+/* ── LOGIN ── */
+#loginPage{height:100%;display:flex;align-items:center;justify-content:center;background:var(--bg0);padding-bottom:30px}
+.login-card{width:390px;background:var(--bg1);border:1px solid var(--line);border-radius:var(--rlg);padding:44px 40px 38px;box-shadow:var(--shadow-lg);animation:slideUp .35s cubic-bezier(.22,.68,0,1.2) both}
+.login-h{font-size:20px;font-weight:800;letter-spacing:-.03em;margin-bottom:4px;color:#000}
+.login-sub{font-size:13px;color:var(--t3);margin-bottom:28px}
+.field+.field{margin-top:15px}
+.field-lbl{font-size:12px;font-weight:500;color:var(--t2);margin-bottom:5px;display:block}
+.field-in{width:100%;height:40px;padding:0 12px;background:var(--bg1);border:1px solid var(--line2);border-radius:var(--r);font-family:'Inter',sans-serif;font-size:14px;color:var(--t1);outline:none;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none}
+.field-in:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accentg)}
+.login-err{display:none;margin-top:14px;padding:10px 12px;background:var(--dangerlt);border:1px solid #FCA5A5;border-radius:var(--r);font-size:13px;color:var(--danger)}
+.btn-login{width:100%;height:42px;background:var(--accent);color:#fff;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;border:none;border-radius:var(--r);cursor:pointer;transition:background .15s,box-shadow .15s,transform .1s;letter-spacing:.01em}
+.btn-login:hover{background:var(--accent2);box-shadow:0 4px 16px rgba(37,99,235,.35)}
+
+/* ── APP SHELL ── */
+#app{display:none;flex-direction:column;height:100vh;padding-bottom:30px}
+.topbar{height:52px;background:var(--bg1);border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 18px;gap:8px;flex-shrink:0;z-index:30;box-shadow:var(--shadow)}
+.t-logo-img{height:28px; width:auto; display:block; margin-right:8px;}
+.mode-group{display:flex;background:var(--bg0);border:1px solid var(--line);border-radius:var(--r);padding:3px;gap:2px}
+.mode-pill{font-family:'Inter',sans-serif;font-size:12px;font-weight:500;padding:4px 13px;border:none;border-radius:6px;background:transparent;color:var(--t3);cursor:pointer;transition:all .14s;white-space:nowrap}
+.mode-pill.on{background:var(--bg1);color:var(--accent);font-weight:600;box-shadow:var(--shadow)}
+.t-space{flex:1}
+.t-chip{font-family:var(--mono);font-size:11px;color:var(--t3);background:var(--bg2);border:1px solid var(--line);border-radius:5px;padding:3px 9px;white-space:nowrap;display:flex;align-items:center}
+.t-chip.done-count{background:var(--oklt);color:var(--ok);border-color:var(--ok);font-weight:700}
+
+.t-avatar{width:28px;height:28px;background:var(--accentlt);border:1.5px solid var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--accent);flex-shrink:0;margin-right:6px}
+.t-uname{font-size:13px;font-weight:500;color:var(--t1)}
+
+.btn-sm{font-family:'Inter',sans-serif;font-size:12px;font-weight:500;background:transparent;border:1px solid var(--line2);border-radius:6px;color:var(--t3);padding:0 11px;height:28px;cursor:pointer;transition:all .14s;display:flex;align-items:center;justify-content:center}
+.btn-top-link{text-decoration:none;background:var(--bg2);border-color:var(--line2);color:var(--t2); font-family:inherit;}
+.btn-top-link:hover{background:var(--accentlt);border-color:var(--accent);color:var(--accent)}
+
+/* ── SETUP PAGE ── */
+#setupPage{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.filter-bar{background:var(--bg1);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;align-items:center;flex-wrap:wrap;gap:12px;flex-shrink:0}
+.fi-sel, .fi-in{font-family:'Inter',sans-serif;font-size:12px;color:var(--t1);background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:4px 8px;outline:none;cursor:pointer; height: 32px;}
+
+.range-box-container {
+    display: flex; align-items: center; background: var(--bg1); border: 1.5px solid var(--accent); border-radius: 6px; padding: 0 10px; height: 32px; gap: 8px; cursor: pointer; transition: box-shadow 0.2s;
+}
+.range-box-container label { font-size: 13px; font-weight: 700; color: #000; white-space: nowrap; margin-right: 4px; }
+.range-box-container input { border: none; background: transparent; font-size: 13px; color: var(--t2); outline: none; width: 170px; cursor: pointer; }
+
+.btn-start{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;background:var(--accent);color:#fff;border:none;border-radius:6px;padding:0 18px;height:34px;cursor:pointer;transition:background .14s;display:flex;align-items:center;gap:6px}
+.btn-start:hover{background:var(--accent2)}
+
+/* ── DASHBOARD TABLE ── */
+.table-wrap{flex:1;overflow:auto;background:var(--bg1);margin:12px 18px;border-radius:var(--rlg);border:1px solid var(--line);box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;min-width:900px}
+th{position:sticky;top:0;background:#f8fafc;padding:12px 16px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--accent);border-bottom:2px solid #edf2f7;z-index:5}
+td{padding:12px 16px;border-bottom:1px solid #edf2f7;font-size:13px;color:var(--t2)}
+tr:hover td{background:var(--bg2)}
+
+/* ── REVIEW PAGE ── */
+#reviewPage{display:none;flex-direction:column;flex:1;overflow:hidden;min-height:0}
+.rev-top{background:var(--bg1);border-bottom:1px solid var(--line);padding:0 18px;display:flex;align-items:stretch;overflow-x:auto;flex-shrink:0}
+.rmc{padding:9px 18px 9px 0;border-right:1px solid var(--line);margin-right:18px;flex-shrink:0;min-width:0;max-width:260px}
+.rmc-l{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#000;margin-bottom:2px}
+.rmc-v{font-family:var(--mono);font-size:11.5px;color:var(--t2);font-weight:400;overflow:hidden;text-overflow:ellipsis}
+
+.prog-row{background:var(--bg2);border-bottom:1px solid var(--line);padding:6px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.prog-track{flex:1;max-width:280px;height:4px;background:var(--line);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:var(--accent);transition:width .4s ease}
+
+.img-area{flex:1;display:grid;grid-template-columns:repeat(3,1fr);overflow:hidden;min-height:0}
+.img-area.two-col{grid-template-columns:1fr 1fr}
+.img-panel{position:relative;display:flex;flex-direction:column;background:#1A1C23;overflow:hidden;border-right:1px solid #2A2D38}
+.img-panel img{width:100%;height:100%;object-fit:contain;display:block;opacity:0;transition:opacity .15s ease;position:absolute;inset:0;image-rendering:auto;will-change:opacity}
+.img-panel img.loaded{opacity:1}
+.img-label{position:absolute;top:10px;left:10px;z-index:5;font-size:10.5px;font-weight:600;text-transform:uppercase;background:rgba(255,255,255,0.88);padding:3px 9px;border-radius:5px}
+.spin-frame{flex:1;width:100%;height:100%;border:none;background:#000}
+
+.rev-footer{background:var(--bg1);border-top:1px solid var(--line);padding:10px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0; position:relative; z-index:50}
+.issue-checkboxes{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center}
+.issue-cb-row{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:var(--t2);cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid var(--line);background:var(--bg2);transition:background 0.2s}
+.issue-cb-row:has(.issue-cb:checked){background:var(--dangerlt);border-color:#FCA5A5;color:var(--danger);font-weight:600}
+.issue-cb-row.done-row:has(.issue-cb:checked){background:var(--oklt);border-color:var(--ok);color:var(--ok)}
+.issue-cb{display:none}
+.issue-cb-num{font-family:var(--mono);font-size:9.5px;font-weight:700;background:var(--bg4);border-radius:3px;padding:1px 4px;color:var(--t3);line-height:1}
+.issue-cb-row:has(.issue-cb:checked) .issue-cb-num{background:var(--danger);color:#fff}
+
+.btn-sub{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;background:var(--ok);color:#fff;border:none;border-radius:var(--r);padding:0 20px;height:38px;cursor:pointer}
+.btn-sub:disabled{background:var(--line2);cursor:not-allowed;color:var(--t3);opacity:0.8}
+.btn-prev{font-family:'Inter',sans-serif;font-size:13px;font-weight:500;background:var(--bg1);border:1px solid var(--line2);padding:0 16px;height:38px;border-radius:var(--r);cursor:pointer}
+
+.comment-in{flex:1;height:38px;border-radius:6px;border:1px solid var(--line);padding:0 12px;font-size:13px; font-family:inherit; outline:none}
+.comment-in:focus{border-color:var(--accent)}
+
+.toast-shelf{position:fixed;bottom:35px;left:18px;z-index:999;display:flex;flex-direction:column;gap:7px}
+.toast{background:var(--bg1);border:1px solid var(--line);border-radius:var(--r);padding:10px 14px;font-size:12.5px;box-shadow:var(--shadow-md);display:flex;align-items:center;gap:8px;animation:tIn .22s ease both}
+.toast.ok{border-left:3px solid var(--ok)}
+.toast.err{border-left:3px solid var(--danger)}
+
+.bottom-ribbon {
+  position: fixed;
+  bottom: 0; left: 0; right: 0; height: 24px; background: var(--bg1); border-top: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--t3); z-index: 1000;
+}
+.bottom-ribbon a { color: var(--accent); text-decoration: none; font-weight: 600; margin-left: 4px; }
+.bottom-ribbon a:hover { text-decoration: underline; }
+
+.load-strip{display:none;align-items:center;gap:10px;padding:9px 18px;background:var(--accentlt);border-bottom:1px solid var(--line);font-size:12.5px;font-weight:500;color:var(--accent);flex-shrink:0}
+.spin{width:14px;height:14px;border:2px solid var(--line2);border-top-color:var(--accent);border-radius:50%;animation:rot .7s linear infinite;flex-shrink:0}
+
+/* ── QC STATUS BUTTON ── */
+.btn-qc-status {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0 14px;
+  height: 28px;
+  cursor: pointer;
+  transition: all .15s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  box-shadow: 0 1px 4px rgba(99,102,241,.3);
+}
+.btn-qc-status:hover { background: linear-gradient(135deg, #4f46e5, #4338ca); box-shadow: 0 3px 10px rgba(99,102,241,.4); }
+
+/* ── QC STATUS MODAL ── */
+#qcStatusModal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15,21,35,.45);
+  backdrop-filter: blur(3px);
+  animation: fadeIn .18s ease both;
+}
+#qcStatusModal.open { display: flex; }
+
+.qcs-card {
+  background: var(--bg1);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  width: 720px;
+  max-width: 96vw;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-lg);
+  animation: popIn .22s cubic-bezier(.22,.68,0,1.2) both;
+  overflow: hidden;
+}
+.qcs-header {
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.qcs-title {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--t1);
+  flex: 1;
+}
+.qcs-week-badge {
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--accentlt);
+  color: var(--accent);
+  border: 1px solid #bfdbfe;
+  border-radius: 20px;
+  padding: 3px 10px;
+  white-space: nowrap;
+}
+.qcs-close {
+  width: 28px; height: 28px;
+  border: 1px solid var(--line2);
+  border-radius: 6px;
+  background: var(--bg2);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  color: var(--t3);
+  transition: all .14s;
+}
+.qcs-close:hover { background: var(--dangerlt); color: var(--danger); border-color: #FCA5A5; }
+
+.qcs-loading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--t3);
+  font-size: 13px;
+  padding: 40px;
+}
+
+.qcs-body { flex: 1; overflow-y: auto; padding: 16px 22px 20px; }
+
+.qcs-mode-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.qcs-mode-tab {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 14px;
+  border: 1px solid var(--line2);
+  border-radius: 20px;
+  background: var(--bg2);
+  color: var(--t3);
+  cursor: pointer;
+  transition: all .14s;
+}
+.qcs-mode-tab.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.qcs-table-wrap { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.qcs-table { width: 100%; border-collapse: collapse; }
+.qcs-table th {
+  background: #f8fafc;
+  padding: 12px 14px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--accent);
+  border-bottom: 1.5px solid #edf2f7;
+}
+.qcs-table th:not(:first-child) { text-align: right; }
+.qcs-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #f0f4f8;
+  font-size: 13px;
+  color: var(--t2);
+  vertical-align: middle;
+}
+.qcs-table td:not(:first-child) { text-align: right; }
+.qcs-table tbody tr:last-child td { border-bottom: none; }
+.qcs-table tbody tr:hover td { background: var(--bg2); }
+
+.qcs-user-cell { display: flex; align-items: center; gap: 10px; text-align: left; }
+.qcs-avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 800;
+  flex-shrink: 0;
+}
+.qcs-total-val { font-family: var(--mono); color: var(--accent); font-weight: 600; }
+.qcs-rejected-val { font-family: var(--mono); color: var(--t2); font-weight: 600; }
+
+.qcs-footer-row td {
+  font-weight: 800;
+  background: #f8fafc !important;
+  border-top: 2px solid var(--line) !important;
+  color: var(--t1);
+}
+
+/* avatar colors */
+.av-0{background:#EEF2FF;color:#4338CA}
+.av-1{background:#FDF4FF;color:#7E22CE}
+.av-2{background:#ECFDF5;color:#065F46}
+.av-3{background:#FFF7ED;color:#9A3412}
+.av-4{background:#F0F9FF;color:#0369A1}
+.av-5{background:#FDF2F8;color:#9D174D}
+.av-6{background:#FFFBEB;color:#92400E}
 </style>
 </head>
 <body>
 
-<!-- TOPBAR -->
-<div class="topbar">
-  <a href="#" style="display:flex;align-items:center;text-decoration:none">
-    <img src="https://spyne-prod-ai.s3.us-east-1.amazonaws.com/ai-dataset/2025/logo/unnamed.png" style="height:26px;width:auto;" alt="Spyne"/>
-  </a>
-  <div class="t-sep"></div>
-  <span class="t-title">Meet Review</span>
-  <div class="t-space"></div>
-  <div class="t-count hidden" id="tCount"></div>
-  <a class="t-back" href="https://nandmodi.github.io/spot-qc-images/" target="_self">← Back to QC</a>
-</div>
-
-<!-- MODE TABS -->
-<div class="mode-tabs">
-  <div class="mode-tab active" id="tabImages" onclick="switchMode('images')">🖼 Images</div>
-  <div class="mode-tab" id="tab360" onclick="switchMode('360')">360° Spin</div>
-</div>
-
-<!-- LOAD STRIP -->
-<div class="load-strip" id="loadStrip">
-  <div class="load-spin"></div>
-  <span id="loadMsg">Loading records…</span>
-</div>
-
-<!-- FILTER BAR -->
-<div class="filter-bar">
-  <div class="fi"><span class="fi-lbl">Date Range</span><input type="text" id="dateRangeFilter" class="fi-date-range" placeholder="Select Range"/></div>
-  <div class="fi"><span class="fi-lbl">Enterprise</span><select id="enterpriseFilter" class="fi-sel"><option value="">All</option></select></div>
-  <div class="fi" id="fi-qcuser"><span class="fi-lbl">QC User</span><select id="qcUserFilter" class="fi-sel"><option value="">All</option></select></div>
-  <div class="fi" id="fi-editor"><span class="fi-lbl">Editor</span><select id="editingUserFilter" class="fi-sel"><option value="">All</option></select></div>
-  <div class="fi hidden" id="fi-user360"><span class="fi-lbl">User</span><select id="user360Filter" class="fi-sel"><option value="">All</option></select></div>
-  <div class="fi hidden" id="fi-qcby"><span class="fi-lbl">QC By</span><select id="qcByFilter" class="fi-sel"><option value="">All</option></select></div>
-  <div class="fi-right">
-    <span class="rec-count" id="recCount"></span>
-    <button class="btn-reset" id="resetBtn">✕ Reset</button>
+<div id="loginPage">
+  <div class="login-card">
+    <img src="https://spyne-prod-ai.s3.us-east-1.amazonaws.com/ai-dataset/2025/download.jpeg" style="height:38px; width:auto; margin-bottom:28px; display:block;" alt="Spyne Logo">
+    <div class="login-h">Welcome back</div>
+    <div class="login-sub">Sign in to QC Review</div>
+    <div class="login-err" id="loginErr">Incorrect name or password.</div>
+    <div class="field">
+      <label class="field-lbl">Your name</label>
+      <select id="loginName" class="field-in">
+        <option value="">— Select —</option>
+        <option>Nand Kishor</option><option>Ranbir Manoranjan</option><option>Nitin Kumar</option>
+        <option>Praveen Agarwal</option><option>Raj Tripathi</option><option>Rohit Chauhan</option><option>Ajay Devrani</option>
+      </select>
+    </div>
+    <div class="field">
+      <label class="field-lbl">Password</label>
+      <input type="password" id="loginPw" class="field-in" placeholder="Enter password"/>
+    </div>
+    <button class="btn-login" id="loginBtn" style="margin-top:20px">Sign in →</button>
   </div>
 </div>
 
-<!-- MAIN AREA -->
-<div class="main-area" id="mainArea">
-  <div class="empty-state">
-    <div class="empty-t">Loading records…</div>
-    <div class="empty-b">Fetching data from sheet.</div>
+<div id="app">
+  <div class="topbar">
+    <img src="https://spyne-prod-ai.s3.us-east-1.amazonaws.com/ai-dataset/2025/download.jpeg" class="t-logo-img" alt="Spyne">
+    <div class="mode-group">
+      <button class="mode-pill on" id="tabQC" onclick="setMode('qc')">QC Pass</button>
+      <button class="mode-pill" id="tabEdit" onclick="setMode('edited')">Re-Edit</button>
+      <button class="mode-pill" id="tabTool" onclick="setMode('qc_tool')">QC Tool</button>
+      <button class="mode-pill" id="tab360" onclick="setMode('360')">360</button>
+    </div>
+    <div class="t-space"></div>
+    <div class="t-chip done-count" id="doneCounter" style="margin-right:6px">Done: 0</div>
+    <button class="btn-qc-status" onclick="openQcStatus()" style="margin-right:6px">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v18H3z"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
+      QC Status
+    </button>
+    <a href="https://nandmodi.github.io/spot-qc/meet-review.html" target="_blank" class="btn-sm btn-top-link" style="margin-right:12px">Review</a>
+    
+    <div class="t-avatar" id="tAvatar">–</div>
+    <div class="t-uname" id="tUser" style="margin-right:12px">–</div>
+    
+    <button class="btn-sm" onclick="doLogout()">Logout</button>
+  </div>
+
+  <div id="setupPage">
+    <div class="filter-bar">
+      <div id="cont360Filters" class="hidden" style="display:contents">
+        <label style="font-weight: 700; font-size: 13px;">Date Range</label>
+        <div class="range-box-container">
+          <input type="text" id="dateRange360" placeholder="Select Range">
+        </div>
+        <label style="font-weight: 700; font-size: 13px; margin-left: 8px;">User</label>
+        <select id="userFilter360" class="fi-sel"><option value="">All Users</option></select>
+        <label style="font-weight: 700; font-size: 13px; margin-left: 8px;">Enterprise</label>
+        <select id="entFilter360" class="fi-sel"><option value="">All Enterprises</option></select>
+        <label style="font-weight: 700; font-size: 13px; margin-left: 8px;">Issue Level</label>
+        <select id="issueFilter360" class="fi-sel">
+          <option value="">All Issues</option>
+          <option value="nullblank">None / Blank</option>
+          <option value="blocker">Blocker</option>
+          <option value="high">High</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+
+      <div id="contStdFilters" style="display:contents">
+        <select id="entFilter" class="fi-sel"><option value="">All Enterprises</option></select>
+        <select id="qcUFilter" class="fi-sel"><option value="">All QC Users</option></select>
+      </div>
+
+      <div class="t-space"></div>
+      <span id="fcount" class="t-chip"></span>
+      <button class="btn-start" id="startBtn">▶ Start Review</button>
+    </div>
+    
+    <div class="load-strip" id="loadStrip"><div class="spin"></div><span id="loadTxt">Fetching data…</span></div>
+    
+    <div id="tableContainer" class="table-wrap hidden"></div>
+    <div id="emptySetupMsg" style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--t4)">Select filters and click Start Review.</div>
+  </div>
+
+  <div id="reviewPage">
+    <div class="rev-top">
+      <div class="rmc"><div class="rmc-l">Enterprise</div><div class="rmc-v" id="mEnt">-</div></div>
+      <div class="rmc"><div class="rmc-l">SKU ID</div><div class="rmc-v" id="mSku">-</div></div>
+      <div class="rmc"><div class="rmc-l" id="labelImg">Image ID</div><div class="rmc-v" id="mImg">-</div></div>
+      <div class="rmc"><div class="rmc-l" id="labelUser">QC Users</div><div class="rmc-v" id="mQcUsers">-</div></div>
+      <div class="rmc hidden" id="mEditorWrap"><div class="rmc-l">Editor</div><div class="rmc-v" id="mEditor">-</div></div>
+      <div class="rmc hidden" id="mIssueWrap" style="color:var(--warn)"><div class="rmc-l">Previous Issue</div><div class="rmc-v" id="mIssue">-</div></div>
+    </div>
+    
+    <div class="prog-row">
+      <div id="progLbl" style="font-size:11px;font-weight:700">Record 1 of 0</div>
+      <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    </div>
+
+    <div class="img-area" id="imgArea">
+      <div class="img-panel"><div class="img-label">Input</div><img id="imgL" src="" alt="Input" decoding="async" loading="eager"/></div>
+      <div class="img-panel"><div class="img-label">AI Output</div><img id="imgM" src="" alt="Output" decoding="async" loading="eager"/></div>
+      <div class="img-panel" id="panelR"><div class="img-label">Final Output</div><img id="imgR" src="" alt="Final" decoding="async" loading="eager"/></div>
+    </div>
+
+    <div id="spinArea" class="hidden" style="flex:1; display:flex">
+      <iframe id="spinIframe" class="spin-frame"></iframe>
+    </div>
+
+    <div class="rev-footer">
+      <div style="flex:1">
+        <div id="standardIssues" class="issue-checkboxes">
+          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb1" value="RBG issue"><span class="issue-cb-num">1</span>RBG issue</label>
+          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb2" value="See-through int"><span class="issue-cb-num">2</span>See-through int</label>
+          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb3" value="See-through ext"><span class="issue-cb-num">3</span>See-through ext</label>
+          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb4" value="Floor extension"><span class="issue-cb-num">4</span>Floor extension</label>
+          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb5" value="Tilt"><span class="issue-cb-num">5</span>Tilt</label>
+          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb6" value="Number Plate"><span class="issue-cb-num">6</span>Number Plate</label>
+          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb7" value="Shadow"><span class="issue-cb-num">7</span>Shadow</label>
+          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb8" value="Open-door RBG"><span class="issue-cb-num">8</span>Open-door RBG</label>
+          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="cb9" value="Wrong Marking"><span class="issue-cb-num">9</span>Wrong Marking</label>
+        </div>
+        <div id="three60Issues" class="issue-checkboxes hidden">
+          <label class="issue-cb-row done-row"><input type="checkbox" class="issue-cb" id="qc360_done" name="qcReason" value="Done">Done</label>
+          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="qc360_1" name="qcReason" value="Wrong QC"><span class="issue-cb-num">1</span>Wrong QC</label>
+          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="qc360_2" name="qcReason" value="To Be Edited"><span class="issue-cb-num">2</span>To Be Edited</label>
+          <label class="issue-cb-row"><input type="checkbox" class="issue-cb" id="qc360_3" name="qcReason" value="Missing Issue Marking"><span class="issue-cb-num">3</span>Missing Issue Marking</label>
+          <input type="text" id="modalComment360" class="comment-in" placeholder="Add comments here (Submits as Other option)...">
+        </div>
+      </div>
+      
+      <label class="issue-cb-row done-row" id="doneLabel"><input type="checkbox" class="issue-cb" id="cbDone" value="Done">Done</label>
+      
+      <div style="display:flex;gap:8px">
+        <button class="btn-prev" id="prevBtn" disabled>← Prev</button>
+        <button class="btn-sub" id="nextBtn" onclick="handleFinalSubmit()">Submit & Next →</button>
+        <button class="btn-prev" onclick="exitToSetup()">Exit</button>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- BOTTOM BAR -->
-<div class="bottom-stick" id="bottomStick" style="display:none">
-  <div class="nav-bar">
-    <div class="prog-lbl" id="progLbl">Record 1 of 0</div>
-    <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
-    <div class="prog-pct" id="progPct">0%</div>
-    <div class="nav-space"></div>
-    <div class="kbd-hint"><span class="kbd">←</span>Prev</div>
-    <button class="btn-prev" id="prevBtn" disabled>← Prev</button>
-    <button class="btn-next" id="nextBtn">Next →</button>
-    <div class="kbd-hint"><span class="kbd">→</span>Next</div>
-    <div class="kbd-hint"><span class="kbd">Enter</span>Next</div>
+<!-- QC STATUS MODAL -->
+<div id="qcStatusModal">
+  <div class="qcs-card">
+    <div class="qcs-header">
+      <div>
+        <div class="qcs-title">📊 QC Status</div>
+      </div>
+      <div class="qcs-week-badge" id="qcsWeekLabel">Week: —</div>
+      <button class="qcs-close" onclick="closeQcStatus()">✕</button>
+    </div>
+    <div class="qcs-body" id="qcsBody">
+      <div class="qcs-loading" id="qcsLoading">
+        <div class="spin"></div>
+        <span>Loading weekly data…</span>
+      </div>
+      <div id="qcsContent" class="hidden">
+        <div class="qcs-mode-tabs">
+          <button class="qcs-mode-tab active" id="qcsTabImg" onclick="switchQcsTab('img')">Images QC</button>
+          <button class="qcs-mode-tab" id="qcsTab360" onclick="switchQcsTab('360')">360 QC</button>
+        </div>
+        <div id="qcsImgTable"></div>
+        <div id="qcs360Table" class="hidden"></div>
+      </div>
+    </div>
   </div>
-  <div class="managed-ribbon">Managed by <span>kishor@spyne.ai</span></div>
 </div>
+
+<div class="bottom-ribbon">Managed by <a href="mailto:kishor@spyne.ai">kishor@spyne.ai</a></div>
+<div class="toast-shelf" id="toastShelf"></div>
+<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
 
 <script>
-const CSV_IMAGES = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=2128295653&single=true&output=csv';
-const CSV_360   = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThoeXNovzUYQaHoFqHYY8p4hxrGTJWUPF8dQs0cinxvypfUVwAzFu74l06jhqXm0x611kRke13fa2t/pub?gid=1009592102&single=true&output=csv';
-const PROXY     = 'https://media.spyneai.com/unsafe/0x0/filters:format(webp)/';
+const QC_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=1717039169&single=true&output=csv";
+const EDIT_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=320301246&single=true&output=csv";
+const THREE60_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThoeXNovzUYQaHoFqHYY8p4hxrGTJWUPF8dQs0cinxvypfUVwAzFu74l06jhqXm0x611kRke13fa2t/pub?gid=0&single=true&output=csv';
+const DONE_COUNT_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWW7muoNyeY_1VOLhybuT7ChNHtkhAscxDikyiCPQChIWqi1m3KXsd9e0_i_UFE7bDrW_7kfH-vIhL/pub?gid=2128295653&single=true&output=csv";
+const DONE_COUNT_360_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vThoeXNovzUYQaHoFqHYY8p4hxrGTJWUPF8dQs0cinxvypfUVwAzFu74l06jhqXm0x611kRke13fa2t/pub?gid=1009592102&single=true&output=csv";
 
-let mode = 'images';
-let imagesData = [], data360 = [];
-let imagesFiltered = [], filtered360 = [];
-let imagesIdx = 0, idx360 = 0;
-let fp = null;
-let filtersReady = { images: false, '360': false };
+const FORM_STD = "https://docs.google.com/forms/d/e/1FAIpQLSdrjhynjWITfOqHpkgKX8enCmDKg1b3s0Ij05Cux36kPmZEUA/formResponse";
+const FORM_360 = 'https://docs.google.com/forms/d/e/1FAIpQLSeQH6R9-rYr1Kh2rwUBKu7uGvJAkRrvx8fnxF6jfkac7sNL2A/formResponse';
 
-function normalizeDate(s) {
-  if (!s) return null;
-  const p = s.trim().split(' ')[0];
-  if (/^\d{4}-\d{2}-\d{2}$/.test(p)) return p;
-  const d = new Date(p);
-  return isNaN(d) ? p : d.toISOString().split('T')[0];
+const PROXY = "https://media.spyneai.com/unsafe/1280x0/filters:format(webp):quality(85)/";
+
+const FMAP = {
+  qc: { ent:'enterprise_name', img:'ai.image_id', sku:'sku_id', l:'input_image_hres_url', m:'output_image_hres_url', r:'manual_image_hres_url', u:'qc_user_name' },
+  edited: { ent:'enterprise_name', img:'ai.image_id', sku:'sku_id', l:'input_image_hres_url', m:'ai_output', r:'final_output', u:'last_qc_user' }
+};
+
+const AVATAR_COLORS = ['av-0','av-1','av-2','av-3','av-4','av-5','av-6'];
+
+let raw=[], group=[], idx=0, mode='qc', user='', fp360=null;
+let imagesLoaded = false, loadedCount = 0, currentDoneCount = 0;
+let safetyTimer = null;
+const preloadedIndices = new Set();
+const prefetchCache = new Set();
+
+// ── WEEK HELPERS ──
+function getCurrentWeekBounds() {
+  const now = new Date();
+  const day = now.getDay(); // 0=Sun,1=Mon,...6=Sat
+  const diffToMonday = (day === 0) ? -6 : 1 - day;
+  const monday = new Date(now);
+  monday.setDate(now.getDate() + diffToMonday);
+  monday.setHours(0, 0, 0, 0);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  sunday.setHours(23, 59, 59, 999);
+  return { monday, sunday };
 }
 
-function showLoad(msg) {
-  const s = document.getElementById('loadStrip');
-  s.style.display = 'flex';
-  document.getElementById('loadMsg').textContent = msg;
-}
-function hideLoad() { document.getElementById('loadStrip').style.display = 'none'; }
-
-// ── LOAD
-showLoad('Loading Images records…');
-fetch(CSV_IMAGES)
-  .then(r => r.text())
-  .then(csv => {
-    imagesData = Papa.parse(csv, {header:true, skipEmptyLines:true}).data
-                     .filter(r => r['Submit Issue'] !== 'Done');
-    populateImagesFilters(imagesData);
-    filtersReady.images = true;
-    if (mode === 'images') applyFilters();
-    loadData360();
-  })
-  .catch(() => { hideLoad(); showError(); });
-
-function loadData360() {
-  showLoad('Loading 360 records…');
-  fetch(CSV_360)
-    .then(r => r.text())
-    .then(csv => {
-      data360 = Papa.parse(csv, {header:true, skipEmptyLines:true}).data;
-      populate360Filters(data360);
-      filtersReady['360'] = true;
-      if (mode === '360') applyFilters();
-      hideLoad();
-      const chip = document.getElementById('tCount');
-      chip.textContent = (imagesData.length + data360.length).toLocaleString() + ' total';
-      chip.classList.remove('hidden');
-    })
-    .catch(() => hideLoad());
+function formatDate(d) {
+  return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
 }
 
-function populateImagesFilters(data) {
-  const ents = [...new Set(data.map(r => r['Enterprise']).filter(Boolean))].sort();
-  const qcus = [...new Set(data.flatMap(r => (r['qc-user']||'').split(',')).map(s=>s.trim()).filter(Boolean))].sort();
-  const eds  = [...new Set(data.map(r => r['editing user']).filter(Boolean))].sort();
-  fill('enterpriseFilter', ents, true);
-  fill('qcUserFilter', qcus);
-  fill('editingUserFilter', eds);
-  ['enterpriseFilter','qcUserFilter','editingUserFilter'].forEach(id =>
-    document.getElementById(id).addEventListener('change', applyFilters));
-}
-// Find the actual column key by normalising (trim, lowercase, strip spaces/underscores)
-function findColKey(data, target) {
-  if (!data.length) return target;
-  const norm = s => s.trim().toLowerCase().replace(/[\s_]+/g,'');
-  const t = norm(target);
-  return Object.keys(data[0]).find(k => norm(k) === t) || target;
+function isInCurrentWeek(dateObj) {
+  if (!dateObj) return false;
+  const { monday, sunday } = getCurrentWeekBounds();
+  return dateObj >= monday && dateObj <= sunday;
 }
 
-let qcByKey   = 'QC By';
-let user360Key = 'User';
-
-function populate360Filters(data) {
-  qcByKey    = findColKey(data, 'QC By');
-  user360Key = findColKey(data, 'User');
-  const users = [...new Set(data.map(r => r[user360Key]).filter(Boolean))].sort();
-  const qcbys = [...new Set(data.map(r => r[qcByKey]).filter(Boolean))].sort();
-  fill('user360Filter', users);
-  fill('qcByFilter', qcbys);
-  ['user360Filter','qcByFilter'].forEach(id =>
-    document.getElementById(id).addEventListener('change', applyFilters));
-}
-function fill(id, vals, append=false) {
-  const sel = document.getElementById(id);
-  if (!append) while(sel.options.length > 1) sel.remove(1);
-  vals.forEach(v => { const o = document.createElement('option'); o.value=v; o.text=v; sel.appendChild(o); });
+function prefetch(src) {
+  if (!src || prefetchCache.has(src)) return;
+  prefetchCache.add(src);
+  const i = new Image(); i.src = src;
 }
 
-function initFlatpickr() {
-  fp = flatpickr('#dateRangeFilter', { mode:'range', dateFormat:'Y-m-d', onChange: applyFilters });
+const PWDS = {"Nand Kishor":"spyne@123","Ranbir Manoranjan":"spyne@123","Nitin Kumar":"spyne@123","Praveen Agarwal":"spyne@123","Raj Tripathi":"spyne@123","Rohit Chauhan":"spyne@123","Ajay Devrani":"spyne@123"};
+
+function _id(id){ return document.getElementById(id); }
+
+function toast(msg, type='ok') {
+  const shelf = _id('toastShelf');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span>${type==='ok'?'✓':'⚠'}</span><span>${msg}</span>`;
+  shelf.appendChild(t);
+  setTimeout(() => { t.style.animation = 'tOut .2s ease both'; setTimeout(() => t.remove(), 200); }, 2500);
 }
 
-function switchMode(m) {
-  mode = m;
-  document.getElementById('tabImages').classList.toggle('active', m === 'images');
-  document.getElementById('tab360').classList.toggle('active', m === '360');
-  ['fi-qcuser','fi-editor'].forEach(id => document.getElementById(id).classList.toggle('hidden', m !== 'images'));
-  ['fi-user360','fi-qcby'].forEach(id => document.getElementById(id).classList.toggle('hidden', m !== '360'));
-  if (fp) fp.clear();
-  if (filtersReady[m]) applyFilters();
+function getRowVal(row, keysArray) {
+    if (!row) return '';
+    const keys = Object.keys(row);
+    if (!Array.isArray(keysArray)) keysArray = [keysArray];
+    for(let key of keysArray) {
+        const foundKey = keys.find(k => k.trim().toLowerCase() === key.toLowerCase());
+        if(foundKey && row[foundKey] !== undefined && row[foundKey] !== null) return row[foundKey].toString().trim();
+    }
+    return '';
 }
 
-function isFiltered() {
-  const sel = fp ? fp.selectedDates : [];
-  const hasDate = sel.length > 0;
-  const hasEnt  = !!document.getElementById('enterpriseFilter').value;
-  const hasImg  = !!(document.getElementById('qcUserFilter').value || document.getElementById('editingUserFilter').value);
-  const has360  = !!(document.getElementById('user360Filter').value || document.getElementById('qcByFilter').value);
-  return hasDate || hasEnt || hasImg || has360;
+function getShiftBoundaries() {
+  const now = new Date();
+  const start = new Date(now);
+  start.setHours(7, 0, 0, 0);
+  if (now.getHours() < 7) { start.setDate(start.getDate() - 1); }
+  const end = new Date(start);
+  end.setDate(start.getDate() + 1);
+  return { start, end };
 }
 
-function sortByDate(arr, ascending) {
-  return arr.slice().sort((a, b) => {
-    const da = normalizeDate(a['Timestamp']) || '';
-    const db = normalizeDate(b['Timestamp']) || '';
-    return ascending ? da.localeCompare(db) : db.localeCompare(da);
+function parseGSheetTimestamp(str) {
+    if (!str) return null;
+    str = str.trim();
+    const parts = str.split(' ');
+    if (parts.length < 1) return null;
+    const dateParts = parts[0].split('/');
+    if (dateParts.length !== 3) return null;
+    const month = parseInt(dateParts[0]) - 1;
+    const day = parseInt(dateParts[1]);
+    const year = parseInt(dateParts[2]);
+    let h=0, m=0, s=0;
+    if (parts.length > 1) {
+        const timeParts = parts[1].split(':');
+        h = parseInt(timeParts[0]) || 0;
+        m = parseInt(timeParts[1]) || 0;
+        s = parseInt(timeParts[2]) || 0;
+    }
+    return new Date(year, month, day, h, m, s);
+}
+
+async function fetchProductionCount() {
+  if (!user) return;
+  const is360 = mode === '360';
+  try {
+    const countUrl = is360 ? DONE_COUNT_360_URL : DONE_COUNT_URL;
+    const response = await fetch(countUrl + (countUrl.includes('?') ? '&' : '?') + 'cb=' + Date.now());
+    if (!response.ok) return;
+    const csvData = await response.text();
+    const boundaries = getShiftBoundaries();
+    
+    Papa.parse(csvData, {
+      header: true, skipEmptyLines: true,
+      complete: res => {
+        const fields = res.meta.fields || [];
+        const findFlexKey = (name) => {
+            const needle = name.trim().toLowerCase().replace(/\s+/g, ' ');
+            return fields.find(k => k.trim().toLowerCase().replace(/\s+/g, ' ') === needle);
+        };
+        const userKey = is360
+          ? (findFlexKey('User') || findFlexKey('QC By') || findFlexKey('QC  By') || findFlexKey('Login User'))
+          : (findFlexKey('qc-user') || findFlexKey('Login User'));
+        const tsKey = findFlexKey('Timestamp');
+
+        if (!userKey || !tsKey) return;
+        
+        const filteredEntries = res.data.filter(row => {
+          const rowUser = (row[userKey] || '').trim();
+          if (rowUser !== user) return false;
+          const rawTs = (row[tsKey] || '').trim();
+          const entryDate = parseGSheetTimestamp(rawTs);
+          return entryDate && entryDate >= boundaries.start && entryDate < boundaries.end;
+        });
+        
+        if (is360 === (mode === '360')) {
+          currentDoneCount = filteredEntries.length;
+          _id('doneCounter').textContent = `Done: ${currentDoneCount}`;
+        }
+      }
+    });
+  } catch (err) {}
+}
+
+// ── QC STATUS MODAL ──
+let qcsCurrentTab = 'img';
+let qcsImgData = null;
+let qcs360Data = null;
+
+function openQcStatus() {
+  _id('qcStatusModal').classList.add('open');
+  const { monday, sunday } = getCurrentWeekBounds();
+  _id('qcsWeekLabel').textContent = `Week: ${formatDate(monday)} – ${formatDate(sunday)}`;
+  _id('qcsLoading').classList.remove('hidden');
+  _id('qcsContent').classList.add('hidden');
+  qcsImgData = null;
+  qcs360Data = null;
+  qcsCurrentTab = 'img';
+  _id('qcsTabImg').classList.add('active');
+  _id('qcsTab360').classList.remove('active');
+  fetchQcsData();
+}
+
+function closeQcStatus() {
+  _id('qcStatusModal').classList.remove('open');
+}
+
+_id('qcStatusModal').addEventListener('click', function(e) {
+  if (e.target === this) closeQcStatus();
+});
+
+function switchQcsTab(tab) {
+  qcsCurrentTab = tab;
+  _id('qcsTabImg').classList.toggle('active', tab === 'img');
+  _id('qcsTab360').classList.toggle('active', tab === '360');
+  _id('qcsImgTable').classList.toggle('hidden', tab !== 'img');
+  _id('qcs360Table').classList.toggle('hidden', tab !== '360');
+}
+
+async function fetchQcsData() {
+  try {
+    const [imgResp, resp360] = await Promise.all([
+      fetch(DONE_COUNT_URL + '&cb=' + Date.now()),
+      fetch(DONE_COUNT_360_URL + '&cb=' + Date.now())
+    ]);
+    const [imgCsv, csv360] = await Promise.all([imgResp.text(), resp360.text()]);
+
+    // Parse Images QC data
+    await new Promise(resolve => {
+      Papa.parse(imgCsv, {
+        header: true, skipEmptyLines: true,
+        complete: res => {
+          qcsImgData = res.data;
+          resolve();
+        }
+      });
+    });
+
+    // Parse 360 QC data
+    await new Promise(resolve => {
+      Papa.parse(csv360, {
+        header: true, skipEmptyLines: true,
+        complete: res => {
+          qcs360Data = res.data;
+          resolve();
+        }
+      });
+    });
+
+    renderQcsTable();
+    _id('qcsLoading').classList.add('hidden');
+    _id('qcsContent').classList.remove('hidden');
+  } catch (err) {
+    _id('qcsLoading').innerHTML = '<span style="color:var(--danger)">⚠ Failed to load data. Please try again.</span>';
+  }
+}
+
+function renderQcsTable() {
+  const { monday, sunday } = getCurrentWeekBounds();
+
+  // ── IMAGES TABLE ──
+  if (qcsImgData) {
+    const fields = qcsImgData.length ? Object.keys(qcsImgData[0]) : [];
+    const findKey = (name) => {
+      const needle = name.trim().toLowerCase().replace(/\s+/g, ' ');
+      return fields.find(k => k.trim().toLowerCase().replace(/\s+/g, ' ') === needle);
+    };
+
+    // Correct column for Images QC User
+    const userKey = findKey('qc-user') || findKey('Login User');
+    const tsKey = findKey('Timestamp');
+    const issueKey = fields.find(k => {
+      const kl = k.trim().toLowerCase().replace(/\s+/g, ' ');
+      return kl.includes('submit issue') || kl.includes('issue') || kl.includes('submit');
+    });
+
+    const userStats = {};
+    qcsImgData.forEach(row => {
+      const rowUser = userKey ? (row[userKey] || '').trim() : '';
+      if (!rowUser) return;
+      const rawTs = tsKey ? (row[tsKey] || '').trim() : '';
+      const entryDate = parseGSheetTimestamp(rawTs);
+      if (!entryDate || entryDate < monday || entryDate > sunday) return;
+
+      if (!userStats[rowUser]) userStats[rowUser] = { total: 0, rejected: 0 };
+      userStats[rowUser].total++;
+      if (issueKey) {
+        const issueVal = (row[issueKey] || '').trim().toLowerCase();
+        if (issueVal && issueVal !== 'done') {
+          userStats[rowUser].rejected++;
+        }
+      }
+    });
+    _id('qcsImgTable').innerHTML = buildQcsHtml(userStats);
+  }
+
+  // ── 360 TABLE ──
+  if (qcs360Data) {
+    const fields360 = qcs360Data.length ? Object.keys(qcs360Data[0]) : [];
+    const findKey360 = (name) => {
+      const needle = name.trim().toLowerCase().replace(/\s+/g, ' ');
+      return fields360.find(k => k.trim().toLowerCase().replace(/\s+/g, ' ') === needle);
+    };
+
+    // User means "User" (Column) for 360
+    const userKey360 = findKey360('User') || findKey360('QC By') || findKey360('QC  By');
+    const tsKey360 = findKey360('Timestamp');
+    const reasonKey = fields360.find(k => {
+      const kl = k.trim().toLowerCase().replace(/\s+/g, ' ');
+      return kl === 'reason' || kl.includes('reason') || kl.includes('qc reason');
+    });
+
+    const userStats360 = {};
+    qcs360Data.forEach(row => {
+      const rowUser = userKey360 ? (row[userKey360] || '').trim() : '';
+      if (!rowUser) return;
+      const rawTs = tsKey360 ? (row[tsKey360] || '').trim() : '';
+      const entryDate = parseGSheetTimestamp(rawTs);
+      if (!entryDate || entryDate < monday || entryDate > sunday) return;
+
+      if (!userStats360[rowUser]) userStats360[rowUser] = { total: 0, rejected: 0 };
+      userStats360[rowUser].total++;
+      if (reasonKey) {
+        const reasonVal = (row[reasonKey] || '').trim().toLowerCase();
+        if (reasonVal && reasonVal !== 'done') {
+          userStats360[rowUser].rejected++;
+        }
+      }
+    });
+    _id('qcs360Table').innerHTML = buildQcsHtml(userStats360);
+  }
+}
+
+function buildQcsHtml(userStats) {
+  const users = Object.keys(userStats);
+  if (!users.length) {
+    return '<div style="text-align:center;padding:32px;color:var(--t4);font-size:13px">No data found for this week</div>';
+  }
+
+  users.sort((a, b) => userStats[b].total - userStats[a].total);
+
+  let totalAll = 0, rejectedAll = 0;
+  users.forEach(u => { totalAll += userStats[u].total; rejectedAll += userStats[u].rejected; });
+
+  let rows = '';
+  users.forEach((u, i) => {
+    const s = userStats[u];
+    const initials = u.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    const avClass = AVATAR_COLORS[i % AVATAR_COLORS.length];
+    rows += `
+      <tr>
+        <td>
+          <div class="qcs-user-cell">
+            <div class="qcs-avatar ${avClass}">${initials}</div>
+            <span class="qcs-user-name" title="${u}">${u}</span>
+          </div>
+        </td>
+        <td class="qcs-total-val">${s.total.toLocaleString()}</td>
+        <td class="qcs-rejected-val">${s.rejected.toLocaleString()}</td>
+      </tr>`;
   });
-}
 
-function applyFilters() {
-  const sel   = fp ? fp.selectedDates : [];
-  const start = sel[0] ? sel[0].toISOString().split('T')[0] : null;
-  const end   = sel[1] ? sel[1].toISOString().split('T')[0] : start;
-  const ent   = document.getElementById('enterpriseFilter').value;
-
-  if (mode === 'images') {
-    const qcu = document.getElementById('qcUserFilter').value;
-    const ed  = document.getElementById('editingUserFilter').value;
-    imagesFiltered = sortByDate(imagesData.filter(r => {
-      const rd = normalizeDate(r['Timestamp']);
-      if (start && rd < start) return false;
-      if (end   && rd > end)   return false;
-      if (ent && r['Enterprise'] !== ent) return false;
-      if (qcu && !(r['qc-user']||'').includes(qcu)) return false;
-      if (ed  && r['editing user'] !== ed) return false;
-      return true;
-    }), isFiltered());
-    imagesIdx = 0;
-    document.getElementById('recCount').textContent = imagesFiltered.length ? imagesFiltered.length.toLocaleString()+' records' : '';
-  } else {
-    const user = document.getElementById('user360Filter').value;
-    const qcby = document.getElementById('qcByFilter').value;
-    filtered360 = sortByDate(data360.filter(r => {
-      const rd = normalizeDate(r['Timestamp']);
-      if (start && rd < start) return false;
-      if (end   && rd > end)   return false;
-      if (ent && r['Enterprise'] !== ent) return false;
-      if (user && r[user360Key] !== user) return false;
-      if (qcby && r[qcByKey] !== qcby)  return false;
-      return true;
-    }), isFiltered());
-    idx360 = 0;
-    document.getElementById('recCount').textContent = filtered360.length ? filtered360.length.toLocaleString()+' records' : '';
-  }
-  render();
-}
-
-function render() {
-  if (mode === 'images') renderImages();
-  else render360();
-}
-
-function renderImages() {
-  const area = document.getElementById('mainArea');
-  const bot  = document.getElementById('bottomStick');
-  if (!imagesFiltered.length) {
-    area.innerHTML = `<div class="empty-state"><div class="empty-t">No records found</div><div class="empty-b">Try adjusting the filters.</div></div>`;
-    bot.style.display = 'none'; return;
-  }
-  bot.style.display = 'block';
-  const r = imagesFiltered[imagesIdx];
-  updateProgress(imagesIdx, imagesFiltered.length);
-
-  const imgEl = (src, label) => {
-    const has = src && src.startsWith('http');
-    return `<div class="img-pane">
-      <div class="img-pane-label">${label}</div>
-      ${has
-        ? `<img src="${PROXY+src}" alt="${label}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
-           <div class="img-err" style="display:none"><span>No image</span></div>`
-        : `<div class="img-err"><span>No image</span></div>`}
+  return `
+    <div class="qcs-table-wrap">
+      <table class="qcs-table">
+        <thead>
+          <tr>
+            <th>USER</th>
+            <th>TOTAL REVIEW</th>
+            <th>Rejected</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows}
+          <tr class="qcs-footer-row">
+            <td><strong>TOTAL</strong></td>
+            <td class="qcs-total-val">${totalAll.toLocaleString()}</td>
+            <td class="qcs-rejected-val">${rejectedAll.toLocaleString()}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>`;
+}
+
+function setMode(m){
+  mode = m;
+  ['tabQC','tabEdit','tabTool','tab360'].forEach(id => _id(id).classList.remove('on'));
+  const activeTabId = m==='qc'?'tabQC':m==='edited'?'tabEdit':m==='qc_tool'?'tabTool':'tab360';
+  _id(activeTabId).classList.add('on');
+  
+  _id('contStdFilters').classList.toggle('hidden', m === '360');
+  _id('cont360Filters').classList.toggle('hidden', m !== '360');
+  _id('emptySetupMsg').classList.toggle('hidden', m === '360');
+  _id('tableContainer').classList.toggle('hidden', m !== '360');
+  _id('startBtn').classList.remove('hidden');
+
+  currentDoneCount = 0;
+  _id('doneCounter').textContent = 'Done: …';
+
+  exitToSetup();
+  raw = []; preloadedIndices.clear();
+  loadData();
+}
+
+async function loadData() {
+  setLoading(true);
+  const url = mode==='qc'?QC_URL:(mode==='360'?THREE60_URL:EDIT_URL);
+  try {
+    const response = await fetch(url + (url.includes('?')?'&':'?') + 'cb=' + Date.now());
+    const csvData = await response.text();
+    Papa.parse(csvData, {
+      header: true, skipEmptyLines: true,
+      complete: res => {
+        raw = res.data.map(r => {
+          if (mode === '360') {
+            const issueField = getRowVal(r, ['Issues', 'validation_failure_reason', 'vdp_validation_failure_reason']);
+            return { 
+                ...r, ent: getRowVal(r, 'Enterprise'), sku: getRowVal(r, 'SKU_ID'), img: getRowVal(r, 'Spin_ID'), 
+                issue: issueField, u: getRowVal(r, 'User'), spin_url: getRowVal(r, 'spin_url'), 
+                status: getRowVal(r, ['status', 'Status']), date: getRowVal(r, 'Date')
+            };
+          }
+          const isQc = mode === 'qc';
+          const map = isQc ? FMAP.qc : FMAP.edited;
+          return {
+            ent: getRowVal(r, map.ent), img: getRowVal(r, map.img), sku: getRowVal(r, map.sku),
+            l: getRowVal(r, map.l), m: getRowVal(r, map.m), r: getRowVal(r, map.r),
+            u: getRowVal(r, map.u) || 'N/A', editor: getRowVal(r, ['last_editor_user', 'editor']) || 'N/A',
+            fqc: getRowVal(r, 'first_qc_user') || 'N/A', lqc: getRowVal(r, 'last_qc_user') || 'N/A',
+            issue: isQc ? '' : getRowVal(r, 'rejected_comments'), 
+            status: getRowVal(r, ['status', 'Status']), action: getRowVal(r, 'latest_image_action')
+          };
+        });
+        fillFilters(); updateCount(); setLoading(false);
+        fetchProductionCount();
+      }
+    });
+  } catch (err) { toast('Error loading data', 'err'); setLoading(false); }
+}
+
+function fillFilters(){
+  const populate = (id, list) => {
+    const sel = _id(id); if (!sel) return;
+    sel.innerHTML = `<option value="">${sel.options[0].text}</option>` + [...new Set(list.filter(Boolean).map(s=>s.trim()))].sort().map(v => `<option value="${v}">${v}</option>`).join('');
   };
-
-  area.innerHTML = `
-    <div class="meta-panel">
-      <div class="mc"><span class="mc-l">Date</span><span class="mc-v">${(r['Timestamp']||'').split(' ')[0]||'–'}</span></div>
-      <div class="mc"><span class="mc-l">Enterprise</span><span class="mc-v">${r['Enterprise']||'–'}</span></div>
-      <div class="mc-double">
-        <div class="mc-sub"><span class="mc-sub-l">SKU ID</span><span class="mc-sub-v">${r['sku_id']||'–'}</span></div>
-        <div class="mc-sub"><span class="mc-sub-l">Image ID</span><span class="mc-sub-v">${r['image_id']||'–'}</span></div>
-      </div>
-      <div class="mc"><span class="mc-l">QC User</span><span class="mc-v">${r['qc-user']||'–'}</span></div>
-      <div class="mc"><span class="mc-l">Editor</span><span class="mc-v">${r['editing user']||'–'}</span></div>
-      <div class="mc mc-warn"><span class="mc-l">⚠ Issue</span><span class="mc-v">${r['Issue']||'–'}</span></div>
-      <div class="mc mc-wide"><span class="mc-l">Comment (Submit Issue)</span><span class="mc-v">${r['Submit Issue']||'–'}</span></div>
-    </div>
-    <div class="media-area">
-      <div class="images-row">
-        ${imgEl(r['input image'], 'Input')}
-        ${imgEl(r['Ai image'],    'AI Output')}
-        ${imgEl(r['Final Image'], 'Final')}
-      </div>
-    </div>`;
-}
-
-function render360() {
-  const area = document.getElementById('mainArea');
-  const bot  = document.getElementById('bottomStick');
-  if (!filtered360.length) {
-    area.innerHTML = `<div class="empty-state"><div class="empty-t">No records found</div><div class="empty-b">Try adjusting the filters.</div></div>`;
-    bot.style.display = 'none'; return;
+  if (mode === '360') {
+    populate('userFilter360', raw.map(r=>r.u));
+    populate('entFilter360', raw.map(r=>r.ent));
+  } else {
+    populate('entFilter', raw.map(r=>r.ent));
+    populate('qcUFilter', raw.map(r=>r.u));
   }
-  bot.style.display = 'block';
-  const r = filtered360[idx360];
-  updateProgress(idx360, filtered360.length);
-
-  const spinUrl = r['spin_url'] || '';
-  const spinBlock = spinUrl
-    ? `<div class="spin-pane"><iframe src="${spinUrl}" allowfullscreen allow="accelerometer; gyroscope; autoplay"></iframe></div>`
-    : `<div class="spin-pane"><div class="spin-err"><span>No 360 spin URL</span></div></div>`;
-
-  area.innerHTML = `
-    <div class="meta-panel">
-      <div class="mc"><span class="mc-l">Date</span><span class="mc-v">${(r['Timestamp']||'').split(' ')[0]||'–'}</span></div>
-      <div class="mc"><span class="mc-l">Enterprise</span><span class="mc-v">${r['Enterprise']||'–'}</span></div>
-      <div class="mc-double">
-        <div class="mc-sub"><span class="mc-sub-l">SKU ID</span><span class="mc-sub-v">${r['SKU_ID']||'–'}</span></div>
-        <div class="mc-sub"><span class="mc-sub-l">Spin ID</span><span class="mc-sub-v">${r['Spin_ID']||'–'}</span></div>
-      </div>
-      <div class="mc"><span class="mc-l">User</span><span class="mc-v">${r[user360Key]||'–'}</span></div>
-      <div class="mc mc-warn"><span class="mc-l">⚠ Issues</span><span class="mc-v">${r['Issues']||'–'}</span></div>
-      <div class="mc"><span class="mc-l">Reason</span><span class="mc-v">${r['Reason']||'–'}</span></div>
-      <div class="mc"><span class="mc-l">Reviewer (QC By)</span><span class="mc-v">${r[qcByKey]||'–'}</span></div>
-    </div>
-    <div class="media-area">
-      ${spinBlock}
-    </div>`;
 }
 
-function updateProgress(i, total) {
-  const pct = Math.round(((i+1)/total)*100);
-  document.getElementById('progLbl').textContent  = `Record ${i+1} of ${total}`;
-  document.getElementById('progFill').style.width = pct+'%';
-  document.getElementById('progPct').textContent  = pct+'%';
-  document.getElementById('prevBtn').disabled = i === 0;
-  document.getElementById('nextBtn').disabled = i === total-1;
+function getFiltered(){
+  if (mode === '360') {
+    const dates = fp360 ? fp360.selectedDates : [];
+    const startStr = dates[0] ? dates[0].toISOString().split('T')[0] : null;
+    const endStr = dates[1] ? dates[1].toISOString().split('T')[0] : null;
+    const userF = _id('userFilter360').value;
+    const entF = _id('entFilter360').value;
+    const issueType = _id('issueFilter360').value.toLowerCase();
+    return raw.filter(row => {
+      if (row.status !== '' && row.status.toLowerCase() !== 'null') return false;
+      const rowDate = row.date;
+      if (startStr && rowDate < startStr) return false;
+      if (endStr && rowDate > endStr) return false;
+      if (userF && row.u !== userF) return false;
+      if (entF && row.ent !== entF) return false;
+      if (issueType) {
+        const rowIssues = (row.issue || '').toLowerCase();
+        if (issueType === 'nullblank') { if (rowIssues.length > 0) return false; }
+        else if (!rowIssues.includes(issueType)) return false;
+      }
+      return true;
+    });
+  } else {
+    const ent = _id('entFilter').value, qcu = _id('qcUFilter').value;
+    return raw.filter(r => {
+      if (r.status !== '' && r.status.toLowerCase() !== 'null') return false;
+      if (ent && r.ent !== ent) return false;
+      if (qcu && r.u !== qcu) return false;
+      if (mode === 'qc_tool') { if (r.action !== 'qc_editingtool') return false; }
+      else if (mode === 'edited') { if (r.action === 'qc_editingtool') return false; }
+      return true;
+    });
+  }
 }
 
-function showError() {
-  document.getElementById('mainArea').innerHTML = `<div class="empty-state"><div class="empty-t">Failed to load</div><div class="empty-b">Check connection and reload.</div></div>`;
+function updateCount(){
+  const filtered = getFiltered();
+  _id('fcount').textContent = filtered.length.toLocaleString() + ' records';
+  if (mode === '360') renderTable(filtered);
 }
 
-document.getElementById('prevBtn').addEventListener('click', () => {
-  if (mode==='images' && imagesIdx>0) { imagesIdx--; render(); }
-  else if (mode==='360' && idx360>0)  { idx360--;    render(); }
+function renderTable(data) {
+  let html = `<table><thead><tr><th>Date</th><th>Spin ID</th><th>SKU</th><th>Issues</th><th>Enterprise</th><th>User</th></tr></thead><tbody>`;
+  data.slice(0, 500).forEach((row) => {
+    html += `<tr><td>${row.date}</td><td><code>${row.img}</code></td><td>${row.sku}</td><td>${row.issue}</td><td>${row.ent}</td><td>${row.u}</td></tr>`;
+  });
+  _id('tableContainer').innerHTML = html + '</tbody></table>';
+}
+
+function startReview(){
+  group = getFiltered().sort(() => Math.random() - 0.5);
+  if(!group.length) return alert('No records');
+  idx = 0; 
+  preloadedIndices.clear();
+
+  if (mode !== '360') {
+    for (let i = 0; i < Math.min(5, group.length); i++) {
+        const item = group[i];
+        prefetch(PROXY + item.l);
+        prefetch(PROXY + item.m);
+        if (mode !== 'qc') prefetch(PROXY + (item.r || item.m));
+        preloadedIndices.add(i);
+    }
+  }
+
+  _id('setupPage').style.display = 'none'; _id('reviewPage').style.display = 'flex';
+  showRecord();
+}
+
+function preloadFuture(count = 20) {
+  if (mode === '360') return;
+  for (let i = 1; i <= count; i++) {
+    const targetIdx = idx + i;
+    if (targetIdx >= group.length) break;
+    if (!preloadedIndices.has(targetIdx)) {
+      const item = group[targetIdx];
+      prefetch(PROXY + item.l);
+      prefetch(PROXY + item.m);
+      if (mode !== 'qc') prefetch(PROXY + (item.r || item.m));
+      preloadedIndices.add(targetIdx);
+    }
+  }
+}
+
+function enableSubmit() {
+    if (imagesLoaded) return;
+    imagesLoaded = true;
+    if (safetyTimer) clearTimeout(safetyTimer);
+    _id('nextBtn').disabled = false;
+    _id('nextBtn').textContent = "Submit & Next →";
+}
+
+function checkAllLoaded() {
+    if (safetyTimer) clearTimeout(safetyTimer);
+    safetyTimer = setTimeout(enableSubmit, 100);
+}
+
+function showRecord(){
+  const r = group[idx];
+  imagesLoaded = false; loadedCount = 0;
+  if (safetyTimer) clearTimeout(safetyTimer);
+  
+  _id('nextBtn').disabled = true; 
+  _id('nextBtn').textContent = "⌛ Loading...";
+
+  const is360 = mode === '360';
+  _id('imgArea').classList.toggle('hidden', is360);
+  _id('spinArea').classList.toggle('hidden', !is360);
+  _id('three60Issues').classList.toggle('hidden', !is360);
+  _id('standardIssues').classList.toggle('hidden', is360);
+  _id('doneLabel').classList.toggle('hidden', is360);
+
+  _id('mEnt').textContent = r.ent;
+  _id('mSku').textContent = r.sku;
+  _id('mImg').textContent = r.img;
+  _id('mQcUsers').textContent = [r.fqc, r.lqc, r.u].filter(u=>u&&u!=='N/A').join(', ');
+  _id('mEditor').textContent = r.editor;
+  _id('mEditorWrap').classList.toggle('hidden', !r.editor || mode === 'qc');
+  _id('mIssue').textContent = r.issue;
+  _id('mIssueWrap').classList.toggle('hidden', !r.issue);
+  _id('progLbl').textContent = `Record ${idx+1} of ${group.length}`;
+  _id('progFill').style.width = ((idx+1)/group.length*100) + '%';
+
+  if (is360) {
+    _id('spinIframe').src = r.spin_url;
+    _id('modalComment360').value = '';
+    checkAllLoaded();
+  } else {
+    const required = mode === 'qc' ? 2 : 3;
+    const imgs = [
+      { el: _id('imgL'), src: PROXY + r.l },
+      { el: _id('imgM'), src: PROXY + r.m },
+      ...(mode !== 'qc' ? [{ el: _id('imgR'), src: PROXY + (r.r || r.m) }] : [])
+    ];
+    
+    imgs.forEach(({ el, src }) => {
+      el.onload = () => { el.classList.add('loaded'); loadedCount++; if (loadedCount >= required) enableSubmit(); };
+      el.onerror = () => { loadedCount++; if (loadedCount >= required) enableSubmit(); };
+      
+      if (el.src !== src) {
+          el.classList.remove('loaded');
+          el.src = src;
+      } else if (el.complete) {
+          el.classList.add('loaded');
+          loadedCount++;
+          if (loadedCount >= required) enableSubmit();
+      }
+    });
+
+    checkAllLoaded();
+    
+    if(mode === 'qc'){ _id('panelR').style.display = 'none'; _id('imgArea').className = 'img-area two-col'; }
+    else { _id('panelR').style.display = 'flex'; _id('imgArea').className = 'img-area'; }
+  }
+  
+  _id('prevBtn').disabled = idx === 0;
+  document.querySelectorAll('.issue-cb').forEach(cb => cb.checked = false);
+  _id(is360?'qc360_done':'cbDone').checked = true;
+
+  preloadFuture(20);
+}
+
+function handleFinalSubmit() {
+    if (!imagesLoaded) return;
+    const r = group[idx];
+    const is360 = mode === '360';
+    const btn = _id('nextBtn');
+    
+    btn.disabled = true; 
+    btn.textContent = 'Submitting...';
+
+    const formUrl = is360 ? FORM_360 : FORM_STD;
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = formUrl;
+    form.target = 'hidden_iframe';
+
+    const data = {};
+    if (is360) {
+        data['entry.703277665'] = r.sku || '';
+        data['entry.179295275'] = r.date || '';
+        data['entry.1125049159'] = r.img || '';
+        data['entry.575622617'] = r.issue || '';
+        data['entry.1815472287'] = r.ent || '';
+        data['entry.582537694'] = r.u || '';
+        data['entry.1372347436'] = r.spin_url || '';
+        data['entry.1243416507'] = user || '';
+        
+        const checkedBoxes = Array.from(document.querySelectorAll('#three60Issues .issue-cb:checked')).map(cb => cb.value);
+        checkedBoxes.forEach(val => {
+            const input = document.createElement('input');
+            input.type = 'hidden'; input.name = 'entry.1751143375'; input.value = val;
+            form.appendChild(input);
+        });
+        
+        const comment = _id('modalComment360').value.trim();
+        if (comment) {
+            const other = document.createElement('input');
+            other.type = 'hidden'; other.name = 'entry.1751143375'; other.value = '__other_option__';
+            form.appendChild(other);
+            const otherVal = document.createElement('input');
+            otherVal.type = 'hidden'; otherVal.name = 'entry.1751143375.other_option_response'; otherVal.value = comment;
+            form.appendChild(otherVal);
+        }
+    } else {
+        data['entry.890284089'] = r.ent || '';
+        data['entry.5932044'] = [r.fqc, r.lqc, r.u].filter(x => x && x !== 'N/A').join(', ');
+        data['entry.1880389842'] = r.editor || '';
+        data['entry.1139236247'] = r.sku || '';
+        data['entry.661750446'] = r.img || '';
+        data['entry.1317530325'] = r.issue || '';
+        data['entry.1455673211'] = r.l || '';
+        data['entry.772576827'] = r.m || '';
+        data['entry.780536997'] = r.r || r.m;
+        data['entry.865196657'] = user || '';
+        
+        const checkedBoxes = Array.from(document.querySelectorAll('#standardIssues .issue-cb:checked, #doneLabel .issue-cb:checked')).map(cb => cb.value);
+        checkedBoxes.forEach(val => {
+            const input = document.createElement('input');
+            input.type = 'hidden'; input.name = 'entry.778698303'; input.value = val;
+            form.appendChild(input);
+        });
+    }
+
+    for (const key in data) {
+        const input = document.createElement('input');
+        input.type = 'hidden'; input.name = key; input.value = data[key];
+        form.appendChild(input);
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+    
+    setTimeout(() => {
+        if (form.parentNode) document.body.removeChild(form);
+        afterSubmitActions();
+    }, 100);
+}
+
+function afterSubmitActions() {
+    toast('Submitted!'); 
+    currentDoneCount++;
+    _id('doneCounter').textContent = `Done: ${currentDoneCount}`;
+    if (idx < group.length - 1) { idx++; showRecord(); } 
+    else { alert('Review Finished.'); exitToSetup(); loadData(); }
+}
+
+function setLoading(s) { _id('loadStrip').style.display = s ? 'flex' : 'none'; }
+function exitToSetup(){ _id('reviewPage').style.display = 'none'; _id('setupPage').style.display = 'flex'; }
+function doLogout(){ location.reload(); }
+
+const doLogin = () => {
+    const name = _id('loginName').value, pw = _id('loginPw').value;
+    if(PWDS[name] === pw){
+        user = name; _id('tUser').textContent = name;
+        _id('tAvatar').textContent = name.split(' ').map(n=>n[0]).join('').toUpperCase();
+        _id('loginPage').style.display = 'none'; _id('app').style.display = 'flex';
+        setMode('qc');
+    } else _id('loginErr').style.display='block';
+};
+
+_id('loginBtn').onclick = doLogin;
+_id('loginPw').onkeydown = e => { if(e.key==='Enter') doLogin(); };
+
+document.querySelectorAll('.issue-cb').forEach(cb => {
+  cb.addEventListener('change', e => {
+    const is360 = mode === '360';
+    const doneId = is360 ? 'qc360_done' : 'cbDone';
+    if(e.target.id === doneId && e.target.checked) {
+        const q = is360 ? '#three60Issues .issue-cb:not(#qc360_done)' : '#standardIssues .issue-cb';
+        document.querySelectorAll(q).forEach(o => o.checked = false);
+        if(is360) _id('modalComment360').value = '';
+    } else if(e.target.checked) { _id(doneId).checked = false; }
+    else {
+        const others = is360 ? '#three60Issues .issue-cb:not(#qc360_done)' : '#standardIssues .issue-cb';
+        const checked = Array.from(document.querySelectorAll(others)).some(o=>o.checked);
+        if(!checked && (mode !== '360' || !_id('modalComment360').value)) _id(doneId).checked = true;
+    }
+  });
 });
-document.getElementById('nextBtn').addEventListener('click', () => {
-  if (mode==='images' && imagesIdx<imagesFiltered.length-1) { imagesIdx++; render(); }
-  else if (mode==='360' && idx360<filtered360.length-1)     { idx360++;    render(); }
-});
-document.getElementById('resetBtn').addEventListener('click', () => {
-  if (fp) fp.clear();
-  ['enterpriseFilter','qcUserFilter','editingUserFilter','user360Filter','qcByFilter']
-    .forEach(id => { document.getElementById(id).value = ''; });
-  applyFilters();
-});
+
 document.addEventListener('keydown', e => {
-  const arr = mode==='images' ? imagesFiltered : filtered360;
-  const cur = mode==='images' ? imagesIdx : idx360;
-  if ((e.key==='ArrowRight'||e.key==='Enter') && cur<arr.length-1) {
-    if (mode==='images') imagesIdx++; else idx360++;
-    render();
-  }
-  if (e.key==='ArrowLeft' && cur>0) {
-    if (mode==='images') imagesIdx--; else idx360--;
-    render();
+  if (_id('reviewPage').style.display === 'flex') {
+    if (mode === '360') { if (e.key >= '1' && e.key <= '3') { const cb = _id('qc360_' + e.key); if (cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); e.preventDefault(); } } }
+    else { if (e.key >= '1' && e.key <= '9') { const cb = _id('cb' + e.key); if (cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); e.preventDefault(); } } }
+    if (e.key === 'Enter') { handleFinalSubmit(); e.preventDefault(); }
+    if (e.key === 'Backspace' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+      if (idx > 0) { idx--; showRecord(); } e.preventDefault();
+    }
   }
 });
 
-initFlatpickr();
+_id('startBtn').onclick = startReview;
+_id('prevBtn').onclick = () => { if(idx > 0) { idx--; showRecord(); } };
+
+window.onload = () => {
+    fp360 = flatpickr("#dateRange360", { mode: "range", dateFormat: "Y-m-d", defaultDate: null, onClose: () => updateCount() });
+};
+
+['userFilter360','entFilter360', 'issueFilter360', 'entFilter', 'qcUFilter'].forEach(id => {
+  const el = _id(id); if (el) el.addEventListener('change', updateCount);
+});
 </script>
 </body>
 </html>
