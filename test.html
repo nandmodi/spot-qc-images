@@ -175,6 +175,7 @@ tr:hover td{background:var(--bg2)}
   background: rgba(15,21,35,.45);
   backdrop-filter: blur(3px);
   animation: fadeIn .18s ease both;
+  padding: 24px;
 }
 #qcStatusModal.open { display: flex; }
 
@@ -182,9 +183,9 @@ tr:hover td{background:var(--bg2)}
   background: var(--bg1);
   border: 1px solid var(--line);
   border-radius: 16px;
-  width: 820px;
-  max-width: 96vw;
-  max-height: 85vh;
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
   display: flex;
   flex-direction: column;
   box-shadow: var(--shadow-lg);
@@ -267,9 +268,9 @@ tr:hover td{background:var(--bg2)}
 
 .qcs-table-wrap { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
 .qcs-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-.qcs-table colgroup col:nth-child(1) { width: 55%; }
-.qcs-table colgroup col:nth-child(2) { width: 22%; }
-.qcs-table colgroup col:nth-child(3) { width: 23%; }
+.qcs-table colgroup col:nth-child(1) { width: 50%; }
+.qcs-table colgroup col:nth-child(2) { width: 25%; }
+.qcs-table colgroup col:nth-child(3) { width: 25%; }
 .qcs-table th {
   background: #f8fafc;
   padding: 10px 14px;
