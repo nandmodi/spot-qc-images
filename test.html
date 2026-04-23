@@ -182,7 +182,7 @@ tr:hover td{background:var(--bg2)}
   background: var(--bg1);
   border: 1px solid var(--line);
   border-radius: 16px;
-  width: 680px;
+  width: 820px;
   max-width: 96vw;
   max-height: 85vh;
   display: flex;
@@ -266,7 +266,10 @@ tr:hover td{background:var(--bg2)}
 }
 
 .qcs-table-wrap { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
-.qcs-table { width: 100%; border-collapse: collapse; }
+.qcs-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.qcs-table colgroup col:nth-child(1) { width: 55%; }
+.qcs-table colgroup col:nth-child(2) { width: 22%; }
+.qcs-table colgroup col:nth-child(3) { width: 23%; }
 .qcs-table th {
   background: #f8fafc;
   padding: 10px 14px;
@@ -277,6 +280,9 @@ tr:hover td{background:var(--bg2)}
   letter-spacing: .06em;
   color: var(--accent);
   border-bottom: 1.5px solid #edf2f7;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .qcs-table th:not(:first-child) { text-align: center; }
 .qcs-table td {
@@ -285,6 +291,8 @@ tr:hover td{background:var(--bg2)}
   font-size: 13px;
   color: var(--t2);
   vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .qcs-table td:not(:first-child) { text-align: center; }
 .qcs-table tbody tr:last-child td { border-bottom: none; }
@@ -736,74 +744,78 @@ async function fetchQcsData() {
   }
 }
 
-function flexFind(fields, exactName) {
-  // Exact match first (case-insensitive, trim whitespace)
-  const needle = exactName.trim().toLowerCase();
-  return fields.find(k => k.trim().toLowerCase() === needle) || null;
+function flexFind(fields, name) {
+  const needle = name.trim().toLowerCase();
+  // 1. Exact match
+  let hit = fields.find(k => k.trim().toLowerCase() === needle);
+  if (hit) return hit;
+  // 2. Partial match
+  hit = fields.find(k => k.trim().toLowerCase().includes(needle));
+  return hit || null;
 }
 
 function renderQcsTable() {
   const { monday, sunday } = getCurrentWeekBounds();
 
   // ── IMAGES TABLE ──
-  // Source: DONE_COUNT_URL sheet
-  // User col  : "qc-user"
-  // Timestamp : "Timestamp"
-  // Rejected  : "Submit Issue" !== "Done"
+  // User      : column "qc-user"
+  // Timestamp : column "Timestamp"
+  // Rejected  : Total - count(rows where "Submit Issue" === "Done")
   if (qcsImgData) {
-    const fields = qcsImgData.length ? Object.keys(qcsImgData[0]) : [];
-    const userKey   = flexFind(fields, 'qc-user') || flexFind(fields, 'qc_user') || flexFind(fields, 'Login User');
-    const tsKey     = flexFind(fields, 'Timestamp');
-    const issueKey  = flexFind(fields, 'Submit Issue');
+    const fields   = qcsImgData.length ? Object.keys(qcsImgData[0]) : [];
+    const userKey  = flexFind(fields, 'qc-user') || flexFind(fields, 'qc_user') || flexFind(fields, 'login user');
+    const tsKey    = flexFind(fields, 'timestamp');
+    const issueKey = flexFind(fields, 'submit issue');
 
     const userStats = {};
     qcsImgData.forEach(row => {
       const rowUser = userKey ? (row[userKey] || '').trim() : '';
       if (!rowUser) return;
-      const entryDate = parseGSheetTimestamp((row[tsKey] || '').trim());
+      const entryDate = parseGSheetTimestamp((tsKey ? row[tsKey] : '') || '');
       if (!entryDate || entryDate < monday || entryDate > sunday) return;
 
-      if (!userStats[rowUser]) userStats[rowUser] = { total: 0, rejected: 0 };
+      if (!userStats[rowUser]) userStats[rowUser] = { total: 0, doneCount: 0 };
       userStats[rowUser].total++;
 
       if (issueKey) {
         const val = (row[issueKey] || '').trim().toLowerCase();
-        // Rejected = value exists and is NOT "done"
-        if (val && val !== 'done') userStats[rowUser].rejected++;
+        if (val === 'done') userStats[rowUser].doneCount++;
       }
     });
 
+    // rejected = total - done
+    Object.values(userStats).forEach(s => { s.rejected = s.total - s.doneCount; });
     _id('qcsImgTable').innerHTML = buildQcsHtml(userStats);
   }
 
   // ── 360 TABLE ──
-  // Source: DONE_COUNT_360_URL sheet
-  // User col  : "User"
-  // Timestamp : "Timestamp"
-  // Rejected  : "Reason" !== "Done"
+  // User      : column "User"
+  // Timestamp : column "Timestamp"
+  // Rejected  : Total - count(rows where "Reason" === "Done")
   if (qcs360Data) {
     const fields360  = qcs360Data.length ? Object.keys(qcs360Data[0]) : [];
-    const userKey360 = flexFind(fields360, 'User');
-    const tsKey360   = flexFind(fields360, 'Timestamp');
-    const reasonKey  = flexFind(fields360, 'Reason');
+    const userKey360 = flexFind(fields360, 'user');
+    const tsKey360   = flexFind(fields360, 'timestamp');
+    const reasonKey  = flexFind(fields360, 'reason');
 
     const userStats360 = {};
     qcs360Data.forEach(row => {
       const rowUser = userKey360 ? (row[userKey360] || '').trim() : '';
       if (!rowUser) return;
-      const entryDate = parseGSheetTimestamp((row[tsKey360] || '').trim());
+      const entryDate = parseGSheetTimestamp((tsKey360 ? row[tsKey360] : '') || '');
       if (!entryDate || entryDate < monday || entryDate > sunday) return;
 
-      if (!userStats360[rowUser]) userStats360[rowUser] = { total: 0, rejected: 0 };
+      if (!userStats360[rowUser]) userStats360[rowUser] = { total: 0, doneCount: 0 };
       userStats360[rowUser].total++;
 
       if (reasonKey) {
         const val = (row[reasonKey] || '').trim().toLowerCase();
-        // Rejected = value exists and is NOT "done"
-        if (val && val !== 'done') userStats360[rowUser].rejected++;
+        if (val === 'done') userStats360[rowUser].doneCount++;
       }
     });
 
+    // rejected = total - done
+    Object.values(userStats360).forEach(s => { s.rejected = s.total - s.doneCount; });
     _id('qcs360Table').innerHTML = buildQcsHtml(userStats360);
   }
 }
@@ -844,6 +856,7 @@ function buildQcsHtml(userStats) {
   return `
     <div class="qcs-table-wrap">
       <table class="qcs-table">
+        <colgroup><col/><col/><col/></colgroup>
         <thead>
           <tr>
             <th>User</th>
